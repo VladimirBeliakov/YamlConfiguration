@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace Parser
 {
-	public class StreamReader : IDisposable
+	public class FileStreamReader : IDisposable
 	{
 		private readonly Stream _stream;
 
-		public StreamReader(Stream stream)
+		public FileStreamReader(Stream stream)
 		{
 			_stream = stream;
 		}

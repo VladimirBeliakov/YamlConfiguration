@@ -6,7 +6,7 @@ namespace Parser
 {
 	public class FileManager
 	{
-		public static Task<FileStream> FindFileForReadOnly(string path)
+		public static Task<FileStream> OpenFileForReadOnly(string path)
 		{
 			return Task.Run(() => File.OpenRead(path));
 		}

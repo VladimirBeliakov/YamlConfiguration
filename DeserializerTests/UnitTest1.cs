@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using NUnit.Framework;
+using Parser;
 
 namespace DeserializerTests
 {
@@ -10,9 +12,19 @@ namespace DeserializerTests
 		}
 
 		[Test]
-		public void Test1()
+		public async Task Test1()
 		{
-			Assert.Pass();
+			const string path = "..\\..\\..\\..\\TestConfigs\\TestConfig.yaml";
+			
+			var fileStream = await FileManager.OpenFileForReadOnly(path);
+
+			using var fileStreamReader = new FileStreamReader(fileStream);
+			var stringValue = await fileStreamReader.ReadString();
+
+
+			var deserializer = new Deserializer();
+
+			var deserializedResult = deserializer.Deserialize<object>(stringValue);
 		}
 	}
 }
