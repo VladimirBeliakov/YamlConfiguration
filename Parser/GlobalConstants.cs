@@ -1,10 +1,37 @@
+using System.Linq;
+
 namespace Parser
 {
 	public static class GlobalConstants
 	{
+		#region Unicode Characters Codes
+
+		private const string C0ControlBlock = "\u0000-\u001F";
+		private const char TAB = '\u0009';
+		private const char LF = '\u000A';
+		private const char CR = '\u000D';
+
+		private const char DEL = '\u007F';
+
+		private const string C1ControlBlock = "\u0080-\u009F";
+		private const char NEL = '\u0085';
+
+		private const string SurrogateBlock = "\uD800-\uDFFF\uFFFE\uFFFF";
+
+		#endregion
+		
 		public const int CharSequenceLength = 100;
 
 		public static readonly string CommentRegex =
 			$"(?: {{1,{CharSequenceLength}}}#.{{1,{CharSequenceLength * CharSequenceLength}}})?$";
+
+		public static readonly string SpacesRegex = $" {{1,{CharSequenceLength}}}";
+
+		public static readonly string ForbiddenChars =
+			C0ControlBlock.Except(new[] { TAB, LF, CR })
+				.Concat(C1ControlBlock.Except(new[] { NEL }))
+				.Concat(new[] { DEL })
+				.Concat(SurrogateBlock)
+				.ToString();
 	}
 }
