@@ -18,9 +18,9 @@ namespace Parser.TypeDefinitions
 			
 			Pair = new KeyValuePair<string, string>(match.Groups[1].Value, match.Groups[2].Value);
 		}
-		
+
 		private static readonly Regex _yamlMappingRegex = new Regex(
-			$"^([\\w]{{1,{GlobalConstants.CharSequenceLength}}}): {{1,{GlobalConstants.CharSequenceLength}}}" +
+			$"^([\\w]{{1,{GlobalConstants.CharSequenceLength}}}):{GlobalConstants.SpacesRegex}" +
 			$"(.{{1,{GlobalConstants.CharSequenceLength}}}?)" +
 			$"{GlobalConstants.CommentRegex}",
 			RegexOptions.Compiled

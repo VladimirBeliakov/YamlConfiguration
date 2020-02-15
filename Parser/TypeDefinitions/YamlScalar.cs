@@ -27,7 +27,7 @@ namespace Parser.TypeDefinitions
 		private static readonly Regex _yamlCollectionScalarRegex = 
 			new Regex(
 				$@"{_yamlScalarRegex.ToString().Replace(
-					"^", $"^ {{1,{GlobalConstants.CharSequenceLength}}}", StringComparison.Ordinal)}"
+					"^", $"^{GlobalConstants.SpacesRegex}", StringComparison.Ordinal)}"
 			);
 	}
 }
