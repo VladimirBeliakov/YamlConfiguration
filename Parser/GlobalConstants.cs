@@ -24,8 +24,9 @@ namespace Parser
 
 		private const string PrivateUseAreaToSpecialsBeginning = "\uE000-\uFFFD";
 
-		private const string LinearBSyllabaryToSupplementaryPrivateUseArea = "\u10000-\u10FFFF";
+		private const string LinearBSyllabaryToSupplementaryPrivateUseArea = "\U00010000-\U0010FFFF";
 
+		private const string BasicLatinToSupplementaryPrivateUseArea = "\u0020-\U0010FFFF";
 		#endregion
 
 		public const int CharSequenceLength = 100;
@@ -48,6 +49,11 @@ namespace Parser
 				.Concat(LatinSupplementToHangulJamo)
 				.Concat(PrivateUseAreaToSpecialsBeginning)
 				.Concat(LinearBSyllabaryToSupplementaryPrivateUseArea)
+				.ToString();
+
+		public static readonly string JsonCompatible =
+			new[] { TAB }
+				.Concat(BasicLatinToSupplementaryPrivateUseArea)
 				.ToString();
 	}
 }
