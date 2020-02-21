@@ -6,16 +6,20 @@ namespace Parser
 	{
 		#region Unicode Characters Codes
 
-		private const string C0ControlBlock = "\u0000-\u001F";
+		#region C0ControlBlock
+
+		private const string C0ControlBlockExceptTabLfCr = "\u0000-\u0008\u000B\u000C\u000E-\u001F";
 		private const char TAB = '\u0009';
 		private const char LF = '\u000A';
 		private const char CR = '\u000D';
+
+		#endregion
 
 		private const string BasicLatinSubset = "\u0020-\u007E";
 
 		private const char DEL = '\u007F';
 
-		private const string C1ControlBlock = "\u0080-\u009F";
+		private const string C1ControlBlockExceptNel = "\u0080-\u0084\u0086-\u009F";
 		private const char NEL = '\u0085';
 
 		private const string LatinSupplementToHangulJamo = "\u00A0-\uD7FF";
@@ -27,6 +31,7 @@ namespace Parser
 		private const string LinearBSyllabaryToSupplementaryPrivateUseArea = "\U00010000-\U0010FFFF";
 
 		private const string BasicLatinToSupplementaryPrivateUseArea = "\u0020-\U0010FFFF";
+
 		#endregion
 
 		public const int CharSequenceLength = 100;
@@ -36,24 +41,16 @@ namespace Parser
 
 		public static readonly string SpacesRegex = $" {{1,{CharSequenceLength}}}";
 
-		public static readonly string ForbiddenChars =
-			C0ControlBlock.Except(new[] { TAB, LF, CR })
-				.Concat(C1ControlBlock.Except(new[] { NEL }))
-				.Concat(new[] { DEL })
-				.Concat(SurrogateBlock)
-				.ToString();
+		public static readonly string ForbiddenCharsRegex =
+			C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock;
 
 		public static readonly string PrintableChars =
-			new[] { TAB, LF, CR, NEL }
-				.Concat(BasicLatinSubset)
-				.Concat(LatinSupplementToHangulJamo)
-				.Concat(PrivateUseAreaToSpecialsBeginning)
-				.Concat(LinearBSyllabaryToSupplementaryPrivateUseArea)
-				.ToString();
+			TAB + LF + CR + NEL +
+			BasicLatinSubset +
+			LatinSupplementToHangulJamo +
+			PrivateUseAreaToSpecialsBeginning +
+			LinearBSyllabaryToSupplementaryPrivateUseArea;
 
-		public static readonly string JsonCompatible =
-			new[] { TAB }
-				.Concat(BasicLatinToSupplementaryPrivateUseArea)
-				.ToString();
+		public static readonly string JsonCompatible = TAB + BasicLatinToSupplementaryPrivateUseArea;
 	}
 }
