@@ -40,6 +40,30 @@ namespace Parser
 
 		#endregion
 
+		#region Indicator Characters
+
+		public const string SequenceEntry = "\u002D";	// -
+		public const string MappingKey = "\u003F";		// ?
+		public const string MappingValue = "\u003A";	// :
+		public const string CollectEntry = "\u002C";	// ,
+		public const string SequenceStart = "\u005B";	// [
+		public const string SequenceEnd = "\u005D";		// ]
+		public const string MappingStart = "\u007B";	// {
+		public const string MappingEnd = "\u007D";		// }
+		public const string Comment = "\u0023";			// #
+		public const string Anchor = "\u0026";			// &
+		public const string Alias = "\u002A";			// *
+		public const string Tag = "\u0021";				// !
+		public const string Literal = "\u007C";			// |
+		public const string Folded = "\u003E";			// >
+		public const string SingleQuote = "\u0027";		// "
+		public const string DoubleQuote = "\u0022";		// "
+		public const string Directive = "\u0025";		// %
+		public const string ReservedChar1 = "\u0040";	// @
+		public const string ReservedChar2 = "\u0060";	// `
+
+		#endregion
+		
 		public const int CharSequenceLength = 100;
 
 		public static readonly string CommentRegex =
@@ -59,5 +83,8 @@ namespace Parser
 			     $"{LinearBSyllabaryToSupplementaryPrivateUseAreaRegex}";
 
 		public static readonly string JsonCompatibleRegex = $"[{TAB + BasicLatinToSupplementaryPrivateUseArea}]";
+
+		public static readonly string FlowIndicatorsRegex =
+			$"[{CollectEntry + SequenceStart + SequenceEnd + MappingStart + MappingEnd}]";
 	}
 }
