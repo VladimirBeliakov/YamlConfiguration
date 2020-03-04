@@ -15,6 +15,7 @@ namespace Parser
 
 		#endregion
 
+		private const string Space = "\u0020";
 		private const string BasicLatinSubset = "\u0020-\u007E";
 
 		private const string DEL = "\u007F";
@@ -86,5 +87,11 @@ namespace Parser
 
 		public static readonly string FlowIndicatorsRegex =
 			$"[{CollectEntry + SequenceStart + SequenceEnd + MappingStart + MappingEnd}]";
+
+		public static readonly string WindowsLineBreakRegex = $"[{CR + LF}]";
+		public static readonly string OldMacOsLineBreakRegex = $"{CR}";
+		public static readonly string UnixAndNewMacOsLineBreakRegex = $"{LF}";
+
+		public static readonly string WhiteSpaceCharsRegex = $"[{Space + TAB}]";
 	}
 }
