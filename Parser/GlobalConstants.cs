@@ -1,4 +1,5 @@
 using System.Linq;
+using Parser.TypeDefinitions;
 
 namespace Parser
 {
@@ -15,7 +16,7 @@ namespace Parser
 
 		#endregion
 
-		private const string Space = "\u0020";
+		private const string SPACE = "\u0020";
 		private const string BasicLatinSubset = "\u0020-\u007E";
 
 		private const string DEL = "\u007F";
@@ -67,10 +68,46 @@ namespace Parser
 		
 		public const int CharSequenceLength = 100;
 
-		public static readonly string CommentRegex =
-			$"(?: {{1,{CharSequenceLength}}}#.{{1,{CharSequenceLength * CharSequenceLength}}})?$";
+		private static readonly string Break = Environment.NewLine;
+		
+		private static readonly string Spaces = $"{SPACE}{{1,{CharSequenceLength}}}";
 
-		public static readonly string SpacesRegex = $" {{1,{CharSequenceLength}}}";
+		private static readonly string Indent = Spaces;
+
+		private static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharSequenceLength}}}";
+
+		private static string LinePrefix(BlockFlowInOut c)
+		{
+			switch (c)
+			{
+				case BlockFlowInOut.BlockOut:
+				case BlockFlowInOut.BlockIn:
+					return Indent;
+				case BlockFlowInOut.FlowOut:
+				case BlockFlowInOut.FlowIn:
+					return $"{Indent}({SeparateInLine})?";
+				default:
+					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlowInOut)} item {c}.");
+			}
+		}
+
+		private static string EmptyLine(BlockFlowInOut c)
+		{
+			return $"[{LinePrefix(c)}{Indent}]{Break}";
+		}
+
+		private static string TrimmedLine(BlockFlowInOut c)
+		{
+			return $"{Break}({EmptyLine(c)})+";
+		}
+
+		private static string FoldedLine(BlockFlowInOut c)
+		{
+			return $"{TrimmedLine(c)}{Break}";
+		}
+
+		public static readonly string CommentRegex =
+			$"(?:{Spaces}#.{{1,{CharSequenceLength * CharSequenceLength}}})?$";
 
 		public static readonly string ForbiddenCharsRegex =
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";
@@ -92,6 +129,6 @@ namespace Parser
 		public static readonly string OldMacOsLineBreakRegex = $"{CR}";
 		public static readonly string UnixAndNewMacOsLineBreakRegex = $"{LF}";
 
-		public static readonly string WhiteSpaceCharsRegex = $"[{Space + TAB}]";
+		public static readonly string WhiteSpaceCharsRegex = $"[{SPACE + TAB}]";
 	}
 }
