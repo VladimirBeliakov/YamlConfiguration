@@ -1,4 +1,4 @@
-using System.Linq;
+using System;
 using Parser.TypeDefinitions;
 
 namespace Parser
@@ -65,18 +65,18 @@ namespace Parser
 		public const string ReservedChar2 = "\u0060";	// `
 
 		#endregion
-		
+
 		public const int CharSequenceLength = 100;
 
-		private static readonly string Break = Environment.NewLine;
-		
-		private static readonly string Spaces = $"{SPACE}{{1,{CharSequenceLength}}}";
+		public static readonly string Break = $"({CR}{LF}?|{LF})";
 
-		private static readonly string Indent = Spaces;
+		public static readonly string Spaces = $"{SPACE}{{1,{CharSequenceLength}}}";
 
-		private static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharSequenceLength}}}";
+		public static readonly string Indent = Spaces;
 
-		private static string LinePrefix(BlockFlowInOut c)
+		public static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharSequenceLength}}}";
+
+		public static string LinePrefix(BlockFlowInOut c)
 		{
 			switch (c)
 			{
@@ -91,19 +91,19 @@ namespace Parser
 			}
 		}
 
-		private static string EmptyLine(BlockFlowInOut c)
+		public static string EmptyLine(BlockFlowInOut c)
 		{
 			return $"[{LinePrefix(c)}{Indent}]{Break}";
 		}
 
-		private static string TrimmedLine(BlockFlowInOut c)
+		public static string TrimmedLine(BlockFlowInOut c)
 		{
 			return $"{Break}({EmptyLine(c)})+";
 		}
 
-		private static string FoldedLine(BlockFlowInOut c)
+		public static string FoldedLine(BlockFlowInOut c)
 		{
-			return $"{TrimmedLine(c)}{Break}";
+			return $"{TrimmedLine(c)}|{Break}";
 		}
 
 		public static readonly string CommentRegex =
@@ -114,20 +114,16 @@ namespace Parser
 
 		public static readonly string PrintableCharsRegex =
 			@$"[{TAB + LF + CR + NEL + 
-			     BasicLatinSubset + 
-			     LatinSupplementToHangulJamo + 
-			     PrivateUseAreaToSpecialsBeginning}]" + 
+				 BasicLatinSubset + 
+				 LatinSupplementToHangulJamo + 
+				 PrivateUseAreaToSpecialsBeginning}]" + 
 				"|" +
-			     $"{LinearBSyllabaryToSupplementaryPrivateUseAreaRegex}";
+				 $"{LinearBSyllabaryToSupplementaryPrivateUseAreaRegex}";
 
 		public static readonly string JsonCompatibleRegex = $"[{TAB + BasicLatinToSupplementaryPrivateUseArea}]";
 
 		public static readonly string FlowIndicatorsRegex =
 			$"[{CollectEntry + SequenceStart + SequenceEnd + MappingStart + MappingEnd}]";
-
-		public static readonly string WindowsLineBreakRegex = $"[{CR + LF}]";
-		public static readonly string OldMacOsLineBreakRegex = $"{CR}";
-		public static readonly string UnixAndNewMacOsLineBreakRegex = $"{LF}";
 
 		public static readonly string WhiteSpaceCharsRegex = $"[{SPACE + TAB}]";
 	}

@@ -11,7 +11,7 @@ namespace Parser.TypeDefinitions
 		}
 		
 		private static readonly Regex _yamlMappingRegex = new Regex(
-			$"^([\\w]{{1,{GlobalConstants.CharSequenceLength}}}):{GlobalConstants.SpacesRegex}" +
+			$"^([\\w]{{1,{GlobalConstants.CharSequenceLength}}}):{GlobalConstants.Spaces}" +
 			$"(.{{1,{GlobalConstants.CharSequenceLength}}}?)" +
 			$"{GlobalConstants.CommentRegex}",
 			RegexOptions.Compiled

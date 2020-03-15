@@ -1,6 +1,6 @@
 namespace Parser.TypeDefinitions
 {
-	internal enum BlockFlowInOut : byte
+	public enum BlockFlowInOut : byte
 	{
 		BlockOut = 0,
 		BlockIn = 1,
