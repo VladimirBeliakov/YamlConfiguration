@@ -53,7 +53,7 @@ namespace DeserializerTests
 		[TestCase("Tab\tTab", 1)]
 		[TestCase("Space \tTab", 1)]
 		[TestCase("Tab\t Space", 1)]
-		[TestCaseSource(nameof(getSeparateInLineLongTestStrings))]
+		[TestCaseSource(nameof(getSeparateInLineLongTestStringsWithMatchCount))]
 		public void SeparateInLine_MatchesWhites(string value, int matchCount)
 		{
 			var matches = _separateInLineRegex.Matches(value);
@@ -69,32 +69,12 @@ namespace DeserializerTests
 			Assert.That(matches.Count, Is.EqualTo(0));
 		}
 
-		[TestCaseSource(nameof(getSeparateInLineTooLongTestStrings))]
+		[TestCaseSource(nameof(getSeparateInLineTooLongTestStringsWithMatchCount))]
 		public void SeparateInLine_TooLongString_MatchesTwice(string tooLongString, int matchCount)
 		{
 			var matches = _separateInLineRegex.Matches(tooLongString);
 
 			Assert.That(matches.Count, Is.EqualTo(matchCount));
-		}
-
-		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
-		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(BlockFlowInOut value, string expectedRegex)
-		{
-			var actualRegex = GlobalConstants.LinePrefix(value);
-
-			Assert.That(actualRegex, Is.EqualTo(expectedRegex));
-		}
-
-		// TODO: Add more cases.
-		[TestCase(BlockFlowInOut.BlockIn, " ABC")]
-		[TestCase(BlockFlowInOut.BlockOut," \tABC")]
-		public void LinePrefix_Block_MatchesOnlySpaces(BlockFlowInOut type, string value)
-		{
-			var regex = new Regex(GlobalConstants.LinePrefix(type));
-
-			var matches = regex.Matches(value);
-
-			Assert.That(matches.Count, Is.EqualTo(1));
 		}
 
 		private static readonly Regex forbiddenCharsRegex =
@@ -129,7 +109,7 @@ namespace DeserializerTests
 		private const string CR = "\u000D";
 		private const string NEL = "\u0085";
 
-		private static IEnumerable<TestCaseData> getSeparateInLineLongTestStrings()
+		private static IEnumerable<TestCaseData> getSeparateInLineLongTestStringsWithMatchCount()
 		{
 			yield return new TestCaseData(new String(Enumerable.Repeat(' ', 100).ToArray()), 1);
 			yield return new TestCaseData(new String(Enumerable.Repeat('\t', 100).ToArray()), 1);
@@ -137,7 +117,7 @@ namespace DeserializerTests
 				new String(Enumerable.Repeat('\t', 50).Concat(Enumerable.Repeat(' ', 50)).ToArray()), 1);
 		}
 
-		private static IEnumerable<TestCaseData> getSeparateInLineTooLongTestStrings()
+		private static IEnumerable<TestCaseData> getSeparateInLineTooLongTestStringsWithMatchCount()
 		{
 			yield return new TestCaseData(new String(Enumerable.Repeat(' ', 101).ToArray()), 2);
 			yield return new TestCaseData(new String(Enumerable.Repeat('\t', 101).ToArray()), 2);
@@ -145,14 +125,6 @@ namespace DeserializerTests
 				new String(Enumerable.Repeat(' ', 51).Concat(Enumerable.Repeat('\t', 50)).ToArray()), 2);
 			yield return new TestCaseData(
 				new String(Enumerable.Repeat('\t', 51).Concat(Enumerable.Repeat(' ', 50)).ToArray()), 2);
-		}
-
-		private static IEnumerable<TestCaseData> getBlockFlowWithCorrespondingRegex()
-		{
-			yield return new TestCaseData(BlockFlowInOut.BlockIn, " {1,100}");
-			yield return new TestCaseData(BlockFlowInOut.BlockOut, " {1,100}");
-			yield return new TestCaseData(BlockFlowInOut.FlowIn, " {1,100}([ \t]{1,100})?");
-			yield return new TestCaseData(BlockFlowInOut.FlowOut, " {1,100}([ \t]{1,100})?");
 		}
 
 		private readonly Regex _breakRegex = new Regex(GlobalConstants.Break, RegexOptions.Compiled);

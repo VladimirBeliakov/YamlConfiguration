@@ -72,7 +72,7 @@ namespace Parser
 
 		public static readonly string Spaces = $"{SPACE}{{1,{CharSequenceLength}}}";
 
-		public static readonly string Indent = Spaces;
+		public static readonly string Indent = $"^{Spaces}";
 
 		public static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharSequenceLength}}}";
 
