@@ -93,7 +93,7 @@ namespace Parser
 
 		public static string EmptyLine(BlockFlowInOut c)
 		{
-			return $"[{LinePrefix(c)}{Indent}]{Break}";
+			return $"(({LinePrefix(c)}{Break})?|(^{Break}))";
 		}
 
 		public static string TrimmedLine(BlockFlowInOut c)
