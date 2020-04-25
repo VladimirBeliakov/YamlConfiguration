@@ -170,7 +170,6 @@ namespace DeserializerTests
 			}
 		}
 
-		// TODO: Continue from here
 		private static IEnumerable<TestCaseData> getEmptyLineBlockFlowWithCorrespondingRegex()
 		{
 			var emptyLinePostfix = "(\r\n?|\n)";
