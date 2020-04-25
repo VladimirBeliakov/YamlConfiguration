@@ -19,9 +19,34 @@ namespace ParserTests
 			Assert.That(actualRegex, Is.EqualTo(expectedRegex));
 		}
 
+		private static IEnumerable<BlockFlowTestCase> getTrimmedLineBlockTestCases()
+		{
+			var oneHundredSpaces = new String(Enumerable.Repeat(' ', 100).ToArray());
+			var lineBreaks = new[] { "\r\n", "\r", "\n" };
+
+			foreach (var lineBreak in lineBreaks)
+			{
+				foreach (var type in BlockFlowCache.GetBlockTypes())
+				{
+					yield return new BlockFlowTestCase(
+						type, 
+						value: lineBreak + "\tABC\t  ",
+						wholeCapture: oneHundredSpaces + lineBreak,
+						firstParenthesisCapture: lineBreak
+					);
+					yield return new BlockFlowTestCase(
+						type, 
+						value: oneHundredSpaces + lineBreak + " ABC\t  ",
+						wholeCapture: oneHundredSpaces + lineBreak,
+						firstParenthesisCapture: lineBreak
+					);
+				}
+			}
+		}
+
 		private static IEnumerable<TestCaseData> getTrimmedLineBlockFlowWithCorrespondingRegex()
 		{
-			var emptyLinePostfix = "(\r\n?|\n)";
+			var emptyLine = "(\r\n?|\n)";
 			foreach (var value in BlockFlowCache.GetBlocksAndFlows())
 			{
 				switch (value)
@@ -30,14 +55,14 @@ namespace ParserTests
 					case BlockFlowInOut.BlockIn:
 						yield return new TestCaseData(
 							value,
-							$"{emptyLinePostfix}" + "(^ {1,100}" + emptyLinePostfix + ")+"
+							$"{emptyLine}" + "(^ {0,100}" + emptyLine + ")+"
 						);
 						break;
 					case BlockFlowInOut.FlowOut:
 					case BlockFlowInOut.FlowIn:
 						yield return new TestCaseData(
 							value,
-							$"{emptyLinePostfix}" + "(^ {1,100}([ \t]{1,100})?" + emptyLinePostfix + ")+"
+							$"{emptyLine}" + "(^ {0,100}([ \t]{1,100})?" + emptyLine + ")+"
 						);
 						break;
 					default:
@@ -45,7 +70,6 @@ namespace ParserTests
 				}
 			}
 		}
-
 
 		private static IReadOnlyDictionary<BlockFlowInOut, Regex> _trimmedLineRegex = BlockFlowCache.GetBlocksAndFlows()
 			.ToDictionary(

@@ -74,7 +74,7 @@ namespace ParserTests
 		[Test]
 		public void EmptyLine_NoSpacesAtBeginning_DoesNotMatch(
 			[ValueSource(nameof(GetBlocksAndFlows))] BlockFlowInOut type,
-			[Values("ABC   ", "\tABC   ")] string testValue
+			[Values("ABC\n   ", "\tABC\n   ", "ABC\r   ", "\tABC\r   ")] string testValue
 		)
 		{
 			var regex = _emptyLineBlockFlowRegexByType[type];
@@ -86,18 +86,18 @@ namespace ParserTests
 
 		private static IEnumerable<TestCaseData> getEmptyLineBlockFlowWithCorrespondingRegex()
 		{
-			var emptyLinePostfix = "(\r\n?|\n)";
+			var emptyLine = "(\r\n?|\n)";
 			foreach (var value in BlockFlowCache.GetBlocksAndFlows())
 			{
 				switch (value)
 				{
 					case BlockFlowInOut.BlockOut:
 					case BlockFlowInOut.BlockIn:
-						yield return new TestCaseData(value, "^ {1,100}" + emptyLinePostfix);
+						yield return new TestCaseData(value, "^ {0,100}" + emptyLine);
 						break;
 					case BlockFlowInOut.FlowOut:
 					case BlockFlowInOut.FlowIn:
-						yield return new TestCaseData(value, "^ {1,100}([ \t]{1,100})?" + emptyLinePostfix);
+						yield return new TestCaseData(value, "^ {0,100}([ \t]{1,100})?" + emptyLine);
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();
@@ -114,6 +114,12 @@ namespace ParserTests
 			{
 				foreach (var type in BlockFlowCache.GetBlockTypes())
 				{
+					yield return new BlockFlowTestCase(
+						type, 
+						value: String.Empty + lineBreak + "\tABC\t  ",
+						wholeCapture: String.Empty + lineBreak,
+						firstParenthesisCapture: lineBreak
+					);
 					yield return new BlockFlowTestCase(
 						type, 
 						value: oneHundredSpaces + lineBreak + "\tABC\t  ",
@@ -141,6 +147,13 @@ namespace ParserTests
 			{
 				foreach (var type in BlockFlowCache.GetFlowTypes())
 				{
+					yield return new BlockFlowTestCase(
+						type, 
+						value: String.Empty + "\t" + lineBreak + "ABC\t  ",
+						wholeCapture: String.Empty + "\t" + lineBreak,
+						firstParenthesisCapture: "\t",
+						secondParenthesisCapture: lineBreak
+					);
 					yield return new BlockFlowTestCase(
 						type, 
 						value: oneHundredSpaces + "\t" + lineBreak + "ABC\t  ",
@@ -188,7 +201,7 @@ namespace ParserTests
 		private static readonly IReadOnlyDictionary<BlockFlowInOut, Regex> _emptyLineBlockFlowRegexByType =
 			BlockFlowCache.GetBlocksAndFlows().ToDictionary(
 				i => i,
-				i => new Regex(GlobalConstants.EmptyLine(i), RegexOptions.Compiled)
+				i => new Regex(GlobalConstants.EmptyLine(i), RegexOptions.Compiled | RegexOptions.Multiline)
 			);
 	}
 }

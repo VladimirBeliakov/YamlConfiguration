@@ -60,19 +60,6 @@ namespace ParserTests
 			});
 		}
 
-		[Test]
-		public void LinePrefix_NoSpacesAtBeginning_DoesNotMatch(
-			[ValueSource(nameof(GetBlocksAndFlows))] BlockFlowInOut type,
-			[Values("ABC   ", "\tABC   ")] string testValue
-		)
-		{
-			var regex = _linePrefixBlockFlowRegexByType[type];
-
-			var matches = regex.Matches(testValue);
-
-			Assert.That(matches.Count, Is.EqualTo(0));
-		}
-
 		private static IEnumerable<TestCaseData> getLinePrefixBlockFlowWithCorrespondingRegex()
 		{
 			foreach (var value in BlockFlowCache.GetBlocksAndFlows())
@@ -81,11 +68,11 @@ namespace ParserTests
 				{
 					case BlockFlowInOut.BlockOut:
 					case BlockFlowInOut.BlockIn:
-						yield return new TestCaseData(value, "^ {1,100}");
+						yield return new TestCaseData(value, "^ {0,100}");
 						break;
 					case BlockFlowInOut.FlowOut:
 					case BlockFlowInOut.FlowIn:
-						yield return new TestCaseData(value, "^ {1,100}([ \t]{1,100})?");
+						yield return new TestCaseData(value, "^ {0,100}([ \t]{1,100})?");
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();
@@ -99,6 +86,11 @@ namespace ParserTests
 
 			foreach (var type in BlockFlowCache.GetBlockTypes())
 			{
+				yield return new BlockFlowTestCase(
+					type, 
+					value: String.Empty + "\tABC\t  ",
+					wholeCapture: String.Empty
+				);
 				yield return new BlockFlowTestCase(
 					type, 
 					value: oneHundredSpaces + "\tABC\t  ",
@@ -120,6 +112,12 @@ namespace ParserTests
 			
 			foreach (var type in BlockFlowCache.GetFlowTypes())
 			{
+				yield return new BlockFlowTestCase(
+					type, 
+					value: "\tABC\t  ",
+					wholeCapture: "\t",
+					firstParenthesisCapture: "\t"
+				);
 				yield return new BlockFlowTestCase(
 					type, 
 					value: oneHundredSpaces + "\tABC\t  ",
@@ -153,15 +151,10 @@ namespace ParserTests
 			}
 		}
 
-		private static IEnumerable<BlockFlowInOut> GetBlocksAndFlows()
-		{
-			return BlockFlowCache.GetBlocksAndFlows();
-		}
-
 		private static readonly IReadOnlyDictionary<BlockFlowInOut, Regex> _linePrefixBlockFlowRegexByType =
 			BlockFlowCache.GetBlocksAndFlows().ToDictionary(
 				i => i,
-				i => new Regex(GlobalConstants.LinePrefix(i), RegexOptions.Compiled)
+				i => new Regex(GlobalConstants.LinePrefix(i), RegexOptions.Compiled | RegexOptions.Multiline)
 			);
 	}
 }
