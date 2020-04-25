@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Parser;
 
-namespace DeserializerTests
+namespace ParserTests
 {
 	// TODO: Add more characters to the test cases.
 	[TestFixture, Parallelizable(ParallelScope.Children)]

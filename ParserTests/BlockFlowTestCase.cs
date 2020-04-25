@@ -1,6 +1,6 @@
 using Parser.TypeDefinitions;
 
-namespace DeserializerTests
+namespace ParserTests
 {
 	public class BlockFlowTestCase
 	{

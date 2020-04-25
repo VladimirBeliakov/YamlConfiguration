@@ -2,7 +2,7 @@ using NUnit.Framework;
 using Parser.Exceptions;
 using Parser.TypeDefinitions;
 
-namespace DeserializerTests
+namespace ParserTests
 {
 	[TestFixture, Parallelizable(ParallelScope.Children)]
 	public class YamlMappingTests
