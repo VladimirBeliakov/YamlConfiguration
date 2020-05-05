@@ -86,18 +86,18 @@ namespace ParserTests
 
 		private static IEnumerable<TestCaseData> getEmptyLineBlockFlowWithCorrespondingRegex()
 		{
-			var emptyLine = "(\r\n?|\n)";
-			foreach (var value in BlockFlowCache.GetBlocksAndFlows())
+			var newLine = "(\r\n?|\n)";
+			foreach (var value in BlockFlowCache.GetBlockAndFlowTypes())
 			{
 				switch (value)
 				{
 					case BlockFlowInOut.BlockOut:
 					case BlockFlowInOut.BlockIn:
-						yield return new TestCaseData(value, "^ {0,100}" + emptyLine);
+						yield return new TestCaseData(value, "^ {0,100}" + newLine);
 						break;
 					case BlockFlowInOut.FlowOut:
 					case BlockFlowInOut.FlowIn:
-						yield return new TestCaseData(value, "^ {0,100}([ \t]{1,100})?" + emptyLine);
+						yield return new TestCaseData(value, "^ {0,100}([ \t]{1,100})?" + newLine);
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();
@@ -108,29 +108,29 @@ namespace ParserTests
 		private static IEnumerable<BlockFlowTestCase> getEmptyLineBlockTestCases()
 		{
 			var oneHundredSpaces = new String(Enumerable.Repeat(' ', 100).ToArray());
-			var lineBreaks = new[] { "\r\n", "\r", "\n" };
+			var newLines = new[] { "\r\n", "\r", "\n" };
 
-			foreach (var lineBreak in lineBreaks)
+			foreach (var newLine in newLines)
 			{
 				foreach (var type in BlockFlowCache.GetBlockTypes())
 				{
 					yield return new BlockFlowTestCase(
 						type, 
-						value: String.Empty + lineBreak + "\tABC\t  ",
-						wholeCapture: String.Empty + lineBreak,
-						firstParenthesisCapture: lineBreak
+						value: String.Empty + newLine + "\tABC\t  ",
+						wholeCapture: String.Empty + newLine,
+						firstParenthesisCapture: newLine
 					);
 					yield return new BlockFlowTestCase(
 						type, 
-						value: oneHundredSpaces + lineBreak + "\tABC\t  ",
-						wholeCapture: oneHundredSpaces + lineBreak,
-						firstParenthesisCapture: lineBreak
+						value: oneHundredSpaces + newLine + "\tABC\t  ",
+						wholeCapture: oneHundredSpaces + newLine,
+						firstParenthesisCapture: newLine
 					);
 					yield return new BlockFlowTestCase(
 						type, 
-						value: oneHundredSpaces + lineBreak + " ABC\t  ",
-						wholeCapture: oneHundredSpaces + lineBreak,
-						firstParenthesisCapture: lineBreak
+						value: oneHundredSpaces + newLine + " ABC\t  ",
+						wholeCapture: oneHundredSpaces + newLine,
+						firstParenthesisCapture: newLine
 					);
 				}
 			}
@@ -139,55 +139,54 @@ namespace ParserTests
 		private static IEnumerable<BlockFlowTestCase> getEmptyLineFlowTestCases()
 		{
 			var oneHundredSpaces = new String(Enumerable.Repeat(' ', 100).ToArray());
-			var oneHundredSpacesAndTabs =
-				new String(Enumerable.Repeat('\t', 50).Concat(Enumerable.Repeat(' ', 50)).ToArray());
-			var lineBreaks = new[] { "\r\n", "\r", "\n" };
+			var oneHundredSpacesAndTabs = String.Join(String.Empty, Enumerable.Repeat("\t ", 50));
+			var newLines = new[] { "\r\n", "\r", "\n" };
 
-			foreach (var lineBreak in lineBreaks)
+			foreach (var newLine in newLines)
 			{
 				foreach (var type in BlockFlowCache.GetFlowTypes())
 				{
 					yield return new BlockFlowTestCase(
 						type, 
-						value: String.Empty + "\t" + lineBreak + "ABC\t  ",
-						wholeCapture: String.Empty + "\t" + lineBreak,
+						value: String.Empty + "\t" + newLine + "ABC\t  ",
+						wholeCapture: String.Empty + "\t" + newLine,
 						firstParenthesisCapture: "\t",
-						secondParenthesisCapture: lineBreak
+						secondParenthesisCapture: newLine
 					);
 					yield return new BlockFlowTestCase(
 						type, 
-						value: oneHundredSpaces + "\t" + lineBreak + "ABC\t  ",
-						wholeCapture: oneHundredSpaces + "\t" + lineBreak,
+						value: oneHundredSpaces + "\t" + newLine + "ABC\t  ",
+						wholeCapture: oneHundredSpaces + "\t" + newLine,
 						firstParenthesisCapture: "\t",
-						secondParenthesisCapture: lineBreak
+						secondParenthesisCapture: newLine
 					);
 					yield return new BlockFlowTestCase(
 						type, 
-						value: oneHundredSpaces + " " + lineBreak + "ABC\t  ",
-						wholeCapture: oneHundredSpaces + " " + lineBreak,
+						value: oneHundredSpaces + " " + newLine + "ABC\t  ",
+						wholeCapture: oneHundredSpaces + " " + newLine,
 						firstParenthesisCapture: " ",
-						secondParenthesisCapture: lineBreak
+						secondParenthesisCapture: newLine
 					);
 					yield return new BlockFlowTestCase(
 						type, 
-						value: oneHundredSpaces + " \t" + lineBreak + "ABC\t  ",
-						wholeCapture: oneHundredSpaces + " \t" + lineBreak,
+						value: oneHundredSpaces + " \t" + newLine + "ABC\t  ",
+						wholeCapture: oneHundredSpaces + " \t" + newLine,
 						firstParenthesisCapture: " \t",
-						secondParenthesisCapture: lineBreak
+						secondParenthesisCapture: newLine
 					);
 					yield return new BlockFlowTestCase(
 						type, 
-						value: oneHundredSpaces + "\t " + lineBreak + "ABC\t  ",
-						wholeCapture: oneHundredSpaces + "\t " + lineBreak,
+						value: oneHundredSpaces + "\t " + newLine + "ABC\t  ",
+						wholeCapture: oneHundredSpaces + "\t " + newLine,
 						firstParenthesisCapture: "\t ",
-						secondParenthesisCapture: lineBreak
+						secondParenthesisCapture: newLine
 					);
 					yield return new BlockFlowTestCase(
 						type, 
-						value: oneHundredSpaces + oneHundredSpacesAndTabs + lineBreak + "\t ABC\t  ",
-						wholeCapture: oneHundredSpaces + oneHundredSpacesAndTabs + lineBreak,
+						value: oneHundredSpaces + oneHundredSpacesAndTabs + newLine + "\t ABC\t  ",
+						wholeCapture: oneHundredSpaces + oneHundredSpacesAndTabs + newLine,
 						firstParenthesisCapture: oneHundredSpacesAndTabs,
-						secondParenthesisCapture: lineBreak
+						secondParenthesisCapture: newLine
 					);
 				}
 			}
@@ -195,13 +194,13 @@ namespace ParserTests
 
 		private static IEnumerable<BlockFlowInOut> GetBlocksAndFlows()
 		{
-			return BlockFlowCache.GetBlocksAndFlows();
+			return BlockFlowCache.GetBlockAndFlowTypes();
 		}
 
 		private static readonly IReadOnlyDictionary<BlockFlowInOut, Regex> _emptyLineBlockFlowRegexByType =
-			BlockFlowCache.GetBlocksAndFlows().ToDictionary(
+			BlockFlowCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
-				i => new Regex(GlobalConstants.EmptyLine(i), RegexOptions.Compiled | RegexOptions.Multiline)
+				i => new Regex(GlobalConstants.EmptyLine(i), RegexOptions.Compiled)
 			);
 	}
 }

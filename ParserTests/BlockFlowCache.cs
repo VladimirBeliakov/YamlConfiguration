@@ -7,14 +7,14 @@ namespace ParserTests
 {
 	internal static class BlockFlowCache
 	{
-		public static IEnumerable<BlockFlowInOut> GetBlocksAndFlows()
+		public static IEnumerable<BlockFlowInOut> GetBlockAndFlowTypes()
 		{
 			return Enum.GetValues(typeof(BlockFlowInOut)).Cast<BlockFlowInOut>();
 		}
 
 		public static IEnumerable<BlockFlowInOut> GetBlockTypes()
 		{
-			return GetBlocksAndFlows().Except(GetFlowTypes());
+			return GetBlockAndFlowTypes().Except(GetFlowTypes());
 		}
 
 		public static IEnumerable<BlockFlowInOut> GetFlowTypes()

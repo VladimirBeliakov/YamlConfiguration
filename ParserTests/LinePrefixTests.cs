@@ -62,7 +62,7 @@ namespace ParserTests
 
 		private static IEnumerable<TestCaseData> getLinePrefixBlockFlowWithCorrespondingRegex()
 		{
-			foreach (var value in BlockFlowCache.GetBlocksAndFlows())
+			foreach (var value in BlockFlowCache.GetBlockAndFlowTypes())
 			{
 				switch (value)
 				{
@@ -107,8 +107,7 @@ namespace ParserTests
 		private static IEnumerable<BlockFlowTestCase> getLinePrefixFlowTestCases()
 		{
 			var oneHundredSpaces = new String(Enumerable.Repeat(' ', 100).ToArray());
-			var oneHundredSpacesAndTabs =
-				new String(Enumerable.Repeat('\t', 50).Concat(Enumerable.Repeat(' ', 50)).ToArray());
+			var oneHundredSpacesAndTabs = String.Join(String.Empty, Enumerable.Repeat("\t ", 50));
 			
 			foreach (var type in BlockFlowCache.GetFlowTypes())
 			{
@@ -152,9 +151,9 @@ namespace ParserTests
 		}
 
 		private static readonly IReadOnlyDictionary<BlockFlowInOut, Regex> _linePrefixBlockFlowRegexByType =
-			BlockFlowCache.GetBlocksAndFlows().ToDictionary(
+			BlockFlowCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
-				i => new Regex(GlobalConstants.LinePrefix(i), RegexOptions.Compiled | RegexOptions.Multiline)
+				i => new Regex(GlobalConstants.LinePrefix(i), RegexOptions.Compiled)
 			);
 	}
 }

@@ -72,33 +72,37 @@ namespace Parser
 
 		public static readonly string Spaces = $"{SPACE}{{1,{CharSequenceLength}}}";
 
-		public static readonly string Indent = $"^{SPACE}{{0,{CharSequenceLength}}}";
+		private static readonly string _anchoredIndent = $"^{SPACE}{{0,{CharSequenceLength}}}";
+
+		private static readonly string _indent = $"{SPACE}{{0,{CharSequenceLength}}}";
 
 		public static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharSequenceLength}}}";
 
-		public static string LinePrefix(BlockFlowInOut c)
+		public static string LinePrefix(BlockFlowInOut c, bool anchoredIndent = true)
 		{
+			var indent = anchoredIndent ? _anchoredIndent : _indent;
+	
 			switch (c)
 			{
 				case BlockFlowInOut.BlockOut:
 				case BlockFlowInOut.BlockIn:
-					return Indent;
+					return indent;
 				case BlockFlowInOut.FlowOut:
 				case BlockFlowInOut.FlowIn:
-					return $"{Indent}({SeparateInLine})?";
+					return $"{indent}({SeparateInLine})?";
 				default:
 					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlowInOut)} item {c}.");
 			}
 		}
 
-		public static string EmptyLine(BlockFlowInOut c)
+		public static string EmptyLine(BlockFlowInOut c, bool anchoredIndent = true)
 		{
-			return $"{LinePrefix(c)}{Break}";
+			return $"{LinePrefix(c, anchoredIndent)}{Break}";
 		}
 
 		public static string TrimmedLine(BlockFlowInOut c)
 		{
-			return $"{Break}({EmptyLine(c)})+";
+			return $"{Break}({EmptyLine(c, anchoredIndent: false)})+";
 		}
 
 		public static string FoldedLine(BlockFlowInOut c)
