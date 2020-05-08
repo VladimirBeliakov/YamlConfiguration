@@ -68,7 +68,7 @@ namespace Parser
 
 		public const int CharSequenceLength = 100;
 
-		public static readonly string Break = $"({CR}{LF}?|{LF})";
+		public static readonly string Break = $"{Environment.NewLine}";
 
 		public static readonly string Spaces = $"{SPACE}{{1,{CharSequenceLength}}}";
 

@@ -25,15 +25,8 @@ namespace ParserTests
 			Assert.True(printableCharsRegex.IsMatch(testString));
 		}
 
-		[TestCase("ABC\rABC", 1)]
-		[TestCase("ABC\nABC", 1)]
-		[TestCase("ABC\r\nABC", 1)]
-		[TestCase("ABC\r\rABC", 2)]
-		[TestCase("ABC\n\nABC", 2)]
-		[TestCase("ABC\r\n\r\nABC", 2)]
-		[TestCase(@"ABC
-					ABC", 1)]
-		public void BreakRegex_MatchesCrAndLf(string value, int matchCount)
+		[TestCaseSource(nameof(getBreakMatchableCases))]
+		public void BreakRegex_MatchesNewLine(string value, int matchCount)
 		{
 			var matches = _breakRegex.Matches(value);
 
@@ -103,6 +96,15 @@ namespace ParserTests
 			yield return NEL;
 		}
 
+		private static IEnumerable<TestCaseData> getBreakMatchableCases()
+		{
+			var newLine = Environment.NewLine;
+			yield return new TestCaseData($"ABC{newLine}ABC", 1);
+			yield return new TestCaseData($"ABC{newLine}{newLine}ABC", 2);
+			yield return new TestCaseData(@"ABC 
+											ABC", 1);
+		}
+
 		private const string TAB = "\u0009";
 		private const string LF = "\u000A";
 		private const string CR = "\u000D";
@@ -110,20 +112,19 @@ namespace ParserTests
 
 		private static IEnumerable<TestCaseData> getSeparateInLineLongTestStringsWithMatchCount()
 		{
-			yield return new TestCaseData(new String(Enumerable.Repeat(' ', 100).ToArray()), 1);
-			yield return new TestCaseData(new String(Enumerable.Repeat('\t', 100).ToArray()), 1);
-			yield return new TestCaseData(
-				new String(Enumerable.Repeat('\t', 50).Concat(Enumerable.Repeat(' ', 50)).ToArray()), 1);
+			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat(' ', 100)), 1);
+			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat('\t', 100)), 1);
+			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat("\t ", 50)), 1);
 		}
 
 		private static IEnumerable<TestCaseData> getSeparateInLineTooLongTestStringsWithMatchCount()
 		{
-			yield return new TestCaseData(new String(Enumerable.Repeat(' ', 101).ToArray()), 2);
-			yield return new TestCaseData(new String(Enumerable.Repeat('\t', 101).ToArray()), 2);
+			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat(' ', 101)), 2);
+			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat('\t', 101).ToArray()), 2);
 			yield return new TestCaseData(
-				new String(Enumerable.Repeat(' ', 51).Concat(Enumerable.Repeat('\t', 50)).ToArray()), 2);
+				String.Join(String.Empty, Enumerable.Repeat(' ', 51).Concat(Enumerable.Repeat('\t', 50))), 2);
 			yield return new TestCaseData(
-				new String(Enumerable.Repeat('\t', 51).Concat(Enumerable.Repeat(' ', 50)).ToArray()), 2);
+				String.Join(String.Empty, Enumerable.Repeat('\t', 51).Concat(Enumerable.Repeat(' ', 50))), 2);
 		}
 
 		private readonly Regex _breakRegex = new Regex(GlobalConstants.Break, RegexOptions.Compiled);

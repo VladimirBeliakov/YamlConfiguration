@@ -29,11 +29,9 @@ namespace ParserTests
 			Assert.That(matches.Count, Is.EqualTo(1));
 			Assert.Multiple(() =>
 			{
-				Assert.That(matches[0].Groups.Count, Is.EqualTo(2));
+				Assert.That(matches[0].Groups.Count, Is.EqualTo(1));
 				Assert.That(matches[0].Groups[0].Captures.Count, Is.EqualTo(1));
 				Assert.That(matches[0].Groups[0].Captures[0].Value, Is.EqualTo(testCase.WholeCapture));
-				Assert.That(matches[0].Groups[1].Captures.Count, Is.EqualTo(1));
-				Assert.That(matches[0].Groups[1].Captures[0].Value, Is.EqualTo(testCase.FirstParenthesisCapture));
 			});
 		}
 
@@ -47,7 +45,7 @@ namespace ParserTests
 			Assert.That(matches.Count, Is.EqualTo(1));
 			Assert.Multiple(() =>
 			{
-				Assert.That(matches[0].Groups.Count, Is.EqualTo(3));
+				Assert.That(matches[0].Groups.Count, Is.EqualTo(2));
 				Assert.That(matches[0].Groups[0].Captures.Count, Is.EqualTo(1));
 				Assert.That(matches[0].Groups[0].Captures[0].Value, Is.EqualTo(testCase.WholeCapture));
 				if (testCase.FirstParenthesisCapture is null)
@@ -59,34 +57,25 @@ namespace ParserTests
 					Assert.That(matches[0].Groups[1].Captures.Count, Is.EqualTo(1));
 					Assert.That(matches[0].Groups[1].Captures[0].Value, Is.EqualTo(testCase.FirstParenthesisCapture));
 				}
-				if (testCase.SecondParenthesisCapture is null)
-				{
-					Assert.That(matches[0].Groups[2].Value, Is.Empty);
-				}
-				else
-				{
-					Assert.That(matches[0].Groups[2].Captures.Count, Is.EqualTo(1));
-					Assert.That(matches[0].Groups[2].Captures[0].Value, Is.EqualTo(testCase.SecondParenthesisCapture));
-				}
 			});
 		}
 
 		[Test]
 		public void EmptyLine_NoSpacesAtBeginning_DoesNotMatch(
 			[ValueSource(nameof(GetBlocksAndFlows))] BlockFlowInOut type,
-			[Values("ABC\n   ", "\tABC\n   ", "ABC\r   ", "\tABC\r   ")] string testValue
+			[ValueSource(nameof(getEmptyLineNonMatchableCases))] string testValue
 		)
 		{
 			var regex = _emptyLineBlockFlowRegexByType[type];
 
-			var matches = regex.Matches(testValue);
+			var match = regex.Match(testValue);
 
-			Assert.That(matches.Count, Is.EqualTo(0));
+			Assert.False(match.Success);
 		}
 
 		private static IEnumerable<TestCaseData> getEmptyLineBlockFlowWithCorrespondingRegex()
 		{
-			var newLine = "(\r\n?|\n)";
+			var newLine = Environment.NewLine;
 			foreach (var value in BlockFlowCache.GetBlockAndFlowTypes())
 			{
 				switch (value)
@@ -107,89 +96,56 @@ namespace ParserTests
 
 		private static IEnumerable<BlockFlowTestCase> getEmptyLineBlockTestCases()
 		{
-			var oneHundredSpaces = new String(Enumerable.Repeat(' ', 100).ToArray());
-			var newLines = new[] { "\r\n", "\r", "\n" };
+			var oneHundredSpaces = String.Join(String.Empty, Enumerable.Repeat(' ', 100));
+			var newLine = Environment.NewLine;
 
-			foreach (var newLine in newLines)
+			foreach (var type in BlockFlowCache.GetBlockTypes())
 			{
-				foreach (var type in BlockFlowCache.GetBlockTypes())
-				{
-					yield return new BlockFlowTestCase(
-						type, 
-						value: String.Empty + newLine + "\tABC\t  ",
-						wholeCapture: String.Empty + newLine,
-						firstParenthesisCapture: newLine
-					);
-					yield return new BlockFlowTestCase(
-						type, 
-						value: oneHundredSpaces + newLine + "\tABC\t  ",
-						wholeCapture: oneHundredSpaces + newLine,
-						firstParenthesisCapture: newLine
-					);
-					yield return new BlockFlowTestCase(
-						type, 
-						value: oneHundredSpaces + newLine + " ABC\t  ",
-						wholeCapture: oneHundredSpaces + newLine,
-						firstParenthesisCapture: newLine
-					);
-				}
+				yield return new BlockFlowTestCase(
+					type, 
+					value: String.Empty + newLine + "\tABC\t  ",
+					wholeCapture: String.Empty + newLine
+				);
+				yield return new BlockFlowTestCase(
+					type, 
+					value: oneHundredSpaces + newLine + "\tABC\t  ",
+					wholeCapture: oneHundredSpaces + newLine
+				);
 			}
 		}
 
 		private static IEnumerable<BlockFlowTestCase> getEmptyLineFlowTestCases()
 		{
-			var oneHundredSpaces = new String(Enumerable.Repeat(' ', 100).ToArray());
+			var oneHundredSpaces = String.Join(String.Empty, Enumerable.Repeat(' ', 100));
 			var oneHundredSpacesAndTabs = String.Join(String.Empty, Enumerable.Repeat("\t ", 50));
-			var newLines = new[] { "\r\n", "\r", "\n" };
+			var newLine = Environment.NewLine;
 
-			foreach (var newLine in newLines)
+			foreach (var type in BlockFlowCache.GetFlowTypes())
 			{
-				foreach (var type in BlockFlowCache.GetFlowTypes())
-				{
-					yield return new BlockFlowTestCase(
-						type, 
-						value: String.Empty + "\t" + newLine + "ABC\t  ",
-						wholeCapture: String.Empty + "\t" + newLine,
-						firstParenthesisCapture: "\t",
-						secondParenthesisCapture: newLine
-					);
-					yield return new BlockFlowTestCase(
-						type, 
-						value: oneHundredSpaces + "\t" + newLine + "ABC\t  ",
-						wholeCapture: oneHundredSpaces + "\t" + newLine,
-						firstParenthesisCapture: "\t",
-						secondParenthesisCapture: newLine
-					);
-					yield return new BlockFlowTestCase(
-						type, 
-						value: oneHundredSpaces + " " + newLine + "ABC\t  ",
-						wholeCapture: oneHundredSpaces + " " + newLine,
-						firstParenthesisCapture: " ",
-						secondParenthesisCapture: newLine
-					);
-					yield return new BlockFlowTestCase(
-						type, 
-						value: oneHundredSpaces + " \t" + newLine + "ABC\t  ",
-						wholeCapture: oneHundredSpaces + " \t" + newLine,
-						firstParenthesisCapture: " \t",
-						secondParenthesisCapture: newLine
-					);
-					yield return new BlockFlowTestCase(
-						type, 
-						value: oneHundredSpaces + "\t " + newLine + "ABC\t  ",
-						wholeCapture: oneHundredSpaces + "\t " + newLine,
-						firstParenthesisCapture: "\t ",
-						secondParenthesisCapture: newLine
-					);
-					yield return new BlockFlowTestCase(
-						type, 
-						value: oneHundredSpaces + oneHundredSpacesAndTabs + newLine + "\t ABC\t  ",
-						wholeCapture: oneHundredSpaces + oneHundredSpacesAndTabs + newLine,
-						firstParenthesisCapture: oneHundredSpacesAndTabs,
-						secondParenthesisCapture: newLine
-					);
-				}
+				yield return new BlockFlowTestCase(
+					type, 
+					value: String.Empty + newLine + "ABC\t  ",
+					wholeCapture: String.Empty + newLine
+				);
+				yield return new BlockFlowTestCase(
+					type, 
+					value: oneHundredSpaces + newLine + "ABC\t  ",
+					wholeCapture: oneHundredSpaces + newLine
+				);
+				yield return new BlockFlowTestCase(
+					type, 
+					value: oneHundredSpaces + oneHundredSpacesAndTabs + newLine + "\t ABC\t  ",
+					wholeCapture: oneHundredSpaces + oneHundredSpacesAndTabs + newLine,
+					firstParenthesisCapture: oneHundredSpacesAndTabs
+				);
 			}
+		}
+
+		private static IEnumerable<string> getEmptyLineNonMatchableCases()
+		{
+			var newLine = Environment.NewLine;
+			yield return $"ABC  {newLine}  ";
+			yield return $"ABC\t{newLine}\t";
 		}
 
 		private static IEnumerable<BlockFlowInOut> GetBlocksAndFlows()
