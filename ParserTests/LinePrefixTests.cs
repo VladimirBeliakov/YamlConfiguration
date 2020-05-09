@@ -11,7 +11,7 @@ namespace ParserTests
 	[TestFixture, Parallelizable(ParallelScope.Children)]
 	public class LinePrefixTests
 	{
-		[TestCaseSource(nameof(getLinePrefixBlockFlowWithCorrespondingRegex))]
+		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
 		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(BlockFlowInOut value, string expectedRegex)
 		{
 			var actualRegex = GlobalConstants.LinePrefix(value);
@@ -19,50 +19,31 @@ namespace ParserTests
 			Assert.That(actualRegex, Is.EqualTo(expectedRegex));
 		}
 
-		[TestCaseSource(nameof(getLinePrefixBlockTestCases))]
+		[TestCaseSource(nameof(getBlockTestCases))]
 		public void LinePrefix_Blocks_SpacesAtBeginning_Matches(BlockFlowTestCase testCase)
 		{
 			var regex = _linePrefixBlockFlowRegexByType[testCase.Type];
 
-			var matches = regex.Matches(testCase.Value);
+			var match = regex.Match(testCase.TestValue);
 
-			Assert.That(matches.Count, Is.EqualTo(1));
-			Assert.Multiple(() =>
-			{
-				Assert.That(matches[0].Groups.Count, Is.EqualTo(1));
-				Assert.That(matches[0].Groups[0].Captures.Count, Is.EqualTo(1));
-				Assert.That(matches[0].Groups[0].Captures[0].Value, Is.EqualTo(testCase.WholeCapture));
-			});
+			Assert.That(match.Value, Is.EqualTo(testCase.WholeCapture));
 		}
 
-		[TestCaseSource(nameof(getLinePrefixFlowTestCases))]
+		[TestCaseSource(nameof(getFlowTestCases))]
 		public void LinePrefix_Flows_SpacesAndTabsAtBeginning_Matches(BlockFlowTestCase testCase)
 		{
 			var regex = _linePrefixBlockFlowRegexByType[testCase.Type];
 
-			var matches = regex.Matches(testCase.Value);
+			var match = regex.Match(testCase.TestValue);
 
-			Assert.That(matches.Count, Is.EqualTo(1));
-			Assert.Multiple(() =>
-			{
-				Assert.That(matches[0].Groups.Count, Is.EqualTo(2));
-				Assert.That(matches[0].Groups[0].Captures.Count, Is.EqualTo(1));
-				Assert.That(matches[0].Groups[0].Captures[0].Value, Is.EqualTo(testCase.WholeCapture));
-				if (String.IsNullOrEmpty(testCase.FirstParenthesisCapture))
-				{
-					Assert.That(matches[0].Groups[1].Value, Is.Empty);
-				}
-				else
-				{
-					Assert.That(matches[0].Groups[1].Captures.Count, Is.EqualTo(1));
-					Assert.That(matches[0].Groups[1].Captures[0].Value, Is.EqualTo(testCase.FirstParenthesisCapture));
-				}
-			});
+			Assert.That(match.Value, Is.EqualTo(testCase.WholeCapture));
 		}
 
-		private static IEnumerable<TestCaseData> getLinePrefixBlockFlowWithCorrespondingRegex()
+		// TODO: Think about how negative cases could be tested.
+
+		private static IEnumerable<TestCaseData> getBlockFlowWithCorrespondingRegex()
 		{
-			foreach (var value in BlockFlowCache.GetBlockAndFlowTypes())
+			foreach (var value in EnumCache.GetBlockAndFlowTypes())
 			{
 				switch (value)
 				{
@@ -72,7 +53,7 @@ namespace ParserTests
 						break;
 					case BlockFlowInOut.FlowOut:
 					case BlockFlowInOut.FlowIn:
-						yield return new TestCaseData(value, "^ {0,100}([ \t]{1,100})?");
+						yield return new TestCaseData(value, "^ {0,100}(?:[ \t]{1,100})?");
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();
@@ -80,78 +61,47 @@ namespace ParserTests
 			}
 		}
 
-		private static IEnumerable<BlockFlowTestCase> getLinePrefixBlockTestCases()
+		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(BlockFlowInOut type)
 		{
-			var oneHundredSpaces = new String(Enumerable.Repeat(' ', 100).ToArray());
+			var spaces = CharCache.Spaces;
 
-			foreach (var type in BlockFlowCache.GetBlockTypes())
-			{
-				yield return new BlockFlowTestCase(
-					type, 
-					value: String.Empty + "\tABC\t  ",
-					wholeCapture: String.Empty
-				);
-				yield return new BlockFlowTestCase(
-					type, 
-					value: oneHundredSpaces + "\tABC\t  ",
-					wholeCapture: oneHundredSpaces
-				);
-				yield return new BlockFlowTestCase(
-					type, 
-					value: oneHundredSpaces + " ABC\t  ",
-					wholeCapture: oneHundredSpaces
-				);
-			}
+			yield return new BlockFlowTestCase(
+				type, 
+				testValue: String.Empty + "ABC",
+				wholeCapture: String.Empty
+			);
+			yield return new BlockFlowTestCase(
+				type, 
+				testValue: spaces + "ABC",
+				wholeCapture: spaces
+			);
 		}
 
-		private static IEnumerable<BlockFlowTestCase> getLinePrefixFlowTestCases()
+		private static IEnumerable<BlockFlowTestCase> getBlockTestCases()
 		{
-			var oneHundredSpaces = new String(Enumerable.Repeat(' ', 100).ToArray());
-			var oneHundredSpacesAndTabs = String.Join(String.Empty, Enumerable.Repeat("\t ", 50));
+			return EnumCache.GetBlockTypes().SelectMany(getCommonTestCases);
+		}
+
+		private static IEnumerable<BlockFlowTestCase> getFlowTestCases()
+		{
+			var spaces = CharCache.Spaces;
+			var spacesAndTabs = CharCache.SpacesAndTabs;
 			
-			foreach (var type in BlockFlowCache.GetFlowTypes())
+			foreach (var type in EnumCache.GetFlowTypes())
 			{
+				foreach (var testCase in getCommonTestCases(type))
+					yield return testCase;
+
 				yield return new BlockFlowTestCase(
 					type, 
-					value: "\tABC\t  ",
-					wholeCapture: "\t",
-					firstParenthesisCapture: "\t"
-				);
-				yield return new BlockFlowTestCase(
-					type, 
-					value: oneHundredSpaces + "\tABC\t  ",
-					wholeCapture: oneHundredSpaces + "\t",
-					firstParenthesisCapture: "\t"
-				);
-				yield return new BlockFlowTestCase(
-					type, 
-					value: oneHundredSpaces + " ABC\t  ",
-					wholeCapture: oneHundredSpaces + " ",
-					firstParenthesisCapture: " "
-				);
-				yield return new BlockFlowTestCase(
-					type, 
-					value: oneHundredSpaces + " \tABC\t  ",
-					wholeCapture: oneHundredSpaces + " \t",
-					firstParenthesisCapture: " \t"
-				);
-				yield return new BlockFlowTestCase(
-					type, 
-					value: oneHundredSpaces + "\t ABC\t  ",
-					wholeCapture: oneHundredSpaces + "\t ",
-					firstParenthesisCapture: "\t "
-				);
-				yield return new BlockFlowTestCase(
-					type, 
-					value: oneHundredSpaces + oneHundredSpacesAndTabs + "\t ABC\t  ",
-					wholeCapture: oneHundredSpaces + oneHundredSpacesAndTabs,
-					firstParenthesisCapture: oneHundredSpacesAndTabs
+					testValue: spaces + spacesAndTabs + "ABC",
+					wholeCapture: spaces + spacesAndTabs
 				);
 			}
 		}
 
 		private static readonly IReadOnlyDictionary<BlockFlowInOut, Regex> _linePrefixBlockFlowRegexByType =
-			BlockFlowCache.GetBlockAndFlowTypes().ToDictionary(
+			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
 				i => new Regex(GlobalConstants.LinePrefix(i), RegexOptions.Compiled)
 			);

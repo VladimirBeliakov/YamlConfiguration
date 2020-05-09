@@ -5,7 +5,7 @@ using Parser.TypeDefinitions;
 
 namespace ParserTests
 {
-	internal static class BlockFlowCache
+	internal static class EnumCache
 	{
 		public static IEnumerable<BlockFlowInOut> GetBlockAndFlowTypes()
 		{

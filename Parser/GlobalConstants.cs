@@ -78,9 +78,9 @@ namespace Parser
 
 		public static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharSequenceLength}}}";
 
-		public static string LinePrefix(BlockFlowInOut c, bool anchoredIndent = true)
+		public static string LinePrefix(BlockFlowInOut c, bool useAnchoredIndent = true)
 		{
-			var indent = anchoredIndent ? _anchoredIndent : _indent;
+			var indent = useAnchoredIndent ? _anchoredIndent : _indent;
 	
 			switch (c)
 			{
@@ -89,26 +89,29 @@ namespace Parser
 					return indent;
 				case BlockFlowInOut.FlowOut:
 				case BlockFlowInOut.FlowIn:
-					return $"{indent}({SeparateInLine})?";
+					return $"{indent}(?:{SeparateInLine})?";
 				default:
 					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlowInOut)} item {c}.");
 			}
 		}
 
-		public static string EmptyLine(BlockFlowInOut c, bool anchoredIndent = true)
+		public static string EmptyLine(BlockFlowInOut c, bool useAnchoredIndent = true)
 		{
-			return $"{LinePrefix(c, anchoredIndent)}{Break}";
+			return $"{LinePrefix(c, useAnchoredIndent)}{Break}";
 		}
+
+		#region Folded Line Regexes
 
 		public static string TrimmedLine(BlockFlowInOut c)
 		{
-			return $"{Break}({EmptyLine(c, anchoredIndent: false)})+";
+			return $"{Break}(?:{EmptyLine(c, useAnchoredIndent: false)})+";
 		}
 
-		public static string FoldedLine(BlockFlowInOut c)
-		{
-			return $"{TrimmedLine(c)}|{Break}";
-		}
+		// TODO: When writing the processor, one matter should be observed:
+		// if line breaks surround a more intended line, then folding doesn't apply to such breaks.
+		public static string BreakAsSpace = $"{Break}(?=.*[^ \t]+.*)";
+
+		#endregion
 
 		public static readonly string CommentRegex =
 			$"(?:{Spaces}#.{{1,{CharSequenceLength * CharSequenceLength}}})?$";
