@@ -41,7 +41,7 @@ namespace ParserTests
 
 		[Test]
 		public void TrimmedLine_NoEmptyLines_DoesNotMatch(
-			[ValueSource(nameof(GetBlocksAndFlows))] BlockFlowInOut type,
+			[ValueSource(nameof(getBlocksAndFlows))] BlockFlowInOut type,
 			[ValueSource(nameof(getTrimmedLineNonMatchableCases))] string testValue
 		)
 		{
@@ -55,6 +55,10 @@ namespace ParserTests
 		private static IEnumerable<TestCaseData> getTrimmedLineBlockFlowWithCorrespondingRegex()
 		{
 			var newLine = Environment.NewLine;
+			var charGroupLength = GlobalConstants.CharGroupLength;
+			var notEmptyLine = 
+				$"^(?:.{{0,{charGroupLength}}}" + $"[^ \t]{{1,{charGroupLength}}}" + $".{{0,{charGroupLength}}})";
+
 			foreach (var value in EnumCache.GetBlockAndFlowTypes())
 			{
 				switch (value)
@@ -63,14 +67,16 @@ namespace ParserTests
 					case BlockFlowInOut.BlockIn:
 						yield return new TestCaseData(
 							value,
-							$"{newLine}" + "(?: {0,100}" + newLine + ")+"
+							notEmptyLine + newLine + 
+							$"(?: {{0,{charGroupLength}}}" + newLine + ")+"
 						);
 						break;
 					case BlockFlowInOut.FlowOut:
 					case BlockFlowInOut.FlowIn:
 						yield return new TestCaseData(
 							value,
-							$"{newLine}" + "(?: {0,100}(?:[ \t]{1,100})?" + newLine + ")+"
+							notEmptyLine + newLine + 
+							$"(?: {{0,{charGroupLength}}}" + $"(?:[ \t]{{1,{charGroupLength}}})?" + newLine + ")+"
 						);
 						break;
 					default:
@@ -81,15 +87,25 @@ namespace ParserTests
 
 		private static IEnumerable<BlockFlowTestCase> getTrimmedLineCommonTestCases(BlockFlowInOut type)
 		{
+			var chars = CharCache.Chars;
 			var spaces = CharCache.Spaces;
 			var newLine = Environment.NewLine;
+			var spacesAndTabs = CharCache.SpacesAndTabs;
 
 			yield return new BlockFlowTestCase(
 				type,
-				testValue: newLine + 
+				testValue: "A" + newLine + 
 						   newLine + 
 						   "\tABC\t  ",
-				wholeCapture: newLine + 
+				wholeCapture: "A" + newLine + 
+							  newLine
+			);
+			yield return new BlockFlowTestCase(
+				type,
+				testValue: spacesAndTabs + chars + spacesAndTabs + newLine + 
+						   newLine + 
+						   "\tABC\t  ",
+				wholeCapture: spacesAndTabs + chars + spacesAndTabs + newLine + 
 							  newLine
 			);
 			yield return new BlockFlowTestCase(
@@ -97,7 +113,7 @@ namespace ParserTests
 				testValue: "\tABC\t  " + newLine + 
 						   newLine + 
 						   "\tABC\t  ",
-				wholeCapture: newLine +
+				wholeCapture: "\tABC\t  " + newLine +
 							  newLine
 			);
 			yield return new BlockFlowTestCase(
@@ -105,7 +121,7 @@ namespace ParserTests
 				testValue: "\tABC\t  " + newLine + 
 						   spaces + newLine + 
 						   "\tABC\t  ",
-				wholeCapture: newLine + 
+				wholeCapture: "\tABC\t  " + newLine + 
 							  spaces + newLine
 			);
 			yield return new BlockFlowTestCase(
@@ -114,7 +130,7 @@ namespace ParserTests
 						   spaces + newLine + 
 						   spaces + newLine + 
 						   "\tABC\t  ",
-				wholeCapture: newLine + 
+				wholeCapture: "\tABC\t  " + newLine + 
 							  spaces + newLine + 
 							  spaces + newLine
 			);
@@ -141,7 +157,7 @@ namespace ParserTests
 					testValue: "\tABC\t  " + newLine + 
 							   spacesAndTabs + newLine + 
 							   "\tABC\t  ",
-					wholeCapture: newLine + 
+					wholeCapture: "\tABC\t  " + newLine + 
 								  spacesAndTabs + newLine
 				);
 				yield return new BlockFlowTestCase(
@@ -149,7 +165,7 @@ namespace ParserTests
 					testValue: "\tABC\t  " + newLine + 
 							   spaces + spacesAndTabs + newLine + 
 							   "\tABC\t  ",
-					wholeCapture: newLine + 
+					wholeCapture: "\tABC\t  " + newLine + 
 								  spaces + spacesAndTabs + newLine
 				);
 				yield return new BlockFlowTestCase(
@@ -158,7 +174,7 @@ namespace ParserTests
 							   spaces + spacesAndTabs + newLine + 
 							   spaces + spacesAndTabs + newLine + 
 							   "\tABC\t  ",
-					wholeCapture: newLine + 
+					wholeCapture: "\tABC\t  " + newLine + 
 								  spaces + spacesAndTabs + newLine + 
 								  spaces + spacesAndTabs + newLine
 				);
@@ -172,7 +188,7 @@ namespace ParserTests
 			yield return $"ABC\t{newLine}\tABC";
 		}
 
-		private static IEnumerable<BlockFlowInOut> GetBlocksAndFlows()
+		private static IEnumerable<BlockFlowInOut> getBlocksAndFlows()
 		{
 			return EnumCache.GetBlockAndFlowTypes();
 		}

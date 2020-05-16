@@ -20,7 +20,7 @@ namespace Parser.TypeDefinitions
 
 		private static readonly Regex _yamlScalarRegex =
 			new Regex(
-				$"^\\- ([\\w]{{1,{GlobalConstants.CharSequenceLength}}}){GlobalConstants.CommentRegex}",
+				$"^\\- ([\\w]{{1,{GlobalConstants.CharGroupLength}}}){GlobalConstants.CommentRegex}",
 				RegexOptions.Compiled
 			);
 		

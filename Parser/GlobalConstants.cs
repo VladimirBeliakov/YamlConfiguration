@@ -66,17 +66,17 @@ namespace Parser
 
 		#endregion
 
-		public const int CharSequenceLength = 100;
+		public const int CharGroupLength = 100;
 
 		public static readonly string Break = $"{Environment.NewLine}";
 
-		public static readonly string Spaces = $"{SPACE}{{1,{CharSequenceLength}}}";
+		public static readonly string Spaces = $"{SPACE}{{1,{CharGroupLength}}}";
 
-		private static readonly string _anchoredIndent = $"^{SPACE}{{0,{CharSequenceLength}}}";
+		private static readonly string _anchoredIndent = $"^{SPACE}{{0,{CharGroupLength}}}";
 
-		private static readonly string _indent = $"{SPACE}{{0,{CharSequenceLength}}}";
+		private static readonly string _indent = $"{SPACE}{{0,{CharGroupLength}}}";
 
-		public static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharSequenceLength}}}";
+		public static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharGroupLength}}}";
 
 		public static string LinePrefix(BlockFlowInOut c, bool useAnchoredIndent = true)
 		{
@@ -102,19 +102,25 @@ namespace Parser
 
 		#region Folded Line Regexes
 
+		private static readonly string _notEmptyLine =
+			$"^(?:.{{0,{CharGroupLength}}}[^ \t]{{1,{CharGroupLength}}}.{{0,{CharGroupLength}}})";
+		
 		public static string TrimmedLine(BlockFlowInOut c)
 		{
-			return $"{Break}(?:{EmptyLine(c, useAnchoredIndent: false)})+";
+			return _notEmptyLine + $"{Break}" +
+				   $"(?:{EmptyLine(c, useAnchoredIndent: false)})+";
 		}
 
 		// TODO: When writing the processor, one matter should be observed:
 		// if line breaks surround a more intended line, then folding doesn't apply to such breaks.
-		public static string BreakAsSpace = $"{Break}(?=.*[^ \t]+.*)";
+		public static string BreakAsSpace = 
+			_notEmptyLine + $"{Break}" +
+			$"(?=.{{0,{CharGroupLength}}}[^ \t]{{1,{CharGroupLength}}}.{{0,{CharGroupLength}}})";
 
 		#endregion
 
 		public static readonly string CommentRegex =
-			$"(?:{Spaces}#.{{1,{CharSequenceLength * CharSequenceLength}}})?$";
+			$"(?:{Spaces}#.{{1,{CharGroupLength * CharGroupLength}}})?$";
 
 		public static readonly string ForbiddenCharsRegex =
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";

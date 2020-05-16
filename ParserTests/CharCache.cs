@@ -8,17 +8,22 @@ namespace ParserTests
 	{
 		public static string Spaces = String.Join(
 			String.Empty,
-			Enumerable.Repeat(' ', GlobalConstants.CharSequenceLength)
+			Enumerable.Repeat(' ', GlobalConstants.CharGroupLength)
 		);
 
 		public static string Tabs = String.Join(
 			String.Empty,
-			Enumerable.Repeat('\t', GlobalConstants.CharSequenceLength)
+			Enumerable.Repeat('\t', GlobalConstants.CharGroupLength)
 		);
 
 		public static string SpacesAndTabs = String.Join(
 			String.Empty,
-			Enumerable.Repeat("\t ", GlobalConstants.CharSequenceLength / 2)
+			Enumerable.Repeat("\t ", GlobalConstants.CharGroupLength / 2)
+		);
+
+		public static string Chars = String.Join(
+			String.Empty,
+			Enumerable.Repeat("ABCD", GlobalConstants.CharGroupLength / 4)
 		);
 	}
 }
