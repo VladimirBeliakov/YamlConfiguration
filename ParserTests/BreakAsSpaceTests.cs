@@ -10,7 +10,7 @@ namespace ParserTests
 	public class BreakAsSpaceTests
 	{
 		[TestCaseSource(nameof(getMatchableTestCases))]
-		public void BreakAsSpace_FoldableLines_Matches(string testValue, string wholeCapture)
+		public void FoldableLines_Matches(string testValue, string wholeCapture)
 		{
 			var match = _breakAsSpaceRegex.Match(testValue);
 
@@ -18,7 +18,7 @@ namespace ParserTests
 		}
 
 		[TestCaseSource(nameof(getUnmatchableTestCases))]
-		public void BreakAsSpace_NonfoldableLine_DoesNotMatch(string unmatchableLine)
+		public void NonfoldableLine_DoesNotMatch(string unmatchableLine)
 		{
 			var match = _breakAsSpaceRegex.Match(unmatchableLine);
 
@@ -27,34 +27,37 @@ namespace ParserTests
 
 		private static IEnumerable<TestCaseData> getMatchableTestCases()
 		{
-			var chars = CharCache.Chars;
-			var newLine = Environment.NewLine;
-			var spacesAndTabs = CharCache.SpacesAndTabs;
+			var @break = Environment.NewLine;
 
 			yield return new TestCaseData(
-/* testValue */		"A" + newLine +
-					"A",
-/* wholeCapture */	"A" + newLine
+/* testValue */		@break +
+					"A" + @break,
+/* wholeCapture */	@break
 			);
 			yield return new TestCaseData(
-/* testValue */		spacesAndTabs + chars + spacesAndTabs + newLine +
-					spacesAndTabs + chars + spacesAndTabs,
-/* wholeCapture */	spacesAndTabs + chars + spacesAndTabs + newLine
+/* testValue */		"A" + @break +
+					"A" + @break,
+/* wholeCapture */	@break
 			);
 		}
 
 		private static IEnumerable<string> getUnmatchableTestCases()
 		{
-			var newLine = Environment.NewLine;
+			var @break = Environment.NewLine;
 
-			yield return "ABC" + newLine +
-						 CharCache.Spaces;
-			yield return "ABC" + newLine +
-						 CharCache.Tabs;
-			yield return "ABC" + newLine +
-						 CharCache.SpacesAndTabs;
+			yield return @break +
+						 CharCache.Spaces + @break;
+			yield return "ABC" + @break +
+						 CharCache.Spaces + @break;
+			yield return "ABC" + @break +
+						 CharCache.Tabs + @break;
+			yield return "ABC" + @break +
+						 CharCache.SpacesAndTabs + @break;
 		}
 
-		private static readonly Regex _breakAsSpaceRegex = new Regex(GlobalConstants.BreakAsSpace);
+		private static readonly Regex _breakAsSpaceRegex = new Regex(
+			GlobalConstants.BreakAsSpace(),
+			RegexOptions.Compiled
+		);
 	}
 }

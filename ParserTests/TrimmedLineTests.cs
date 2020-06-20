@@ -12,7 +12,7 @@ namespace ParserTests
 	public class TrimmedLineTests
 	{
 		[TestCaseSource(nameof(getTrimmedLineBlockFlowWithCorrespondingRegex))]
-		public void TrimmedLine_ReturnsCorrespondingRegexForBlockOrFlowType(BlockFlowInOut value, string expectedRegex)
+		public void ReturnsCorrespondingRegexForBlockOrFlowType(BlockFlowInOut value, string expectedRegex)
 		{
 			var actualRegex = GlobalConstants.TrimmedLine(value);
 
@@ -20,7 +20,7 @@ namespace ParserTests
 		}
 
 		[TestCaseSource(nameof(getTrimmedLineBlockTestCases))]
-		public void TrimmedLine_Blocks_LineBreakAndEmptyLine_Matches(BlockFlowTestCase testCase)
+		public void Blocks_LineBreakAndEmptyLine_Matches(BlockFlowTestCase testCase)
 		{
 			var regex = _trimmedLineRegex[testCase.Type];
 
@@ -30,7 +30,7 @@ namespace ParserTests
 		}
 
 		[TestCaseSource(nameof(getTrimmedLineFlowTestCases))]
-		public void TrimmedLine_Flows_LineBreakAndEmptyLine_Matches(BlockFlowTestCase testCase)
+		public void Flows_LineBreakAndEmptyLine_Matches(BlockFlowTestCase testCase)
 		{
 			var regex = _trimmedLineRegex[testCase.Type];
 
@@ -40,7 +40,7 @@ namespace ParserTests
 		}
 
 		[Test]
-		public void TrimmedLine_NoEmptyLines_DoesNotMatch(
+		public void NoEmptyLines_DoesNotMatch(
 			[ValueSource(nameof(getBlocksAndFlows))] BlockFlowInOut type,
 			[ValueSource(nameof(getTrimmedLineNonMatchableCases))] string testValue
 		)
@@ -56,8 +56,6 @@ namespace ParserTests
 		{
 			var newLine = Environment.NewLine;
 			var charGroupLength = GlobalConstants.CharGroupLength;
-			var notEmptyLine = 
-				$"^(?:.{{0,{charGroupLength}}}" + $"[^ \t]{{1,{charGroupLength}}}" + $".{{0,{charGroupLength}}})";
 
 			foreach (var value in EnumCache.GetBlockAndFlowTypes())
 			{
@@ -67,7 +65,7 @@ namespace ParserTests
 					case BlockFlowInOut.BlockIn:
 						yield return new TestCaseData(
 							value,
-							notEmptyLine + newLine + 
+							newLine +
 							$"(?: {{0,{charGroupLength}}}" + newLine + ")+"
 						);
 						break;
@@ -75,7 +73,7 @@ namespace ParserTests
 					case BlockFlowInOut.FlowIn:
 						yield return new TestCaseData(
 							value,
-							notEmptyLine + newLine + 
+							newLine +
 							$"(?: {{0,{charGroupLength}}}" + $"(?:[ \t]{{1,{charGroupLength}}})?" + newLine + ")+"
 						);
 						break;
@@ -87,52 +85,42 @@ namespace ParserTests
 
 		private static IEnumerable<BlockFlowTestCase> getTrimmedLineCommonTestCases(BlockFlowInOut type)
 		{
-			var chars = CharCache.Chars;
 			var spaces = CharCache.Spaces;
-			var newLine = Environment.NewLine;
-			var spacesAndTabs = CharCache.SpacesAndTabs;
+			var @break = Environment.NewLine;
 
 			yield return new BlockFlowTestCase(
 				type,
-				testValue: "A" + newLine + 
-						   newLine + 
+				testValue: @break +
+						   @break +
 						   "\tABC\t  ",
-				wholeCapture: "A" + newLine + 
-							  newLine
+				wholeCapture: @break +
+							  @break
 			);
 			yield return new BlockFlowTestCase(
 				type,
-				testValue: spacesAndTabs + chars + spacesAndTabs + newLine + 
-						   newLine + 
+				testValue: "\tABC\t  " + @break +
+						   @break +
 						   "\tABC\t  ",
-				wholeCapture: spacesAndTabs + chars + spacesAndTabs + newLine + 
-							  newLine
+				wholeCapture: @break +
+							  @break
 			);
 			yield return new BlockFlowTestCase(
 				type,
-				testValue: "\tABC\t  " + newLine + 
-						   newLine + 
+				testValue: "\tABC\t  " + @break +
+						   spaces + @break +
 						   "\tABC\t  ",
-				wholeCapture: "\tABC\t  " + newLine +
-							  newLine
+				wholeCapture: @break +
+							  spaces + @break
 			);
 			yield return new BlockFlowTestCase(
 				type,
-				testValue: "\tABC\t  " + newLine + 
-						   spaces + newLine + 
+				testValue: "\tABC\t  " + @break +
+						   spaces + @break +
+						   spaces + @break +
 						   "\tABC\t  ",
-				wholeCapture: "\tABC\t  " + newLine + 
-							  spaces + newLine
-			);
-			yield return new BlockFlowTestCase(
-				type,
-				testValue: "\tABC\t  " + newLine + 
-						   spaces + newLine + 
-						   spaces + newLine + 
-						   "\tABC\t  ",
-				wholeCapture: "\tABC\t  " + newLine + 
-							  spaces + newLine + 
-							  spaces + newLine
+				wholeCapture: @break +
+							  spaces + @break +
+							  spaces + @break
 			);
 		}
 		
@@ -154,10 +142,18 @@ namespace ParserTests
 
 				yield return new BlockFlowTestCase(
 					type,
+					testValue: newLine +
+							   spacesAndTabs + newLine +
+							   "\tABC\t  ",
+					wholeCapture: newLine +
+								  spacesAndTabs + newLine
+				);
+				yield return new BlockFlowTestCase(
+					type,
 					testValue: "\tABC\t  " + newLine + 
 							   spacesAndTabs + newLine + 
 							   "\tABC\t  ",
-					wholeCapture: "\tABC\t  " + newLine + 
+					wholeCapture: newLine +
 								  spacesAndTabs + newLine
 				);
 				yield return new BlockFlowTestCase(
@@ -165,7 +161,7 @@ namespace ParserTests
 					testValue: "\tABC\t  " + newLine + 
 							   spaces + spacesAndTabs + newLine + 
 							   "\tABC\t  ",
-					wholeCapture: "\tABC\t  " + newLine + 
+					wholeCapture: newLine +
 								  spaces + spacesAndTabs + newLine
 				);
 				yield return new BlockFlowTestCase(
@@ -174,7 +170,7 @@ namespace ParserTests
 							   spaces + spacesAndTabs + newLine + 
 							   spaces + spacesAndTabs + newLine + 
 							   "\tABC\t  ",
-					wholeCapture: "\tABC\t  " + newLine + 
+					wholeCapture: newLine +
 								  spaces + spacesAndTabs + newLine + 
 								  spaces + spacesAndTabs + newLine
 				);
@@ -183,9 +179,10 @@ namespace ParserTests
 
 		private static IEnumerable<string> getTrimmedLineNonMatchableCases()
 		{
-			var newLine = Environment.NewLine;
-			yield return $"ABC  {newLine}  ABC";
-			yield return $"ABC\t{newLine}\tABC";
+			var @break = Environment.NewLine;
+			yield return $"{@break}  ABC";
+			yield return $"ABC  {@break}  ABC";
+			yield return $"ABC\t{@break}\tABC";
 		}
 
 		private static IEnumerable<BlockFlowInOut> getBlocksAndFlows()

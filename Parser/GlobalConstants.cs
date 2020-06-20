@@ -58,7 +58,7 @@ namespace Parser
 		public const string Tag = "\u0021";				// !
 		public const string Literal = "\u007C";			// |
 		public const string Folded = "\u003E";			// >
-		public const string SingleQuote = "\u0027";		// "
+		public const string SingleQuote = "\u0027";		// '
 		public const string DoubleQuote = "\u0022";		// "
 		public const string Directive = "\u0025";		// %
 		public const string ReservedChar1 = "\u0040";	// @
@@ -68,7 +68,8 @@ namespace Parser
 
 		public const int CharGroupLength = 100;
 
-		public static readonly string Break = $"{Environment.NewLine}";
+		// TODO: Define the break code by the file parsed.
+		public static readonly string Break = Environment.NewLine;
 
 		public static readonly string Spaces = $"{SPACE}{{1,{CharGroupLength}}}";
 
@@ -81,7 +82,7 @@ namespace Parser
 		public static string LinePrefix(BlockFlowInOut c, bool useAnchoredIndent = true)
 		{
 			var indent = useAnchoredIndent ? _anchoredIndent : _indent;
-	
+
 			switch (c)
 			{
 				case BlockFlowInOut.BlockOut:
@@ -102,20 +103,26 @@ namespace Parser
 
 		#region Folded Line Regexes
 
-		private static readonly string _notEmptyLine =
-			$"^(?:.{{0,{CharGroupLength}}}[^ \t]{{1,{CharGroupLength}}}.{{0,{CharGroupLength}}})";
-		
 		public static string TrimmedLine(BlockFlowInOut c)
 		{
-			return _notEmptyLine + $"{Break}" +
+			return $"{Break}" +
 				   $"(?:{EmptyLine(c, useAnchoredIndent: false)})+";
 		}
 
 		// TODO: When writing the processor, one matter should be observed:
-		// if line breaks surround a more intended line, then folding doesn't apply to such breaks.
-		public static string BreakAsSpace = 
-			_notEmptyLine + $"{Break}" +
-			$"(?=.{{0,{CharGroupLength}}}[^ \t]{{1,{CharGroupLength}}}.{{0,{CharGroupLength}}})";
+		// if line breaks within a block surround a more intended line, then folding doesn't apply to such breaks.
+		public static string BreakAsSpace(string linePrefix = "") =>
+			$"{Break}" +
+			linePrefix + $"(?=.{{0,{CharGroupLength}}}[^ \t{Break}]{{1,{CharGroupLength}}}.{{0,{CharGroupLength}}})";
+
+		public static string FlowFoldedTrimmedLine =
+			$"(?:{SeparateInLine})?" +
+			TrimmedLine(BlockFlowInOut.FlowIn) +
+			LinePrefix(BlockFlowInOut.FlowIn, useAnchoredIndent: false);
+
+		public static string FlowFoldedLineWithBreakAsSpace =
+			$"(?:{SeparateInLine})?" +
+			BreakAsSpace(linePrefix: LinePrefix(BlockFlowInOut.FlowIn, useAnchoredIndent: false));
 
 		#endregion
 
@@ -126,7 +133,7 @@ namespace Parser
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";
 
 		public static readonly string PrintableCharsRegex =
-			@$"[{TAB + LF + CR + NEL + 
+			$@"[{TAB + LF + CR + NEL +
 				 BasicLatinSubset + 
 				 LatinSupplementToHangulJamo + 
 				 PrivateUseAreaToSpecialsBeginning}]" + 
