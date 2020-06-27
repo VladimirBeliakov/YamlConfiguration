@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using Parser.Exceptions;
 using Parser.TypeDefinitions;
@@ -14,7 +15,8 @@ namespace ParserTests
 		)
 		{
 			var item = isCollectionItem ? "  - type_Name1" : "- type_Name1";
-			Assert.DoesNotThrow(() => new YamlScalar(item + comment, isCollectionItem));
+			var @break = Environment.NewLine;
+			Assert.DoesNotThrow(() => new YamlScalar(item + comment + @break, isCollectionItem));
 		}
 
 		[TestCase(" type_Name1", "")]

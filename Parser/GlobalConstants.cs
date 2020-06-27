@@ -127,7 +127,7 @@ namespace Parser
 		#endregion
 
 		public static readonly string CommentRegex =
-			$"{_separateInLine}#[^{Break}]{{0,{CharGroupLength * CharGroupLength}}}$";
+			$"{_separateInLine}#[^{Break}]{{0,{CharGroupLength * CharGroupLength}}}{Break}";
 
 		public static readonly string ForbiddenCharsRegex =
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";
