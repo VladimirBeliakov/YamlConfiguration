@@ -77,7 +77,7 @@ namespace Parser
 
 		private static readonly string _indent = $"{SPACE}{{0,{CharGroupLength}}}";
 
-		public static readonly string SeparateInLine = $"[{SPACE}{TAB}]{{1,{CharGroupLength}}}";
+		private static readonly string _separateInLine = $"(?:^|[{SPACE}{TAB}]{{1,{CharGroupLength}}})";
 
 		public static string LinePrefix(BlockFlowInOut c, bool useAnchoredIndent = true)
 		{
@@ -90,7 +90,7 @@ namespace Parser
 					return indent;
 				case BlockFlowInOut.FlowOut:
 				case BlockFlowInOut.FlowIn:
-					return $"{indent}(?:{SeparateInLine})?";
+					return $"{indent}{_separateInLine}?";
 				default:
 					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlowInOut)} item {c}.");
 			}
@@ -116,18 +116,18 @@ namespace Parser
 			linePrefix + $"(?=.{{0,{CharGroupLength}}}[^ \t{Break}]{{1,{CharGroupLength}}}.{{0,{CharGroupLength}}})";
 
 		public static string FlowFoldedTrimmedLine =
-			$"(?:{SeparateInLine})?" +
+			$"(?:{_separateInLine})?" +
 			TrimmedLine(BlockFlowInOut.FlowIn) +
 			LinePrefix(BlockFlowInOut.FlowIn, useAnchoredIndent: false);
 
 		public static string FlowFoldedLineWithBreakAsSpace =
-			$"(?:{SeparateInLine})?" +
+			$"(?:{_separateInLine})?" +
 			BreakAsSpace(linePrefix: LinePrefix(BlockFlowInOut.FlowIn, useAnchoredIndent: false));
 
 		#endregion
 
 		public static readonly string CommentRegex =
-			$"(?:{Spaces}#.{{1,{CharGroupLength * CharGroupLength}}})?$";
+			$"{_separateInLine}#[^{Break}]{{0,{CharGroupLength * CharGroupLength}}}$";
 
 		public static readonly string ForbiddenCharsRegex =
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";

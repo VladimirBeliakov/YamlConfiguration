@@ -74,7 +74,7 @@ namespace ParserTests
 						yield return new TestCaseData(
 							value,
 							newLine +
-							$"(?: {{0,{charGroupLength}}}" + $"(?:[ \t]{{1,{charGroupLength}}})?" + newLine + ")+"
+							$"(?: {{0,{charGroupLength}}}" + $"(?:^|[ \t]{{1,{charGroupLength}}})?" + newLine + ")+"
 						);
 						break;
 					default:

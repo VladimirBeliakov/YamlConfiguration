@@ -65,7 +65,7 @@ namespace ParserTests
 						break;
 					case BlockFlowInOut.FlowOut:
 					case BlockFlowInOut.FlowIn:
-						yield return new TestCaseData(value, "^ {0,100}(?:[ \t]{1,100})?" + newLine);
+						yield return new TestCaseData(value, "^ {0,100}(?:^|[ \t]{1,100})?" + newLine);
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();

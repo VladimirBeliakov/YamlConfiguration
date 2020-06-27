@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Parser;
@@ -29,11 +30,9 @@ namespace ParserTests
 		private static IEnumerable<BlockFlowTestCase> getTestCases()
 		{
 			var spaces = CharCache.Spaces;
-			var tabs = CharCache.Tabs;
-			var spacesAndTabs = CharCache.SpacesAndTabs;
 			var @break = Environment.NewLine;
 
-			foreach (var separateInLine in new[] { String.Empty, " ", "\t", spaces, tabs, spacesAndTabs })
+			foreach (var separateInLine in new[] { String.Empty }.Concat(CharCache.SeparateInLineCases))
 			{
 				foreach (var linePrefix in new[] { String.Empty, spaces + separateInLine })
 				{

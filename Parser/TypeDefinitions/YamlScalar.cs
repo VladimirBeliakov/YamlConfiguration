@@ -20,14 +20,15 @@ namespace Parser.TypeDefinitions
 
 		private static readonly Regex _yamlScalarRegex =
 			new Regex(
-				$"^\\- ([\\w]{{1,{GlobalConstants.CharGroupLength}}}){GlobalConstants.CommentRegex}",
+				$"^\\- ([\\w]{{1,{GlobalConstants.CharGroupLength}}})(?:{GlobalConstants.CommentRegex})?$",
 				RegexOptions.Compiled
 			);
 		
 		private static readonly Regex _yamlCollectionScalarRegex = 
 			new Regex(
-				$@"{_yamlScalarRegex.ToString().Replace(
-					"^", $"^{GlobalConstants.Spaces}", StringComparison.Ordinal)}"
+				$"^{GlobalConstants.Spaces}\\- ([\\w]{{1,{GlobalConstants.CharGroupLength}}})" +
+				$"(?:{GlobalConstants.CommentRegex})?$",
+				RegexOptions.Compiled
 			);
 	}
 }

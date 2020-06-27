@@ -40,34 +40,6 @@ namespace ParserTests
 
 			Assert.That(matches.Count, Is.EqualTo(0));
 		}
-		
-		[TestCase("Space Space", 1)]
-		[TestCase("Tab\tTab", 1)]
-		[TestCase("Space \tTab", 1)]
-		[TestCase("Tab\t Space", 1)]
-		[TestCaseSource(nameof(getSeparateInLineLongTestStringsWithMatchCount))]
-		public void SeparateInLine_MatchesWhites(string value, int matchCount)
-		{
-			var matches = _separateInLineRegex.Matches(value);
-
-			Assert.That(matches.Count, Is.EqualTo(matchCount));
-		}
-
-		[TestCase("ABCABC")]
-		public void SeparateInLine_DoesNotMatchOtherChars(string otherChars)
-		{
-			var matches = _separateInLineRegex.Matches(otherChars);
-
-			Assert.That(matches.Count, Is.EqualTo(0));
-		}
-
-		[TestCaseSource(nameof(getSeparateInLineTooLongTestStringsWithMatchCount))]
-		public void SeparateInLine_TooLongString_MatchesTwice(string tooLongString, int matchCount)
-		{
-			var matches = _separateInLineRegex.Matches(tooLongString);
-
-			Assert.That(matches.Count, Is.EqualTo(matchCount));
-		}
 
 		private static readonly Regex forbiddenCharsRegex =
 			new Regex(GlobalConstants.ForbiddenCharsRegex, RegexOptions.Compiled);
@@ -110,24 +82,6 @@ namespace ParserTests
 		private const string CR = "\u000D";
 		private const string NEL = "\u0085";
 
-		private static IEnumerable<TestCaseData> getSeparateInLineLongTestStringsWithMatchCount()
-		{
-			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat(' ', 100)), 1);
-			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat('\t', 100)), 1);
-			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat("\t ", 50)), 1);
-		}
-
-		private static IEnumerable<TestCaseData> getSeparateInLineTooLongTestStringsWithMatchCount()
-		{
-			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat(' ', 101)), 2);
-			yield return new TestCaseData(String.Join(String.Empty, Enumerable.Repeat('\t', 101).ToArray()), 2);
-			yield return new TestCaseData(
-				String.Join(String.Empty, Enumerable.Repeat(' ', 51).Concat(Enumerable.Repeat('\t', 50))), 2);
-			yield return new TestCaseData(
-				String.Join(String.Empty, Enumerable.Repeat('\t', 51).Concat(Enumerable.Repeat(' ', 50))), 2);
-		}
-
 		private readonly Regex _breakRegex = new Regex(GlobalConstants.Break, RegexOptions.Compiled);
-		private readonly Regex _separateInLineRegex = new Regex(GlobalConstants.SeparateInLine, RegexOptions.Compiled);
 	}
 }

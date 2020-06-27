@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Parser;
 
@@ -25,5 +26,7 @@ namespace ParserTests
 			String.Empty,
 			Enumerable.Repeat("ABCD", GlobalConstants.CharGroupLength / 4)
 		);
+
+		public static IEnumerable<string> SeparateInLineCases = new[] { " ", "\t", Spaces, Tabs, SpacesAndTabs };
 	}
 }
