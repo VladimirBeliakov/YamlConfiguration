@@ -12,7 +12,7 @@ namespace ParserTests
 	public class EmptyLinesTests
 	{
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
-		public void EmptyLine_ReturnsCorrespondingRegexForBlockFlow(BlockFlowInOut value, string expectedRegex)
+		public void EmptyLine_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, string expectedRegex)
 		{
 			var actualRegex = GlobalConstants.EmptyLine(value);
 
@@ -41,7 +41,7 @@ namespace ParserTests
 
 		[Test]
 		public void EmptyLine_NoSpacesAtBeginning_DoesNotMatch(
-			[ValueSource(nameof(getBlocksAndFlows))] BlockFlowInOut type,
+			[ValueSource(nameof(getBlocksAndFlows))] BlockFlow type,
 			[ValueSource(nameof(getNonMatchableCases))] string testValue
 		)
 		{
@@ -59,12 +59,12 @@ namespace ParserTests
 			{
 				switch (value)
 				{
-					case BlockFlowInOut.BlockOut:
-					case BlockFlowInOut.BlockIn:
+					case BlockFlow.BlockOut:
+					case BlockFlow.BlockIn:
 						yield return new TestCaseData(value, "^ {0,100}" + newLine);
 						break;
-					case BlockFlowInOut.FlowOut:
-					case BlockFlowInOut.FlowIn:
+					case BlockFlow.FlowOut:
+					case BlockFlow.FlowIn:
 						yield return new TestCaseData(value, "^ {0,100}(?:^|[ \t]{1,100})?" + newLine);
 						break;
 					default:
@@ -73,7 +73,7 @@ namespace ParserTests
 			}
 		}
 
-		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(BlockFlowInOut type)
+		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(BlockFlow type)
 		{
 			var spaces = CharCache.Spaces;
 			var newLine = Environment.NewLine;
@@ -122,12 +122,12 @@ namespace ParserTests
 			yield return $"ABC\t{newLine}\t";
 		}
 
-		private static IEnumerable<BlockFlowInOut> getBlocksAndFlows()
+		private static IEnumerable<BlockFlow> getBlocksAndFlows()
 		{
 			return EnumCache.GetBlockAndFlowTypes();
 		}
 
-		private static readonly IReadOnlyDictionary<BlockFlowInOut, Regex> _emptyLineBlockFlowRegexByType =
+		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _emptyLineBlockFlowRegexByType =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
 				i => new Regex(GlobalConstants.EmptyLine(i), RegexOptions.Compiled)

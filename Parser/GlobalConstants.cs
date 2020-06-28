@@ -73,37 +73,37 @@ namespace Parser
 
 		public static readonly string Spaces = $"{SPACE}{{1,{CharGroupLength}}}";
 
-		private static readonly string _anchoredIndent = $"^{SPACE}{{0,{CharGroupLength}}}";
-
 		private static readonly string _indent = $"{SPACE}{{0,{CharGroupLength}}}";
+
+		private static readonly string _anchoredIndent = $"^{_indent}";
 
 		private static readonly string _separateInLine = $"(?:^|[{SPACE}{TAB}]{{1,{CharGroupLength}}})";
 
-		public static string LinePrefix(BlockFlowInOut c, bool useAnchoredIndent = true)
+		public static string LinePrefix(BlockFlow c, bool useAnchoredIndent = true)
 		{
 			var indent = useAnchoredIndent ? _anchoredIndent : _indent;
 
 			switch (c)
 			{
-				case BlockFlowInOut.BlockOut:
-				case BlockFlowInOut.BlockIn:
+				case BlockFlow.BlockIn:
+				case BlockFlow.BlockOut:
 					return indent;
-				case BlockFlowInOut.FlowOut:
-				case BlockFlowInOut.FlowIn:
+				case BlockFlow.FlowIn:
+				case BlockFlow.FlowOut:
 					return $"{indent}{_separateInLine}?";
 				default:
-					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlowInOut)} item {c}.");
+					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlow)} item {c}.");
 			}
 		}
 
-		public static string EmptyLine(BlockFlowInOut c, bool useAnchoredIndent = true)
+		public static string EmptyLine(BlockFlow c, bool useAnchoredIndent = true)
 		{
 			return $"{LinePrefix(c, useAnchoredIndent)}{Break}";
 		}
 
 		#region Folded Line Regexes
 
-		public static string TrimmedLine(BlockFlowInOut c)
+		public static string TrimmedLine(BlockFlow c)
 		{
 			return $"{Break}" +
 				   $"(?:{EmptyLine(c, useAnchoredIndent: false)})+";
@@ -117,17 +117,40 @@ namespace Parser
 
 		public static string FlowFoldedTrimmedLine =
 			$"(?:{_separateInLine})?" +
-			TrimmedLine(BlockFlowInOut.FlowIn) +
-			LinePrefix(BlockFlowInOut.FlowIn, useAnchoredIndent: false);
+			TrimmedLine(BlockFlow.FlowIn) +
+			LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false);
 
 		public static string FlowFoldedLineWithBreakAsSpace =
 			$"(?:{_separateInLine})?" +
-			BreakAsSpace(linePrefix: LinePrefix(BlockFlowInOut.FlowIn, useAnchoredIndent: false));
+			BreakAsSpace(linePrefix: LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false));
 
 		#endregion
 
 		public static readonly string CommentRegex =
-			$"{_separateInLine}#[^{Break}]{{0,{CharGroupLength * CharGroupLength}}}{Break}";
+			$"(?:{_separateInLine}(?:#[^{Break}]{{0,{CharGroupLength * CharGroupLength}}})?)?{Break}";
+
+		// TODO: Move the logic to a higher level.
+		public static string SeparateLines(BlockFlow c)
+		{
+			throw new NotSupportedException("This regex is for informational purposes only. Will be deleted later.");
+			switch (c)
+			{
+				case BlockFlow.BlockIn:
+				case BlockFlow.BlockOut:
+				case BlockFlow.FlowIn:
+				case BlockFlow.FlowOut:
+					return $"(?:{CommentRegex}" +
+						   $"(?:{CommentRegex})*" +
+						   $"{LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false)}" +
+						   "|" +
+						   $"{_separateInLine})";
+//				case BlockFlow.BlockKey:
+//				case BlockFlow.FlowKey:
+//					return _separateInLine;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(c), c, null);
+			}
+		}
 
 		public static readonly string ForbiddenCharsRegex =
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";

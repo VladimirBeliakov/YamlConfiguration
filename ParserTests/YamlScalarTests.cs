@@ -24,11 +24,11 @@ namespace ParserTests
 		[TestCase("type_Name1", "")]
 		[TestCase("- type Name1", "")]
 		[TestCase("- !@#$%^&*()-=+", "")]
-		[TestCase("- type_Name1 ", "")]
 		[TestCase("- type_Name1", " invalid comment")]
 		public void Add_InvalidItem_Throws(string item, string comment)
 		{
-			Assert.Throws<InvalidYamlCollectionItemException>(() => new YamlScalar(item + comment));
+			var @break = Environment.NewLine;
+			Assert.Throws<InvalidYamlCollectionItemException>(() => new YamlScalar(item + comment + @break));
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace ParserTests
 	public class TrimmedLineTests
 	{
 		[TestCaseSource(nameof(getTrimmedLineBlockFlowWithCorrespondingRegex))]
-		public void ReturnsCorrespondingRegexForBlockOrFlowType(BlockFlowInOut value, string expectedRegex)
+		public void ReturnsCorrespondingRegexForBlockOrFlowType(BlockFlow value, string expectedRegex)
 		{
 			var actualRegex = GlobalConstants.TrimmedLine(value);
 
@@ -41,7 +41,7 @@ namespace ParserTests
 
 		[Test]
 		public void NoEmptyLines_DoesNotMatch(
-			[ValueSource(nameof(getBlocksAndFlows))] BlockFlowInOut type,
+			[ValueSource(nameof(getBlocksAndFlows))] BlockFlow type,
 			[ValueSource(nameof(getTrimmedLineNonMatchableCases))] string testValue
 		)
 		{
@@ -61,16 +61,16 @@ namespace ParserTests
 			{
 				switch (value)
 				{
-					case BlockFlowInOut.BlockOut:
-					case BlockFlowInOut.BlockIn:
+					case BlockFlow.BlockOut:
+					case BlockFlow.BlockIn:
 						yield return new TestCaseData(
 							value,
 							newLine +
 							$"(?: {{0,{charGroupLength}}}" + newLine + ")+"
 						);
 						break;
-					case BlockFlowInOut.FlowOut:
-					case BlockFlowInOut.FlowIn:
+					case BlockFlow.FlowOut:
+					case BlockFlow.FlowIn:
 						yield return new TestCaseData(
 							value,
 							newLine +
@@ -83,7 +83,7 @@ namespace ParserTests
 			}
 		}
 
-		private static IEnumerable<BlockFlowTestCase> getTrimmedLineCommonTestCases(BlockFlowInOut type)
+		private static IEnumerable<BlockFlowTestCase> getTrimmedLineCommonTestCases(BlockFlow type)
 		{
 			var spaces = CharCache.Spaces;
 			var @break = Environment.NewLine;
@@ -185,12 +185,12 @@ namespace ParserTests
 			yield return $"ABC\t{@break}\tABC";
 		}
 
-		private static IEnumerable<BlockFlowInOut> getBlocksAndFlows()
+		private static IEnumerable<BlockFlow> getBlocksAndFlows()
 		{
 			return EnumCache.GetBlockAndFlowTypes();
 		}
 
-		private static readonly IReadOnlyDictionary<BlockFlowInOut, Regex> _trimmedLineRegex =
+		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _trimmedLineRegex =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
 				i => new Regex(GlobalConstants.TrimmedLine(i), RegexOptions.Compiled)

@@ -7,20 +7,20 @@ namespace ParserTests
 {
 	internal static class EnumCache
 	{
-		public static IEnumerable<BlockFlowInOut> GetBlockAndFlowTypes()
+		public static IEnumerable<BlockFlow> GetBlockAndFlowTypes()
 		{
-			return Enum.GetValues(typeof(BlockFlowInOut)).Cast<BlockFlowInOut>();
+			return Enum.GetValues(typeof(BlockFlow)).Cast<BlockFlow>();
 		}
 
-		public static IEnumerable<BlockFlowInOut> GetBlockTypes()
+		public static IEnumerable<BlockFlow> GetBlockTypes()
 		{
 			return GetBlockAndFlowTypes().Except(GetFlowTypes());
 		}
 
-		public static IEnumerable<BlockFlowInOut> GetFlowTypes()
+		public static IEnumerable<BlockFlow> GetFlowTypes()
 		{
-			yield return BlockFlowInOut.FlowIn;
-			yield return BlockFlowInOut.FlowOut;
+			yield return BlockFlow.FlowIn;
+			yield return BlockFlow.FlowOut;
 		}
 	}
 }

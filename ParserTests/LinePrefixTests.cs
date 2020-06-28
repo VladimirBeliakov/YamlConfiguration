@@ -12,7 +12,7 @@ namespace ParserTests
 	public class LinePrefixTests
 	{
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
-		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(BlockFlowInOut value, string expectedRegex)
+		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, string expectedRegex)
 		{
 			var actualRegex = GlobalConstants.LinePrefix(value);
 
@@ -47,12 +47,12 @@ namespace ParserTests
 			{
 				switch (value)
 				{
-					case BlockFlowInOut.BlockOut:
-					case BlockFlowInOut.BlockIn:
+					case BlockFlow.BlockOut:
+					case BlockFlow.BlockIn:
 						yield return new TestCaseData(value, "^ {0,100}");
 						break;
-					case BlockFlowInOut.FlowOut:
-					case BlockFlowInOut.FlowIn:
+					case BlockFlow.FlowOut:
+					case BlockFlow.FlowIn:
 						yield return new TestCaseData(value, "^ {0,100}(?:^|[ \t]{1,100})?");
 						break;
 					default:
@@ -61,7 +61,7 @@ namespace ParserTests
 			}
 		}
 
-		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(BlockFlowInOut type)
+		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(BlockFlow type)
 		{
 			var spaces = CharCache.Spaces;
 
@@ -100,7 +100,7 @@ namespace ParserTests
 			}
 		}
 
-		private static readonly IReadOnlyDictionary<BlockFlowInOut, Regex> _linePrefixBlockFlowRegexByType =
+		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _linePrefixBlockFlowRegexByType =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
 				i => new Regex(GlobalConstants.LinePrefix(i), RegexOptions.Compiled)

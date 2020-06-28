@@ -61,11 +61,9 @@ namespace ParserTests
 
 		private static IEnumerable<string> getUnmatchableTestCases()
 		{
-			var @break = Environment.NewLine;
-
-			yield return $"ABC#{@break}";
+			yield return "ABC#";
 			yield return "ABC #";
-			yield return $"ABC#ABC{@break}";
+			yield return "ABC#ABC";
 			yield return "ABC #ABC";
 		}
 

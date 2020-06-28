@@ -59,7 +59,7 @@ namespace ParserTests
 					})
 					{
 						yield return new BlockFlowTestCase(
-							BlockFlowInOut.FlowIn,
+							BlockFlow.FlowIn,
 							testValue: separateInLine +
 									   breakAsSpace +
 									   "ABC" + @break,
@@ -68,7 +68,7 @@ namespace ParserTests
 										  linePrefix
 						);
 						yield return new BlockFlowTestCase(
-							BlockFlowInOut.FlowIn,
+							BlockFlow.FlowIn,
 							testValue: "ABC" + separateInLine +
 									   breakAsSpace +
 									   "ABC" + @break,
