@@ -14,7 +14,7 @@ namespace ParserTests
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
 		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, string expectedRegex)
 		{
-			var actualRegex = GlobalConstants.LinePrefix(value);
+			var actualRegex = BasicStructures.LinePrefix(value);
 
 			Assert.That(actualRegex, Is.EqualTo(expectedRegex));
 		}
@@ -103,7 +103,7 @@ namespace ParserTests
 		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _linePrefixBlockFlowRegexByType =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
-				i => new Regex(GlobalConstants.LinePrefix(i), RegexOptions.Compiled)
+				i => new Regex(BasicStructures.LinePrefix(i), RegexOptions.Compiled)
 			);
 	}
 }

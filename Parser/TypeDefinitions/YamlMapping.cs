@@ -20,9 +20,9 @@ namespace Parser.TypeDefinitions
 		}
 
 		private static readonly Regex _yamlMappingRegex = new Regex(
-			$"^([\\w]{{1,{GlobalConstants.CharGroupLength}}}):{GlobalConstants.Spaces}" +
-			$"(.{{1,{GlobalConstants.CharGroupLength}}}?)" +
-			$"(?:{GlobalConstants.CommentRegex})?$",
+			$"^([\\w]{{1,{BasicStructures.CharGroupLength}}}):{BasicStructures.Spaces}" +
+			$"(.{{1,{BasicStructures.CharGroupLength}}}?)" +
+			$"(?:{BasicStructures.CommentRegex})?$",
 			RegexOptions.Compiled
 		);
 	}

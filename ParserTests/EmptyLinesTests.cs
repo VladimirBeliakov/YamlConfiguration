@@ -14,7 +14,7 @@ namespace ParserTests
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
 		public void EmptyLine_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, string expectedRegex)
 		{
-			var actualRegex = GlobalConstants.EmptyLine(value);
+			var actualRegex = BasicStructures.EmptyLine(value);
 
 			Assert.That(actualRegex, Is.EqualTo(expectedRegex));
 		}
@@ -130,7 +130,7 @@ namespace ParserTests
 		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _emptyLineBlockFlowRegexByType =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
-				i => new Regex(GlobalConstants.EmptyLine(i), RegexOptions.Compiled)
+				i => new Regex(BasicStructures.EmptyLine(i), RegexOptions.Compiled)
 			);
 	}
 }

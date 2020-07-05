@@ -77,7 +77,7 @@ namespace ParserTests
 		}
 
 		private readonly Regex _flowFoldedTrimmedLineRegex = new Regex(
-			GlobalConstants.FlowFoldedTrimmedLine,
+			BasicStructures.FlowFoldedTrimmedLine,
 			RegexOptions.Compiled
 		);
 	}

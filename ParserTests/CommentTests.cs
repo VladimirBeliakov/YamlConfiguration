@@ -67,6 +67,6 @@ namespace ParserTests
 			yield return "ABC #ABC";
 		}
 
-		private readonly Regex _commentRegex = new Regex(GlobalConstants.CommentRegex, RegexOptions.Compiled);
+		private readonly Regex _commentRegex = new Regex(BasicStructures.CommentRegex, RegexOptions.Compiled);
 	}
 }

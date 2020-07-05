@@ -96,7 +96,7 @@ namespace ParserTests
 		}
 
 		private readonly Regex _flowFoldedLineWithBreakAsSpaceRegex = new Regex(
-			GlobalConstants.FlowFoldedLineWithBreakAsSpace,
+			BasicStructures.FlowFoldedLineWithBreakAsSpace,
 			RegexOptions.Compiled
 		);
 	}

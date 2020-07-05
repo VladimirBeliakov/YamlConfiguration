@@ -9,22 +9,22 @@ namespace ParserTests
 	{
 		public static string Spaces = String.Join(
 			String.Empty,
-			Enumerable.Repeat(' ', GlobalConstants.CharGroupLength)
+			Enumerable.Repeat(' ', BasicStructures.CharGroupLength)
 		);
 
 		public static string Tabs = String.Join(
 			String.Empty,
-			Enumerable.Repeat('\t', GlobalConstants.CharGroupLength)
+			Enumerable.Repeat('\t', BasicStructures.CharGroupLength)
 		);
 
 		public static string SpacesAndTabs = String.Join(
 			String.Empty,
-			Enumerable.Repeat("\t ", GlobalConstants.CharGroupLength / 2)
+			Enumerable.Repeat("\t ", BasicStructures.CharGroupLength / 2)
 		);
 
 		public static string Chars = String.Join(
 			String.Empty,
-			Enumerable.Repeat("ABCD", GlobalConstants.CharGroupLength / 4)
+			Enumerable.Repeat("ABCD", BasicStructures.CharGroupLength / 4)
 		);
 
 		public static IEnumerable<string> SeparateInLineCases = new[] { " ", "\t", Spaces, Tabs, SpacesAndTabs };

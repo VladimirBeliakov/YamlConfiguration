@@ -14,7 +14,7 @@ namespace ParserTests
 		[TestCaseSource(nameof(getTrimmedLineBlockFlowWithCorrespondingRegex))]
 		public void ReturnsCorrespondingRegexForBlockOrFlowType(BlockFlow value, string expectedRegex)
 		{
-			var actualRegex = GlobalConstants.TrimmedLine(value);
+			var actualRegex = BasicStructures.TrimmedLine(value);
 
 			Assert.That(actualRegex, Is.EqualTo(expectedRegex));
 		}
@@ -55,7 +55,7 @@ namespace ParserTests
 		private static IEnumerable<TestCaseData> getTrimmedLineBlockFlowWithCorrespondingRegex()
 		{
 			var newLine = Environment.NewLine;
-			var charGroupLength = GlobalConstants.CharGroupLength;
+			var charGroupLength = BasicStructures.CharGroupLength;
 
 			foreach (var value in EnumCache.GetBlockAndFlowTypes())
 			{
@@ -193,7 +193,7 @@ namespace ParserTests
 		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _trimmedLineRegex =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
-				i => new Regex(GlobalConstants.TrimmedLine(i), RegexOptions.Compiled)
+				i => new Regex(BasicStructures.TrimmedLine(i), RegexOptions.Compiled)
 			);
 	}
 }

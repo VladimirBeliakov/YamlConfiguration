@@ -56,7 +56,7 @@ namespace ParserTests
 		}
 
 		private static readonly Regex _breakAsSpaceRegex = new Regex(
-			GlobalConstants.BreakAsSpace(),
+			BasicStructures.BreakAsSpace(),
 			RegexOptions.Compiled
 		);
 	}

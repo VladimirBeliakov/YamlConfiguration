@@ -42,10 +42,10 @@ namespace ParserTests
 		}
 
 		private static readonly Regex forbiddenCharsRegex =
-			new Regex(GlobalConstants.ForbiddenCharsRegex, RegexOptions.Compiled);
+			new Regex(BasicStructures.ForbiddenCharsRegex, RegexOptions.Compiled);
 		
 		private static readonly Regex printableCharsRegex =
-			new Regex(GlobalConstants.PrintableCharsRegex, RegexOptions.Compiled);
+			new Regex(BasicStructures.PrintableCharsRegex, RegexOptions.Compiled);
 
 		private static IEnumerable<string> getC0AndC1BlockExcludedChars()
 		{
@@ -82,6 +82,6 @@ namespace ParserTests
 		private const string CR = "\u000D";
 		private const string NEL = "\u0085";
 
-		private readonly Regex _breakRegex = new Regex(GlobalConstants.Break, RegexOptions.Compiled);
+		private readonly Regex _breakRegex = new Regex(BasicStructures.Break, RegexOptions.Compiled);
 	}
 }
