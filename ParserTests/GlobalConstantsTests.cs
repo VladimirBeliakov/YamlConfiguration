@@ -42,10 +42,10 @@ namespace ParserTests
 		}
 
 		private static readonly Regex forbiddenCharsRegex =
-			new Regex(BasicStructures.ForbiddenCharsRegex, RegexOptions.Compiled);
+			new Regex(Characters.ForbiddenCharsRegex, RegexOptions.Compiled);
 		
 		private static readonly Regex printableCharsRegex =
-			new Regex(BasicStructures.PrintableCharsRegex, RegexOptions.Compiled);
+			new Regex(Characters.PrintableChars, RegexOptions.Compiled);
 
 		private static IEnumerable<string> getC0AndC1BlockExcludedChars()
 		{

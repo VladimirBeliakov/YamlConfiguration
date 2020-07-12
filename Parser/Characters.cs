@@ -1,6 +1,6 @@
 namespace Parser
 {
-	internal static class Characters
+	public static class Characters
 	{
 		#region Unicode Characters Codes
 
@@ -66,7 +66,7 @@ namespace Parser
 		public static readonly string ForbiddenCharsRegex =
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";
 
-		public static readonly string PrintableCharsRegex =
+		public static readonly string PrintableChars =
 			$@"[{TAB + LF + CR + NEL +
 				 BasicLatinSubset +
 				 LatinSupplementToHangulJamo +
@@ -74,11 +74,19 @@ namespace Parser
 				"|" +
 				 $"{LinearBSyllabaryToSupplementaryPrivateUseAreaRegex}";
 
+		private static readonly string _whiteSpaceChars= $"{SPACE + TAB}";
+
+		public static readonly string NonBreakChar =
+			$"(?![{LF + CR + ByteOrderMark}]){PrintableChars}";
+
+		public static readonly string NonSpaceChar =
+			$"(?![{LF + CR + ByteOrderMark + _whiteSpaceChars}]){PrintableChars}";
+
 		public static readonly string JsonCompatibleRegex = $"[{TAB + BasicLatinToSupplementaryPrivateUseArea}]";
 
 		public static readonly string FlowIndicatorsRegex =
 			$"[{CollectEntry + SequenceStart + SequenceEnd + MappingStart + MappingEnd}]";
 
-		public static readonly string WhiteSpaceCharsRegex = $"[{SPACE + TAB}]";
+		public const int CharGroupLength = 100;
 	}
 }

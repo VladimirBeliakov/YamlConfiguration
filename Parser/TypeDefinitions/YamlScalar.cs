@@ -20,14 +20,14 @@ namespace Parser.TypeDefinitions
 
 		private static readonly Regex _yamlScalarRegex =
 			new Regex(
-				$"^\\- ([\\w]{{1,{BasicStructures.CharGroupLength}}})(?:{BasicStructures.CommentRegex})?$",
+				$"^\\- ([\\w]{{1,{Characters.CharGroupLength}}})(?:{BasicStructures.Comment})?$",
 				RegexOptions.Compiled
 			);
 		
 		private static readonly Regex _yamlCollectionScalarRegex = 
 			new Regex(
-				$"^{BasicStructures.Spaces}\\- ([\\w]{{1,{BasicStructures.CharGroupLength}}})" +
-				$"(?:{BasicStructures.CommentRegex})?$",
+				$"^{BasicStructures.Spaces}\\- ([\\w]{{1,{Characters.CharGroupLength}}})" +
+				$"(?:{BasicStructures.Comment})?$",
 				RegexOptions.Compiled
 			);
 	}

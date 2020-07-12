@@ -5,18 +5,17 @@ namespace Parser
 {
 	public static class BasicStructures
 	{
-		public const int CharGroupLength = 100;
-
 		// TODO: Define the break code by the file parsed.
 		public static readonly string Break = Environment.NewLine;
 
-		public static readonly string Spaces = $"{Characters.SPACE}{{1,{CharGroupLength}}}";
+		public static readonly string Spaces = $"{Characters.SPACE}{{1,{Characters.CharGroupLength}}}";
 
-		private static readonly string _indent = $"{Characters.SPACE}{{0,{CharGroupLength}}}";
+		private static readonly string _indent = $"{Characters.SPACE}{{0,{Characters.CharGroupLength}}}";
 
 		private static readonly string _anchoredIndent = $"^{_indent}";
 
-		private static readonly string _separateInLine = $"(?:^|[{Characters.SPACE}{Characters.TAB}]{{1,{CharGroupLength}}})";
+		public static readonly string SeparateInLine =
+			$"(?:^|[{Characters.SPACE}{Characters.TAB}]{{1,{Characters.CharGroupLength}}})";
 
 		public static string LinePrefix(BlockFlow c, bool useAnchoredIndent = true)
 		{
@@ -29,7 +28,7 @@ namespace Parser
 					return indent;
 				case BlockFlow.FlowIn:
 				case BlockFlow.FlowOut:
-					return $"{indent}{_separateInLine}?";
+					return $"{indent}{SeparateInLine}?";
 				default:
 					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlow)} item {c}.");
 			}
@@ -51,22 +50,23 @@ namespace Parser
 		// TODO: When writing the processor, one matter should be observed:
 		// if line breaks within a block surround a more intended line, then folding doesn't apply to such breaks.
 		public static string BreakAsSpace(string linePrefix = "") =>
-			$"{Break}" +
-			linePrefix + $"(?=.{{0,{CharGroupLength}}}[^ \t{Break}]{{1,{CharGroupLength}}}.{{0,{CharGroupLength}}})";
+			Break +
+			linePrefix +
+			$"(?=.{{0,{Characters.CharGroupLength}}}[^ \t{Break}]{{1,{Characters.CharGroupLength}}}.{{0,{Characters.CharGroupLength}}})";
 
 		public static string FlowFoldedTrimmedLine =
-			$"(?:{_separateInLine})?" +
+			$"(?:{SeparateInLine})?" +
 			TrimmedLine(BlockFlow.FlowIn) +
 			LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false);
 
 		public static string FlowFoldedLineWithBreakAsSpace =
-			$"(?:{_separateInLine})?" +
+			$"(?:{SeparateInLine})?" +
 			BreakAsSpace(linePrefix: LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false));
 
 		#endregion
 
-		public static readonly string CommentRegex =
-			$"(?:{_separateInLine}(?:#[^{Break}]{{0,{CharGroupLength * CharGroupLength}}})?)?{Break}";
+		public static readonly string Comment =
+			$"(?:{SeparateInLine}(?:#[^{Break}]{{0,{Characters.CharGroupLength * Characters.CharGroupLength}}})?)?{Break}";
 
 		// TODO: Move the logic to a higher level.
 		public static string SeparateLines(BlockFlow c)
@@ -78,11 +78,11 @@ namespace Parser
 				case BlockFlow.BlockOut:
 				case BlockFlow.FlowIn:
 				case BlockFlow.FlowOut:
-					return $"(?:{CommentRegex}" +
-						   $"(?:{CommentRegex})*" +
+					return $"(?:{Comment}" +
+						   $"(?:{Comment})*" +
 						   $"{LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false)}" +
 						   "|" +
-						   $"{_separateInLine})";
+						   $"{SeparateInLine})";
 //				case BlockFlow.BlockKey:
 //				case BlockFlow.FlowKey:
 //					return _separateInLine;

@@ -55,7 +55,7 @@ namespace ParserTests
 		private static IEnumerable<TestCaseData> getTrimmedLineBlockFlowWithCorrespondingRegex()
 		{
 			var newLine = Environment.NewLine;
-			var charGroupLength = BasicStructures.CharGroupLength;
+			var charGroupLength = Characters.CharGroupLength;
 
 			foreach (var value in EnumCache.GetBlockAndFlowTypes())
 			{
