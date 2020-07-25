@@ -63,6 +63,9 @@ namespace Parser
 
 		#endregion
 
+		public const string DecimalDigits = "0-9";
+		public const string VersionSeparator = ".";
+
 		public static readonly string ForbiddenCharsRegex =
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";
 

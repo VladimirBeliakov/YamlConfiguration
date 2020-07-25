@@ -99,7 +99,7 @@ namespace ParserTests
 		{
 			var oneHundredSpaces = CharCache.Spaces;
 			var oneHundredSpacesAndTabs = CharCache.SpacesAndTabs;
-			var newLine = Environment.NewLine;
+			var @break = Environment.NewLine;
 
 			foreach (var type in EnumCache.GetFlowTypes())
 			{
@@ -107,19 +107,19 @@ namespace ParserTests
 					yield return testCase;
 
 				yield return new BlockFlowTestCase(
-					type, 
-					testValue: oneHundredSpaces + oneHundredSpacesAndTabs + newLine + 
+					type,
+					testValue: oneHundredSpaces + oneHundredSpacesAndTabs + @break +
 							   "\t ABC\t  ",
-					wholeCapture: oneHundredSpaces + oneHundredSpacesAndTabs + newLine
+					wholeCapture: oneHundredSpaces + oneHundredSpacesAndTabs + @break
 				);
 			}
 		}
 
 		private static IEnumerable<string> getNonMatchableCases()
 		{
-			var newLine = Environment.NewLine;
-			yield return $"ABC  {newLine}  ";
-			yield return $"ABC\t{newLine}\t";
+			var @break = Environment.NewLine;
+			yield return $"ABC  {@break}  ";
+			yield return $"ABC\t{@break}\t";
 		}
 
 		private static IEnumerable<BlockFlow> getBlocksAndFlows()

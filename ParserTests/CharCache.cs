@@ -27,6 +27,11 @@ namespace ParserTests
 			Enumerable.Repeat("ABCD", Characters.CharGroupLength / 4)
 		);
 
+		public static string Digits = String.Join(
+			String.Empty,
+			Enumerable.Repeat("0123456789", Characters.CharGroupLength / 10)
+		);
+
 		public static IEnumerable<string> SeparateInLineCases = new[] { " ", "\t", Spaces, Tabs, SpacesAndTabs };
 	}
 }
