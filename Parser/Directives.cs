@@ -3,8 +3,8 @@ namespace Parser
 	public static class Directives
 	{
 		private static readonly string _reservedDirectiveName =
-			$"(?:{Characters.NonSpaceChar}){{1,{Characters.CharGroupLength}}}";
-		private static readonly string _parameter = $"(?:{Characters.NonSpaceChar}){{1,{Characters.CharGroupLength}}}";
+			$"((?:{Characters.NonSpaceChar}){{1,{Characters.CharGroupLength}}})";
+		private static readonly string _parameter = $"((?:{Characters.NonSpaceChar}){{1,{Characters.CharGroupLength}}})";
 
 		private const string _yamlDirectiveName = "YAML";
 

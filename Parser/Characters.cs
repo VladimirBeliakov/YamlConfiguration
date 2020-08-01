@@ -8,8 +8,8 @@ namespace Parser
 
 		private const string C0ControlBlockExceptTabLfCr = "\u0000-\u0008\u000B\u000C\u000E-\u001F";
 		public const string TAB = "\u0009";
-		private const string LF = "\u000A";
-		private const string CR = "\u000D";
+		private const string _lf = "\u000A";
+		private const string _cr = "\u000D";
 
 		#endregion
 
@@ -70,7 +70,7 @@ namespace Parser
 			$"[{C0ControlBlockExceptTabLfCr + C1ControlBlockExceptNel + DEL + SurrogateBlock}]";
 
 		public static readonly string PrintableChars =
-			$@"[{TAB + LF + CR + NEL +
+			$@"[{TAB + _lf + _cr + NEL +
 				 BasicLatinSubset +
 				 LatinSupplementToHangulJamo +
 				 PrivateUseAreaToSpecialsBeginning}]" +
@@ -80,10 +80,10 @@ namespace Parser
 		private static readonly string _whiteSpaceChars= $"{SPACE + TAB}";
 
 		public static readonly string NonBreakChar =
-			$"(?![{LF + CR + ByteOrderMark}]){PrintableChars}";
+			$"(?![{_lf + _cr + ByteOrderMark}])(?:{PrintableChars})";
 
 		public static readonly string NonSpaceChar =
-			$"(?![{LF + CR + ByteOrderMark + _whiteSpaceChars}]){PrintableChars}";
+			$"(?![{_lf + _cr + ByteOrderMark + _whiteSpaceChars}])(?:{PrintableChars})";
 
 		public static readonly string JsonCompatibleRegex = $"[{TAB + BasicLatinToSupplementaryPrivateUseArea}]";
 

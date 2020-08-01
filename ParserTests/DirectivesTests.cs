@@ -10,11 +10,21 @@ namespace ParserTests
 	public class DirectivesTests
 	{
 		[TestCaseSource(nameof(getReservedDirectiveTestCases))]
-		public void ReservedDirective_ValidDirective_Matches(string testCase)
+		public void ReservedDirective_ValidDirective_Matches(RegexTestCase testCase)
 		{
-			var match = _reservedDirectiveRegex.Match(testCase);
+			var match = _reservedDirectiveRegex.Match(testCase.TestCase);
 
-			Assert.True(match.Success);
+			Assert.Multiple(
+				() =>
+				{
+					Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
+					Assert.That(match.Groups.Count, Is.EqualTo(3));
+					Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
+					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures[0]));
+					Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(1));
+					Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(testCase.Captures[1]));
+				}
+			);
 		}
 
 		[TestCaseSource(nameof(getReservedDirectiveUnmatchableTestCases))]
@@ -41,7 +51,7 @@ namespace ParserTests
 			Assert.False(match.Success);
 		}
 
-		private static IEnumerable<string> getReservedDirectiveTestCases()
+		private static IEnumerable<RegexTestCase> getReservedDirectiveTestCases()
 		{
 			var chars = CharCache.Chars;
 			var @break = Environment.NewLine;
@@ -57,7 +67,12 @@ namespace ParserTests
 							string.Empty + @break, $" #{@break}", $" #{chars + chars}{@break}"
 						})
 						{
-							yield return "%" + directiveName + separateInLine + directiveParameter + comment;
+							yield return new RegexTestCase(
+								testCase: "%" + directiveName + separateInLine + directiveParameter + comment + chars,
+								wholeMatch: "%" + directiveName + separateInLine + directiveParameter + comment,
+								directiveName,
+								directiveParameter
+							);
 						}
 					}
 				}
