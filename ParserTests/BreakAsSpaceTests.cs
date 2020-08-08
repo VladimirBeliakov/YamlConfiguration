@@ -6,7 +6,9 @@ using Parser;
 
 namespace ParserTests
 {
-	[TestFixture, Parallelizable(ParallelScope.Children)]
+	// TODO: Leaving the test for informational purposes only. Will be deleted when the BreakAsSpace logic
+	// is moved to upper levels
+	[TestFixture, Parallelizable(ParallelScope.Children), Explicit]
 	public class BreakAsSpaceTests
 	{
 		[TestCaseSource(nameof(getMatchableTestCases))]

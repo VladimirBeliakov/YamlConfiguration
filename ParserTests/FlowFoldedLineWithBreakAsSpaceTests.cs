@@ -8,7 +8,9 @@ using Parser.TypeDefinitions;
 
 namespace ParserTests
 {
-	[TestFixture]
+	// TODO: Leaving the test for informational purposes only. Will be deleted when the FlowFoldedLineWithBreakAsSpace
+	// logic is moved to upper levels
+	[TestFixture, Parallelizable(ParallelScope.Children), Explicit]
 	public class FlowFoldedLineWithBreakAsSpaceTests
 	{
 		[TestCaseSource(nameof(getTestCases))]
@@ -96,7 +98,7 @@ namespace ParserTests
 		}
 
 		private readonly Regex _flowFoldedLineWithBreakAsSpaceRegex = new Regex(
-			BasicStructures.FlowFoldedLineWithBreakAsSpace,
+			BasicStructures.FlowFoldedLineWithBreakAsSpace(),
 			RegexOptions.Compiled
 		);
 	}

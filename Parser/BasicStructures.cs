@@ -43,25 +43,43 @@ namespace Parser
 
 		public static string TrimmedLine(BlockFlow c)
 		{
+			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
+			// their login will be moved to upper levels.
+			throw new NotSupportedException();
 			return $"{Break}" +
 				   $"(?:{EmptyLine(c, useAnchoredIndent: false)})+";
 		}
 
 		// TODO: When writing the processor, one matter should be observed:
 		// if line breaks within a block surround a more intended line, then folding doesn't apply to such breaks.
-		public static string BreakAsSpace(string linePrefix = "") =>
-			Break +
-			linePrefix +
-			$"(?=.{{0,{Characters.CharGroupLength}}}[^ \t{Break}]{{1,{Characters.CharGroupLength}}}.{{0,{Characters.CharGroupLength}}})";
+		public static string BreakAsSpace(string linePrefix = "")
+		{
+			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
+			// their login will be moved to upper levels.
+			throw new NotSupportedException();
+			return Break +
+				linePrefix +
+				$"(?=.{{0,{Characters.CharGroupLength}}}[^ \t{Break}]{{1,{Characters.CharGroupLength}}}.{{0,{Characters.CharGroupLength}}})";
+		}
 
-		public static string FlowFoldedTrimmedLine =
-			$"(?:{SeparateInLine})?" +
+		public static string FlowFoldedTrimmedLine()
+		{
+			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
+			// their login will be moved to upper levels.
+			throw new NotSupportedException();
+			return $"{SeparateInLine}?" +
 			TrimmedLine(BlockFlow.FlowIn) +
 			LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false);
+		}
 
-		public static string FlowFoldedLineWithBreakAsSpace =
-			$"(?:{SeparateInLine})?" +
+		public static string FlowFoldedLineWithBreakAsSpace()
+		{
+			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
+			// their login will be moved to upper levels.
+			throw new NotSupportedException();
+			return $"{SeparateInLine}?" +
 			BreakAsSpace(linePrefix: LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false));
+		}
 
 		#endregion
 
@@ -71,7 +89,9 @@ namespace Parser
 		// TODO: Move the logic to a higher level.
 		public static string SeparateLines(BlockFlow c)
 		{
-			throw new NotSupportedException("This regex is for informational purposes only. Will be deleted later.");
+			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
+			// their login will be moved to upper levels.
+			throw new NotSupportedException();
 			switch (c)
 			{
 				case BlockFlow.BlockIn:

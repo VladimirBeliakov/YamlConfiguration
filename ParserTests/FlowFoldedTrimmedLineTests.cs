@@ -8,7 +8,9 @@ using Parser.TypeDefinitions;
 
 namespace ParserTests
 {
-	[TestFixture, Parallelizable(ParallelScope.Children)]
+	// TODO: Leaving the test for informational purposes only. Will be deleted when the FlowFoldedTrimmedLine logic
+	// is moved to upper levels
+	[TestFixture, Parallelizable(ParallelScope.Children), Explicit]
 	public class FlowFoldedTrimmedLineTests
 	{
 		[TestCaseSource(nameof(getTestCases))]
@@ -77,7 +79,7 @@ namespace ParserTests
 		}
 
 		private readonly Regex _flowFoldedTrimmedLineRegex = new Regex(
-			BasicStructures.FlowFoldedTrimmedLine,
+			BasicStructures.FlowFoldedTrimmedLine(),
 			RegexOptions.Compiled
 		);
 	}

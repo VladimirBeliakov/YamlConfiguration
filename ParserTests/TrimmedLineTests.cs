@@ -8,7 +8,9 @@ using Parser.TypeDefinitions;
 
 namespace ParserTests
 {
-	[TestFixture, Parallelizable(ParallelScope.Children)]
+	// TODO: Leaving the test for informational purposes only. Will be deleted when the TrimmedLine
+	// logic is moved to upper levels
+	[TestFixture, Parallelizable(ParallelScope.Children), Explicit]
 	public class TrimmedLineTests
 	{
 		[TestCaseSource(nameof(getTrimmedLineBlockFlowWithCorrespondingRegex))]
