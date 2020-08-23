@@ -17,4 +17,8 @@
       <ProjectReference Include="..\Processor\Processor.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="ProcessorTests.csproj.DotSettings" />
+    </ItemGroup>
+
 </Project>
