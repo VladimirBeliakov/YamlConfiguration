@@ -93,7 +93,7 @@ namespace ProcessorTests
 			var directiveNames = new[] { "A", chars };
 			var separateInLines = CharCache.SeparateInLineCases;
 			var directiveParameters = new[] { "A", chars };
-			var comments = getComments().ToList();
+			var comments = CharCache.GetComments().ToList();
 
 			var anyDirectiveName = directiveNames.First();
 			var anySeparateInLine = separateInLines.First();
@@ -162,7 +162,7 @@ namespace ProcessorTests
 			var chars = CharCache.Chars;
 			var separateInLines = CharCache.SeparateInLineCases;
 			var digits = CharCache.Digits;
-			var comments = getComments().ToList();
+			var comments = CharCache.GetComments().ToList();
 
 			var anySeparateInLine = separateInLines.First();
 			var anyDigit = digits.First();
@@ -219,9 +219,9 @@ namespace ProcessorTests
 
 		private static IEnumerable<RegexTestCase> getTagDirectiveTestCases()
 		{
-			var tagHandleCases = getTagHandles().ToList();
+			var tagHandleCases = CharCache.GetTagHandles().ToList();
 			var tagPrefixCases = getLocalTagPrefixes().Concat(getGlobalTagPrefixes()).ToList();
-			var commentCases = getComments().ToList();
+			var commentCases = CharCache.GetComments().ToList();
 
 			var anySeparateInLine = CharCache.SeparateInLineCases.First();
 			var anyTagHandle = tagHandleCases.First();
@@ -295,41 +295,21 @@ namespace ProcessorTests
 			yield return "%TAG !e! !%11 #comment";
 		}
 
-		private static IEnumerable<string> getTagHandles()
-		{
-			yield return "!";
-			yield return "!!";
-
-			foreach (var wordChar in _wordChars.GroupBy(Characters.CharGroupLength))
-			{
-				yield return $"!{wordChar}";
-				yield return $"!{wordChar}!";
-			}
-		}
-
 		private static IEnumerable<string> getLocalTagPrefixes()
 		{
 			yield return "!";
 
-			foreach (var uriCharGroup in getUriCharGroups())
+			foreach (var uriCharGroup in CharCache.GetUriCharGroups())
 				yield return "!" + uriCharGroup;
-		}
-
-		private static IEnumerable<string> getComments()
-		{
-			var @break = Environment.NewLine;
-			var chars = CharCache.Chars;
-
-			return new[] { String.Empty + @break, $" #{@break}", $" #{chars + chars}{@break}" };
 		}
 
 		private static IEnumerable<string> getGlobalTagPrefixes()
 		{
 			var notAllowedFirstChars = new[] { "!", ",", "[", "]", "{", "}" };
-			var uriChars = getUriCharsWithoutHexNumbers().Concat(getHexNumbers());
+			var uriChars = CharCache.GetUriCharsWithoutHexNumbers().Concat(CharCache.GetHexNumbers());
 
 			var allowedFirstChars = uriChars.Except(notAllowedFirstChars).ToList();
-			var uriCharGroups = getUriCharGroups().ToList();
+			var uriCharGroups = CharCache.GetUriCharGroups().ToList();
 
 			var anyUriCharGroup = uriCharGroups.First();
 			var anyAllowedChar = allowedFirstChars.First();
@@ -340,50 +320,6 @@ namespace ProcessorTests
 			foreach (var uriCharGroup in uriCharGroups)
 				yield return anyAllowedChar + uriCharGroup;
 		}
-
-		private static IEnumerable<string> getUriCharGroups()
-		{
-			var hexNumberGroups = getHexNumbers().GroupBy(Characters.CharGroupLength);
-			var uriCharGroupsWithoutHexNumbers = getUriCharsWithoutHexNumbers().GroupBy(Characters.CharGroupLength);
-
-			return hexNumberGroups.Concat(uriCharGroupsWithoutHexNumbers);
-		}
-
-		private static IEnumerable<string> getHexNumbers()
-		{
-			var hexDigits = _hexLetters.Concat(_decimalDigits).ToList();
-
-			return from firstHexDigit in hexDigits
-				   from secondHexDigit in hexDigits
-				   select "%" + firstHexDigit + secondHexDigit;
-		}
-
-		private static IEnumerable<string> getUriCharsWithoutHexNumbers()
-		{
-			var additionalUriChar = new[]
-			{
-				"#", ";", "/", "?", ":", "@", "&", "=", "+", "$", ",", "_", ".", "!", "~", "*", "'", "(", ")",
-				"[", "]", "”"
-			};
-
-			return additionalUriChar.Concat(_wordChars);
-		}
-
-		private static readonly IEnumerable<string> _decimalDigits =
-			new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-
-		private static readonly IEnumerable<string> _hexLetters =
-			new[] { "A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f" };
-
-		private static readonly IEnumerable<string> _asciiLetters = _hexLetters.Concat(
-			new[]
-			{
-				"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-				"g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
-			}
-		);
-
-		private static readonly IEnumerable<string> _wordChars = _decimalDigits.Concat(_asciiLetters);
 
 		private static readonly Regex _reservedDirectiveRegex = new Regex(
 			BasicStructures.Directives.Reserved,
