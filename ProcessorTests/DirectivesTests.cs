@@ -273,16 +273,19 @@ namespace ProcessorTests
 			// Wrong %TAG
 			yield return "TAG !e! !%11 #comment" + @break;
 			yield return "%AG !e! !%11 #comment" + @break;
+			yield return " !e! !%11 #comment" + @break;
 			// Wrong tag handle
 			yield return "%TAG e! !%11 #comment" + @break;
 			yield return "%TAG ? !%11 #comment" + @break;
 			yield return "%TAG !? !%11 #comment" + @break;
 			yield return "%TAG !?! !%11 #comment" + @break;
 			yield return "%TAG #!e! !%11 #comment" + @break;
+			yield return "%TAG !%11 #comment" + @break;
 			// Wrong tag prefix
 			yield return "%TAG !e! }%11 #comment" + @break;
 			yield return "%TAG !e! !%1 #comment" + @break;
 			yield return "%TAG !e! !` #comment" + @break;
+			yield return "%TAG !e!" + @break;
 			// Wrong separate in line
 			yield return "%TAG!e! !%11 #comment" + @break;
 			yield return "%TAG !e!!%11 #comment" + @break;
