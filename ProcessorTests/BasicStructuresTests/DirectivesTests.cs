@@ -8,7 +8,7 @@ using ProcessorTests.Extensions;
 
 namespace ProcessorTests
 {
-	[TestFixture, Parallelizable(ParallelScope.Children)]
+	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class DirectivesTests
 	{
 		[TestCaseSource(nameof(getReservedDirectiveTestCases))]

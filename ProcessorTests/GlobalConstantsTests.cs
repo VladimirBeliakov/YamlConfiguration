@@ -7,7 +7,7 @@ using Processor;
 namespace ProcessorTests
 {
 	// TODO: Add more characters to the test cases.
-	[TestFixture, Parallelizable(ParallelScope.Children)]
+	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class GlobalConstantsTests
 	{
 		[TestCaseSource(nameof(getC0AndC1BlockExcludedChars))]

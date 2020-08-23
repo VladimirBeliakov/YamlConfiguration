@@ -4,7 +4,7 @@ using Processor.TypeDefinitions;
 
 namespace ProcessorTests
 {
-	[TestFixture, Parallelizable(ParallelScope.Children)]
+	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class YamlMappingTests
 	{
 		[TestCase("key_1:  65", "")]

@@ -10,7 +10,7 @@ namespace ProcessorTests
 {
 	// TODO: Leaving the test for informational purposes only. Will be deleted when the FlowFoldedLineWithBreakAsSpace
 	// logic is moved to upper levels
-	[TestFixture, Parallelizable(ParallelScope.Children), Explicit]
+	[TestFixture, Parallelizable(ParallelScope.All), Explicit]
 	public class FlowFoldedLineWithBreakAsSpaceTests
 	{
 		[TestCaseSource(nameof(getTestCases))]

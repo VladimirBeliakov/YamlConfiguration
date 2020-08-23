@@ -8,7 +8,7 @@ using Processor.TypeDefinitions;
 
 namespace ProcessorTests
 {
-	[TestFixture, Parallelizable(ParallelScope.Children)]
+	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class EmptyLinesTests
 	{
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]

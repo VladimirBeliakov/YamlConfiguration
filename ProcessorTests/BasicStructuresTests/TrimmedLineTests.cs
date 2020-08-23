@@ -10,7 +10,7 @@ namespace ProcessorTests
 {
 	// TODO: Leaving the test for informational purposes only. Will be deleted when the TrimmedLine
 	// logic is moved to upper levels
-	[TestFixture, Parallelizable(ParallelScope.Children), Explicit]
+	[TestFixture, Parallelizable(ParallelScope.All), Explicit]
 	public class TrimmedLineTests
 	{
 		[TestCaseSource(nameof(getTrimmedLineBlockFlowWithCorrespondingRegex))]
