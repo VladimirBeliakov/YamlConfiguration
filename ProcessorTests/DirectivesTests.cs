@@ -79,6 +79,14 @@ namespace ProcessorTests
 			);
 		}
 
+		[TestCaseSource(nameof(getTagDirectiveUnmatchableTestCases))]
+		public void TagDirective_InvalidDirective_DoesNotMatch(string testCase)
+		{
+			var match = _tagDirectiveRegex.Match(testCase);
+
+			Assert.False(match.Success);
+		}
+
 		private static IEnumerable<RegexTestCase> getReservedDirectiveTestCases()
 		{
 			var chars = CharCache.Chars;
@@ -257,6 +265,31 @@ namespace ProcessorTests
 					anyTagHandle,
 					anyTagPrefix
 				);
+		}
+
+		private static IEnumerable<string> getTagDirectiveUnmatchableTestCases()
+		{
+			var @break = Environment.NewLine;
+			// Wrong %TAG
+			yield return "TAG !e! !%11 #comment" + @break;
+			yield return "%AG !e! !%11 #comment" + @break;
+			// Wrong tag handle
+			yield return "%TAG e! !%11 #comment" + @break;
+			yield return "%TAG ? !%11 #comment" + @break;
+			yield return "%TAG !? !%11 #comment" + @break;
+			yield return "%TAG !?! !%11 #comment" + @break;
+			yield return "%TAG #!e! !%11 #comment" + @break;
+			// Wrong tag prefix
+			yield return "%TAG !e! }%11 #comment" + @break;
+			yield return "%TAG !e! !%1 #comment" + @break;
+			yield return "%TAG !e! !` #comment" + @break;
+			// Wrong separate in line
+			yield return "%TAG!e! !%11 #comment" + @break;
+			yield return "%TAG !e!!%11 #comment" + @break;
+			// Wrong comment
+			yield return "%TAG !e! !%11# comment" + @break;
+			// No line break
+			yield return "%TAG !e! !%11 #comment";
 		}
 
 		private static IEnumerable<string> getTagHandles()
