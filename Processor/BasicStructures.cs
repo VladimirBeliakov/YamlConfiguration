@@ -44,7 +44,7 @@ namespace Processor
 		public static string TrimmedLine(BlockFlow c)
 		{
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their login will be moved to upper levels.
+			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
 			return $"{Break}" +
 				   $"(?:{EmptyLine(c, useAnchoredIndent: false)})+";
@@ -55,7 +55,7 @@ namespace Processor
 		public static string BreakAsSpace(string linePrefix = "")
 		{
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their login will be moved to upper levels.
+			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
 			return Break +
 				linePrefix +
@@ -65,7 +65,7 @@ namespace Processor
 		public static string FlowFoldedTrimmedLine()
 		{
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their login will be moved to upper levels.
+			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
 			return $"{SeparateInLine}?" +
 			TrimmedLine(BlockFlow.FlowIn) +
@@ -75,7 +75,7 @@ namespace Processor
 		public static string FlowFoldedLineWithBreakAsSpace()
 		{
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their login will be moved to upper levels.
+			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
 			return $"{SeparateInLine}?" +
 			BreakAsSpace(linePrefix: LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false));
@@ -90,7 +90,7 @@ namespace Processor
 		public static string SeparateLines(BlockFlow c)
 		{
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their login will be moved to upper levels.
+			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
 			switch (c)
 			{
@@ -109,6 +109,50 @@ namespace Processor
 				default:
 					throw new ArgumentOutOfRangeException(nameof(c), c, null);
 			}
+		}
+
+		public static class Directives
+		{
+			private const string _yamlDirectiveName = "YAML";
+			private const string _tagDirectiveName = "TAG";
+
+			private static readonly string _reservedDirectiveName =
+				$"((?:{Characters.NonSpaceChar}){{1,{Characters.CharGroupLength}}})";
+
+			private static readonly string _parameter =
+				$"((?:{Characters.NonSpaceChar}){{1,{Characters.CharGroupLength}}})";
+
+			private static readonly string _tagHandle =
+				$"({Characters.Tag}{Characters.WordChar}{{0,{Characters.CharGroupLength}}}{Characters.Tag}?)";
+
+			private static readonly string _localTagPrefix =
+				$"{Characters.Tag}{Characters.UriChar}{{0,{Characters.CharGroupLength}}}";
+
+			private static readonly string _globalTagPrefix =
+				$"{Characters.TagChar}{Characters.UriChar}{{0,{Characters.CharGroupLength}}}";
+
+			private static readonly string _tagPrefix = $"({_localTagPrefix}|{_globalTagPrefix})";
+
+			public static readonly string Reserved =
+				$"^{Characters.Directive + _reservedDirectiveName}" +
+				$"{BasicStructures.SeparateInLine + _parameter}" +
+				$"{BasicStructures.Comment}";
+
+			public static readonly string Yaml =
+				$"^{Characters.Directive + _yamlDirectiveName}" +
+				$"{BasicStructures.SeparateInLine}" +
+				$"([{Characters.DecimalDigits}]{{1,{Characters.CharGroupLength}}}" +
+				$"{Characters.VersionSeparator}" +
+				$"[{Characters.DecimalDigits}]{{1,{Characters.CharGroupLength}}})" +
+				$"{BasicStructures.Comment}";
+
+			public static readonly string Tag =
+				$"^{Characters.Directive + _tagDirectiveName}" +
+				$"{BasicStructures.SeparateInLine}" +
+				$"{_tagHandle}" +
+				$"{BasicStructures.SeparateInLine}" +
+				$"{_tagPrefix}" +
+				$"{BasicStructures.Comment}";
 		}
 	}
 }

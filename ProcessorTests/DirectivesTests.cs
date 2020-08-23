@@ -349,8 +349,19 @@ namespace ProcessorTests
 
 		private static readonly IEnumerable<string> _wordChars = _decimalDigits.Concat(_asciiLetters);
 
-		private static readonly Regex _reservedDirectiveRegex = new Regex(Directives.Reserved, RegexOptions.Compiled);
-		private static readonly Regex _yamlDirectiveRegex = new Regex(Directives.Yaml, RegexOptions.Compiled);
-		private static readonly Regex _tagDirectiveRegex = new Regex(Directives.Tag, RegexOptions.Compiled);
+		private static readonly Regex _reservedDirectiveRegex = new Regex(
+			BasicStructures.Directives.Reserved,
+			RegexOptions.Compiled
+		);
+
+		private static readonly Regex _yamlDirectiveRegex = new Regex(
+			BasicStructures.Directives.Yaml,
+			RegexOptions.Compiled
+		);
+
+		private static readonly Regex _tagDirectiveRegex = new Regex(
+			BasicStructures.Directives.Tag,
+			RegexOptions.Compiled
+		);
 	}
 }

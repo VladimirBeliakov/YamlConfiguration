@@ -12,18 +12,19 @@ namespace ProcessorTests.Extensions
 			if (valuesInGroup < 1)
 				throw new InvalidOperationException($"{nameof(valuesInGroup)} must be greater than zero.");
 
-			var firstValueLength = values.First().Length;
+			var listedValues = values.ToList();
+			var firstValueLength = listedValues.First().Length;
 
-			if (values.Any(v => v.Length != firstValueLength))
+			if (listedValues.Any(v => v.Length != firstValueLength))
 				throw new InvalidOperationException(
-					$"All value lengths of {nameof(values)} must be equal to each other"
+					$"All value lengths of {nameof(listedValues)} must be equal to each other"
 				);
 
 			var oneGroupLength = firstValueLength * valuesInGroup;
 
 			var sb = new StringBuilder(oneGroupLength);
 
-			foreach (var value in values)
+			foreach (var value in listedValues)
 			{
 				sb.Append(value);
 
