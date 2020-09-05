@@ -1,5 +1,6 @@
 using System;
 using Processor.TypeDefinitions;
+using static Processor.BasicStructures;
 
 namespace Processor
 {
@@ -14,8 +15,11 @@ namespace Processor
 
 		private static readonly string _anchoredIndent = $"^{_indent}";
 
-		public static readonly string SeparateInLine =
+		private static readonly string _separateInLine =
 			$"(?:^|[{Characters.SPACE}{Characters.TAB}]{{1,{Characters.CharGroupLength}}})";
+
+		private static readonly string _tagHandle =
+			$"{Characters.Tag}{Characters.WordChar}{{0,{Characters.CharGroupLength}}}{Characters.Tag}?";
 
 		public static string LinePrefix(BlockFlow c, bool useAnchoredIndent = true)
 		{
@@ -28,7 +32,7 @@ namespace Processor
 					return indent;
 				case BlockFlow.FlowIn:
 				case BlockFlow.FlowOut:
-					return $"{indent}{SeparateInLine}?";
+					return $"{indent}{_separateInLine}?";
 				default:
 					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlow)} item {c}.");
 			}
@@ -67,7 +71,7 @@ namespace Processor
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
 			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
-			return $"{SeparateInLine}?" +
+			return $"{_separateInLine}?" +
 			TrimmedLine(BlockFlow.FlowIn) +
 			LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false);
 		}
@@ -77,14 +81,15 @@ namespace Processor
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
 			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
-			return $"{SeparateInLine}?" +
+			return $"{_separateInLine}?" +
 			BreakAsSpace(linePrefix: LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false));
 		}
 
 		#endregion
 
 		public static readonly string Comment =
-			$"(?:{SeparateInLine}(?:#[^{Break}]{{0,{Characters.CharGroupLength * Characters.CharGroupLength}}})?)?{Break}";
+			$"(?:{_separateInLine}(?:#[^{Break}]{{0,{Characters.CharGroupLength * Characters.CharGroupLength}}})?)?" +
+			$"{Break}";
 
 		// TODO: Move the logic to a higher level.
 		public static string SeparateLines(BlockFlow c)
@@ -102,7 +107,7 @@ namespace Processor
 						   $"(?:{Comment})*" +
 						   $"{LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false)}" +
 						   "|" +
-						   $"{SeparateInLine})";
+						   $"{_separateInLine})";
 //				case BlockFlow.BlockKey:
 //				case BlockFlow.FlowKey:
 //					return _separateInLine;
@@ -117,13 +122,10 @@ namespace Processor
 			private const string _tagDirectiveName = "TAG";
 
 			private static readonly string _reservedDirectiveName =
-				$"((?:{Characters.NonSpaceChar}){{1,{Characters.CharGroupLength}}})";
+				$"({Characters.NonSpaceChar}{{1,{Characters.CharGroupLength}}})";
 
 			private static readonly string _parameter =
-				$"((?:{Characters.NonSpaceChar}){{1,{Characters.CharGroupLength}}})";
-
-			private static readonly string _tagHandle =
-				$"({Characters.Tag}{Characters.WordChar}{{0,{Characters.CharGroupLength}}}{Characters.Tag}?)";
+				$"({Characters.NonSpaceChar}{{1,{Characters.CharGroupLength}}})";
 
 			private static readonly string _localTagPrefix =
 				$"{Characters.Tag}{Characters.UriChar}{{0,{Characters.CharGroupLength}}}";
@@ -135,24 +137,45 @@ namespace Processor
 
 			public static readonly string Reserved =
 				$"^{Characters.Directive + _reservedDirectiveName}" +
-				$"{BasicStructures.SeparateInLine + _parameter}" +
-				$"{BasicStructures.Comment}";
+				$"{_separateInLine + _parameter}" +
+				$"{Comment}";
 
 			public static readonly string Yaml =
 				$"^{Characters.Directive + _yamlDirectiveName}" +
-				$"{BasicStructures.SeparateInLine}" +
+				$"{_separateInLine}" +
 				$"([{Characters.DecimalDigits}]{{1,{Characters.CharGroupLength}}}" +
 				$"{Characters.VersionSeparator}" +
 				$"[{Characters.DecimalDigits}]{{1,{Characters.CharGroupLength}}})" +
-				$"{BasicStructures.Comment}";
+				$"{Comment}";
 
 			public static readonly string Tag =
 				$"^{Characters.Directive + _tagDirectiveName}" +
-				$"{BasicStructures.SeparateInLine}" +
-				$"{_tagHandle}" +
-				$"{BasicStructures.SeparateInLine}" +
+				$"{_separateInLine}" +
+				$"({_tagHandle})" +
+				$"{_separateInLine}" +
 				$"{_tagPrefix}" +
-				$"{BasicStructures.Comment}";
+				$"{Comment}";
+		}
+
+		public static class NodeTags
+		{
+			// Even though '!<!>' satisfies the regex, it's not a valid verbatim tag since verbatim tags are not
+			// subject to tag resolution.
+			private static readonly string _verbatimTag = $"!<{Characters.UriChar}{{1,{Characters.CharGroupLength}}}>";
+
+			private static readonly string _shorthandTag =
+				$"{_tagHandle}{Characters.TagChar}{{1,{Characters.CharGroupLength}}}";
+
+			private static readonly string _nonSpecificTag = $"{Characters.Tag}";
+
+			private static readonly string _tagProperty = $"({_verbatimTag}|{_shorthandTag}|{_nonSpecificTag})";
+
+			private static readonly string _anchorName = $"{Characters.AnchorChar}{{1,{Characters.CharGroupLength}}}";
+
+			private static readonly string _anchorProperty = $"{Characters.Anchor}({_anchorName})";
+
+			public static readonly string TagAnchorProperties = $"{_tagProperty}(?:{_separateInLine}{_anchorProperty})?";
+			public static readonly string AnchorTagProperties = $"{_anchorProperty}(?:{_separateInLine}{_tagProperty})?";
 		}
 	}
 }

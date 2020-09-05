@@ -6,7 +6,7 @@ using Processor;
 
 namespace ProcessorTests
 {
-	[TestFixture]
+	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class CommentTests
 	{
 		[TestCaseSource(nameof(getTestCases))]

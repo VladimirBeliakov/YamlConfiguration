@@ -75,6 +75,70 @@ namespace ProcessorTests
 			return additionalUriChar.Concat(WordChars);
 		}
 
+		public static IEnumerable<string> GetTagChars()
+		{
+			var notAllowedChars = _flowIndicators.Append("!");
+			var uriChars = GetUriCharsWithoutHexNumbers().Concat(GetHexNumbers());
+
+			return uriChars.Except(notAllowedChars);
+		}
+
+		public static IEnumerable<string> GetAnchorCharGroups()
+		{
+			const string lf = "\u000A";
+			const string cr = "\u000D";
+			const string byteOrderMark = "\uFEFF";
+			const string space = " ";
+			const string tab = "\t";
+
+			return GetPrintableCharGroups(
+				excludedChars: _flowIndicators.Concat(new[] { lf, cr, byteOrderMark, space, tab }).ToList()
+			);
+		}
+
+		public static IEnumerable<string> GetPrintableCharGroups(IReadOnlyCollection<string> excludedChars)
+		{
+			const string tag = "\u0009";
+			const string lf = "\u000A";
+			const string cr = "\u000D";
+			const string nel = "\u0085";
+
+			var basicLatinSubset = getCharSequence(0x20, 0x7E);
+			var latinSupplementToHangulJamo = getCharSequence(0x00A0, 0xD7FF);
+			var privateUseAreaToSpecialsBeginning = getCharSequence(0xE000, 0xFFFD);
+
+			var highSurrogates = getCharSequence(0xD800, 0xDBFF);
+			var lowSurrogates = getCharSequence(0xDC00, 0xDFFF);
+
+			var linearBSyllabaryToSupplementaryPrivateUseArea =
+				from highSurrogate in highSurrogates
+				from lowSurrogate in lowSurrogates
+				select new String(new[] { highSurrogate, lowSurrogate });
+
+			var oneCharGroups = basicLatinSubset
+				.Concat(latinSupplementToHangulJamo)
+				.Concat(privateUseAreaToSpecialsBeginning)
+				.Select(c => c.ToString())
+				.Append(tag)
+				.Append(lf)
+				.Append(cr)
+				.Append(nel)
+				.Except(excludedChars)
+				.GroupBy(Characters.CharGroupLength);
+
+			var surrogatePairGroups =
+				linearBSyllabaryToSupplementaryPrivateUseArea
+					.Except(excludedChars)
+					.GroupBy(Characters.CharGroupLength);
+
+			return oneCharGroups.Concat(surrogatePairGroups);
+		}
+
+		private static IEnumerable<char> getCharSequence(int start, int end)
+		{
+			return Enumerable.Range(start, end - start + 1).Select(c => (char) c);
+		}
+
 		private static readonly IEnumerable<string> _decimalDigits =
 			new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
@@ -88,6 +152,8 @@ namespace ProcessorTests
 				"g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
 			}
 		);
+
+		private static readonly IReadOnlyCollection<string> _flowIndicators = new[] { ",", "[", "]", "{", "}" };
 
 		public static readonly IEnumerable<string> WordChars = _decimalDigits.Concat(_asciiLetters);
 	}

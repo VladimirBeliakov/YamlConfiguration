@@ -28,7 +28,7 @@ namespace Processor
 		private const string _surrogateBlock = "\uD800-\uDFFF\uFFFE\uFFFF";
 		private const string _privateUseAreaToSpecialsBeginning = "\uE000-\uFFFD";
 		// This is a workaround for using "[\U00010000-\U0010FFFF]" in regex.
-		private const string _linearBSyllabaryToSupplementaryPrivateUseAreaRegex = "[\uD800-\uDBFF][\uDC00-\uDFFF]";
+		private const string _linearBSyllabaryToSupplementaryPrivateUseArea = "[\uD800-\uDBFF][\uDC00-\uDFFF]";
 		private const string _basicLatinToSupplementaryPrivateUseArea = "\u0020-\U0010FFFF";
 
 		#endregion
@@ -64,32 +64,35 @@ namespace Processor
 			$"[{_c0ControlBlockExceptTabLfCr + _c1ControlBlockExceptNel + _del + _surrogateBlock}]";
 
 		public static readonly string PrintableChar =
-			$@"[{TAB + _lf + _cr + _nel +
+			$@"(?:[{TAB + _lf + _cr + _nel +
 				 _basicLatinSubset +
 				 _latinSupplementToHangulJamo +
 				 _privateUseAreaToSpecialsBeginning}]" +
 				"|" +
-				 $"{_linearBSyllabaryToSupplementaryPrivateUseAreaRegex}";
+				 $"{_linearBSyllabaryToSupplementaryPrivateUseArea})";
 
 		public static readonly string JsonCompatibleRegex = $"[{TAB + _basicLatinToSupplementaryPrivateUseArea}]";
 
 		public static readonly string FlowIndicatorsRegex =
 			$"[{CollectEntry + SequenceStart + SequenceEnd + MappingStart + MappingEnd}]";
 
+		public const string DecimalDigits = "0-9";
 		private static readonly string _whiteSpaceChars= $"{SPACE + TAB}";
 		private const string _asciiLetters = "A-Za-z";
-		public const string DecimalDigits = "0-9";
 		private static readonly string _hexDigits = $"{DecimalDigits}A-Fa-f";
 
 		internal static readonly string WordChar = $"[{DecimalDigits}{_asciiLetters}-]";
 		internal static readonly string UriChar = $"(?:%[{_hexDigits}]{{2}}|{WordChar}|[#;\\/?:@&=+$,_.!~*'()\\[\\]”])";
-		internal static readonly string TagChar = $"(?![{Tag}{_flowIndicators}]){UriChar}";
+		// TODO: When writing negative TagAnchor tests change this to (?![{Tag}{_flowIndicators}]){UriChar} to check if the tests fall with an error
+		internal static readonly string TagChar = $"(?:(?![{Tag}{_flowIndicators}]){UriChar})";
 
 		public static readonly string NonBreakChar =
-			$"(?![{_lf + _cr + _byteOrderMark}]){PrintableChar}";
+			$"(?:(?![{_lf + _cr + _byteOrderMark}]){PrintableChar})";
 
 		public static readonly string NonSpaceChar =
-			$"(?![{_lf + _cr + _byteOrderMark + _whiteSpaceChars}]){PrintableChar}";
+			$"(?:(?![{_lf + _cr + _byteOrderMark + _whiteSpaceChars}]){PrintableChar})";
+
+		internal static readonly string AnchorChar = $"(?:(?![{_flowIndicators}]){NonSpaceChar})";
 
 		public const int CharGroupLength = 100;
 	}

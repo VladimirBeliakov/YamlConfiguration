@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Processor;
-using ProcessorTests.Extensions;
 
 namespace ProcessorTests
 {
@@ -305,20 +304,17 @@ namespace ProcessorTests
 
 		private static IEnumerable<string> getGlobalTagPrefixes()
 		{
-			var notAllowedFirstChars = new[] { "!", ",", "[", "]", "{", "}" };
-			var uriChars = CharCache.GetUriCharsWithoutHexNumbers().Concat(CharCache.GetHexNumbers());
-
-			var allowedFirstChars = uriChars.Except(notAllowedFirstChars).ToList();
+			var tagChars = CharCache.GetTagChars().ToList();
 			var uriCharGroups = CharCache.GetUriCharGroups().ToList();
 
 			var anyUriCharGroup = uriCharGroups.First();
-			var anyAllowedChar = allowedFirstChars.First();
+			var anyTagChar = tagChars.First();
 
-			foreach (var allowedFirstChar in allowedFirstChars)
+			foreach (var allowedFirstChar in tagChars)
 				yield return allowedFirstChar + anyUriCharGroup;
 
 			foreach (var uriCharGroup in uriCharGroups)
-				yield return anyAllowedChar + uriCharGroup;
+				yield return anyTagChar + uriCharGroup;
 		}
 
 		private static readonly Regex _reservedDirectiveRegex = new Regex(
