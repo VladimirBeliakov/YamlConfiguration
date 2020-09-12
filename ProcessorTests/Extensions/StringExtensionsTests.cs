@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 
-namespace ProcessorTests.Extensions
+namespace ProcessorTests
 {
 	[TestFixture]
 	public class StringExtensionsTests

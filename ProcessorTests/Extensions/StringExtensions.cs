@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ProcessorTests.Extensions
+namespace ProcessorTests
 {
 	internal static class StringExtensions
 	{

@@ -11,7 +11,7 @@ namespace ProcessorTests
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class NodeTagsTests
 	{
-		[TestCaseSource(nameof(getTagAnchorTestCases))]
+		[TestCaseSource(nameof(getTagAnchorPositiveTestCases))]
 		public void TagAnchor_ValidNodeTags_Matches(RegexTestCase testCase)
 		{
 			var match = _tagAnchorPropertiesRegex.Match(testCase.TestValue);
@@ -32,7 +32,7 @@ namespace ProcessorTests
 			);
 		}
 
-		[TestCaseSource(nameof(getAnchorTagTestCases))]
+		[TestCaseSource(nameof(getAnchorTagPositiveTestCases))]
 		public void AnchorTag_ValidNodeTags_Matches(RegexTestCase testCase)
 		{
 			var match = _anchorTagPropertiesRegex.Match(testCase.TestValue);
@@ -53,9 +53,25 @@ namespace ProcessorTests
 			);
 		}
 
-		private static IEnumerable<RegexTestCase> getTagAnchorTestCases()
+		[TestCaseSource(nameof(getTagAnchorNegativeTestCases))]
+		public void TagAnchor_InvalidProperty_DoesNotMatch(string testCase)
 		{
-			var spaceWithChars = " " + CharCache.Chars;
+			var match = _tagAnchorPropertiesRegex.Match(testCase);
+
+			Assert.False(match.Success);
+		}
+
+		[TestCaseSource(nameof(getAnchorTagNegativeTestCases))]
+		public void AnchorTag_InvalidProperty_DoesNotMatch(string testCase)
+		{
+			var match = _anchorTagPropertiesRegex.Match(testCase);
+
+			Assert.False(match.Success);
+		}
+
+		private static IEnumerable<RegexTestCase> getTagAnchorPositiveTestCases()
+		{
+			var chars = CharStore.Chars;
 
 			var (tagProperties, separateInLines, anchorNames, anyTagProperty, anySeparateInLine, anyAnchorName) =
 				_commonCases.Value;
@@ -63,8 +79,10 @@ namespace ProcessorTests
 			foreach (var tagProperty in tagProperties)
 			{
 				yield return new RegexTestCase(
-					testValue: tagProperty + anySeparateInLine + "&" + anyAnchorName + spaceWithChars,
-					wholeMatch: tagProperty + anySeparateInLine + "&" + anyAnchorName,
+					testValue: anySeparateInLine + tagProperty + anySeparateInLine + "&" + anyAnchorName +
+							   anySeparateInLine + chars,
+					wholeMatch: anySeparateInLine + tagProperty + anySeparateInLine + "&" + anyAnchorName +
+								anySeparateInLine,
 					tagProperty,
 					anyAnchorName
 				);
@@ -73,8 +91,9 @@ namespace ProcessorTests
 			foreach (var separateInLine in separateInLines)
 			{
 				yield return new RegexTestCase(
-					testValue: anyTagProperty + separateInLine + "&" + anyAnchorName + spaceWithChars,
-					wholeMatch: anyTagProperty + separateInLine + "&" + anyAnchorName,
+					testValue: separateInLine + anyTagProperty + separateInLine + "&" + anyAnchorName + separateInLine +
+							   chars,
+					wholeMatch: separateInLine + anyTagProperty + separateInLine + "&" + anyAnchorName + separateInLine,
 					anyTagProperty,
 					anyAnchorName
 				);
@@ -83,24 +102,33 @@ namespace ProcessorTests
 			foreach (var anchorName in anchorNames)
 			{
 				yield return new RegexTestCase(
-					testValue: anyTagProperty + anySeparateInLine + "&" + anchorName + spaceWithChars,
-					wholeMatch: anyTagProperty + anySeparateInLine + "&" + anchorName,
+					testValue: anySeparateInLine + anyTagProperty + anySeparateInLine + "&" + anchorName +
+							   anySeparateInLine + chars,
+					wholeMatch: anySeparateInLine + anyTagProperty + anySeparateInLine + "&" + anchorName +
+								anySeparateInLine,
 					anyTagProperty,
 					anchorName
 				);
 			}
 
 			yield return new RegexTestCase(
-				testValue: anyTagProperty + anySeparateInLine + spaceWithChars,
-				wholeMatch: anyTagProperty,
+				testValue: anySeparateInLine + anyTagProperty + anySeparateInLine + chars,
+				wholeMatch: anySeparateInLine + anyTagProperty + anySeparateInLine,
+				anyTagProperty,
+				null
+			);
+
+			yield return new RegexTestCase(
+				testValue: anyTagProperty + anySeparateInLine + chars,
+				wholeMatch: anyTagProperty + anySeparateInLine ,
 				anyTagProperty,
 				null
 			);
 		}
 
-		private static IEnumerable<RegexTestCase> getAnchorTagTestCases()
+		private static IEnumerable<RegexTestCase> getAnchorTagPositiveTestCases()
 		{
-			var spaceWithChars = " " + CharCache.Chars;
+			var chars = CharStore.Chars;
 
 			var (tagProperties, separateInLines, anchorNames, anyTagProperty, anySeparateInLine, anyAnchorName) =
 				_commonCases.Value;
@@ -108,8 +136,10 @@ namespace ProcessorTests
 			foreach (var anchorName in anchorNames)
 			{
 				yield return new RegexTestCase(
-					testValue: "&" + anchorName + anySeparateInLine + anyTagProperty + spaceWithChars,
-					wholeMatch: "&" + anchorName + anySeparateInLine + anyTagProperty,
+					testValue: anySeparateInLine + "&" + anchorName + anySeparateInLine + anyTagProperty +
+							   anySeparateInLine + chars,
+					wholeMatch: anySeparateInLine + "&" + anchorName + anySeparateInLine + anyTagProperty +
+								anySeparateInLine,
 					anchorName,
 					anyTagProperty
 				);
@@ -118,8 +148,9 @@ namespace ProcessorTests
 			foreach (var separateInLine in separateInLines)
 			{
 				yield return new RegexTestCase(
-					testValue: "&" + anyAnchorName + separateInLine + anyTagProperty + spaceWithChars,
-					wholeMatch: "&" + anyAnchorName + separateInLine + anyTagProperty,
+					testValue: separateInLine + "&" + anyAnchorName + separateInLine + anyTagProperty + separateInLine +
+							   chars,
+					wholeMatch: separateInLine + "&" + anyAnchorName + separateInLine + anyTagProperty + separateInLine,
 					anyAnchorName,
 					anyTagProperty
 				);
@@ -128,16 +159,25 @@ namespace ProcessorTests
 			foreach (var tagProperty in tagProperties)
 			{
 				yield return new RegexTestCase(
-					testValue: "&" + anyAnchorName + anySeparateInLine + tagProperty + spaceWithChars,
-					wholeMatch: "&" + anyAnchorName + anySeparateInLine + tagProperty,
+					testValue: anySeparateInLine + "&" + anyAnchorName + anySeparateInLine + tagProperty +
+							   anySeparateInLine + chars,
+					wholeMatch: anySeparateInLine + "&" + anyAnchorName + anySeparateInLine + tagProperty +
+								anySeparateInLine,
 					anyAnchorName,
 					tagProperty
 				);
 			}
 
 			yield return new RegexTestCase(
-				testValue: "&" + anyAnchorName + anySeparateInLine + spaceWithChars,
-				wholeMatch: "&" + anyAnchorName,
+				testValue: anySeparateInLine + "&" + anyAnchorName + anySeparateInLine + chars,
+				wholeMatch: anySeparateInLine + "&" + anyAnchorName + anySeparateInLine,
+				anyAnchorName,
+				null
+			);
+
+			yield return new RegexTestCase(
+				testValue: "&" + anyAnchorName + anySeparateInLine + chars,
+				wholeMatch: "&" + anyAnchorName + anySeparateInLine,
 				anyAnchorName,
 				null
 			);
@@ -145,8 +185,8 @@ namespace ProcessorTests
 
 		private static IEnumerable<string> getShorthandTags()
 		{
-			var tagHandles = CharCache.GetTagHandles().ToList();
-			var tagChars = CharCache.GetTagChars().ToList();
+			var tagHandles = CharStore.GetTagHandles().ToList();
+			var tagChars = CharStore.GetTagChars().ToList();
 
 			var anyTagHandle = tagHandles.First();
 			var anyTagChar = tagChars.First();
@@ -167,13 +207,13 @@ namespace ProcessorTests
 			string anyAnchorName
 		) getCommonCases()
 		{
-			var verbatimTags = CharCache.GetUriCharGroups().Select(g => $"!<{g}>");
+			var verbatimTags = CharStore.GetUriCharGroups().Select(g => $"!<{g}>");
 			var shorthandTags = getShorthandTags();
 			const string nonSpecificTag = "!";
 
 			var tagProperties = verbatimTags.Concat(shorthandTags).Append(nonSpecificTag).ToList();
-			var separateInLines = CharCache.SeparateInLineCases;
-			var anchorNames = CharCache.GetAnchorCharGroups().ToList();
+			var separateInLines = CharStore.SeparateInLineCases;
+			var anchorNames = CharStore.GetAnchorCharGroups().ToList();
 
 			var anyTagProperty = tagProperties.First();
 			var anySeparateInLine = separateInLines.First();
@@ -199,6 +239,43 @@ namespace ProcessorTests
 					string anySeparateInLine,
 					string anyAnchorName
 				)>(getCommonCases, LazyThreadSafetyMode.ExecutionAndPublication);
+
+		private static IEnumerable<string> getTagAnchorNegativeTestCases()
+		{
+			// Verbatim tag
+			yield return "!<%0f>&a ";
+			yield return "<%0f> &a ";
+			yield return "!%0f> &a ";
+			yield return "!<%0f &a ";
+			yield return "!<%> &a ";
+			yield return "!<%f> &a ";
+			yield return "!< %0f> &a ";
+			yield return "!<%0f > &a ";
+			yield return $"!<{CharStore.GetCharRange("0") + "0"}> &a ";
+
+			// Shorthand tag
+			yield return "!0z! &a ";
+			yield return "!0z!0z&a";
+			yield return "0z!0z &a ";
+			yield return "!0z!0z% &a ";
+			yield return "!0z%!0z &a ";
+			yield return "!0z! 0z &a ";
+			yield return $"!0z!{CharStore.GetCharRange("0") + "0"} &a ";
+			yield return $"!{CharStore.GetCharRange("0") + "0"}!0z &a ";
+
+//			// Nonspecific tag
+			yield return "!";
+		}
+
+		private static IEnumerable<string> getAnchorTagNegativeTestCases()
+		{
+			yield return "&a";
+			yield return "a ";
+			yield return "& a ";
+			yield return "&[ ";
+			yield return "& ";
+			yield return $"&{CharStore.GetCharRange("a") + "a"} ";
+		}
 
 		private static readonly Regex _tagAnchorPropertiesRegex = new Regex(
 			BasicStructures.NodeTags.TagAnchorProperties,

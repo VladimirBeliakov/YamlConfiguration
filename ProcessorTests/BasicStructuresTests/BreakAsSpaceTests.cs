@@ -48,13 +48,13 @@ namespace ProcessorTests
 			var @break = Environment.NewLine;
 
 			yield return @break +
-						 CharCache.Spaces + @break;
+						 CharStore.Spaces + @break;
 			yield return "ABC" + @break +
-						 CharCache.Spaces + @break;
+						 CharStore.Spaces + @break;
 			yield return "ABC" + @break +
-						 CharCache.Tabs + @break;
+						 CharStore.Tabs + @break;
 			yield return "ABC" + @break +
-						 CharCache.SpacesAndTabs + @break;
+						 CharStore.SpacesAndTabs + @break;
 		}
 
 		private static readonly Regex _breakAsSpaceRegex = new Regex(

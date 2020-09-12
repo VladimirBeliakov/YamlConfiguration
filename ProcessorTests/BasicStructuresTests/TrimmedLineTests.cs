@@ -87,7 +87,7 @@ namespace ProcessorTests
 
 		private static IEnumerable<BlockFlowTestCase> getTrimmedLineCommonTestCases(BlockFlow type)
 		{
-			var spaces = CharCache.Spaces;
+			var spaces = CharStore.Spaces;
 			var @break = Environment.NewLine;
 
 			yield return new BlockFlowTestCase(
@@ -133,8 +133,8 @@ namespace ProcessorTests
 
 		private static IEnumerable<BlockFlowTestCase> getTrimmedLineFlowTestCases()
 		{
-			var spaces = CharCache.Spaces;
-			var spacesAndTabs = CharCache.SpacesAndTabs;
+			var spaces = CharStore.Spaces;
+			var spacesAndTabs = CharStore.SpacesAndTabs;
 			var newLine = Environment.NewLine;
 
 			foreach (var type in EnumCache.GetFlowTypes())

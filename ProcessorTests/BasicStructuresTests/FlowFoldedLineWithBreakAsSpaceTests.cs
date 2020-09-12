@@ -31,12 +31,12 @@ namespace ProcessorTests
 
 		private static IEnumerable<BlockFlowTestCase> getTestCases()
 		{
-			var spaces = CharCache.Spaces;
-			var spacesAndTabs = CharCache.SpacesAndTabs;
-			var chars = CharCache.Chars;
+			var spaces = CharStore.Spaces;
+			var spacesAndTabs = CharStore.SpacesAndTabs;
+			var chars = CharStore.Chars;
 			var @break = Environment.NewLine;
 
-			foreach (var separateInLine in new[] { String.Empty }.Concat(CharCache.SeparateInLineCases))
+			foreach (var separateInLine in new[] { String.Empty }.Concat(CharStore.SeparateInLineCases))
 			{
 				foreach (var linePrefix in new[] { String.Empty, spaces + separateInLine })
 				{
@@ -88,13 +88,13 @@ namespace ProcessorTests
 			var @break = Environment.NewLine;
 
 			yield return @break +
-						 CharCache.Spaces + @break;
+						 CharStore.Spaces + @break;
 			yield return "ABC" + @break +
-						 CharCache.Spaces + @break;
+						 CharStore.Spaces + @break;
 			yield return "ABC" + @break +
-						 CharCache.Tabs + @break;
+						 CharStore.Tabs + @break;
 			yield return "ABC" + @break +
-						 CharCache.SpacesAndTabs + @break;
+						 CharStore.SpacesAndTabs + @break;
 		}
 
 		private readonly Regex _flowFoldedLineWithBreakAsSpaceRegex = new Regex(

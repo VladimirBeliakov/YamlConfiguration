@@ -63,7 +63,7 @@ namespace ProcessorTests
 
 		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(BlockFlow type)
 		{
-			var spaces = CharCache.Spaces;
+			var spaces = CharStore.Spaces;
 
 			yield return new BlockFlowTestCase(
 				type, 
@@ -84,8 +84,8 @@ namespace ProcessorTests
 
 		private static IEnumerable<BlockFlowTestCase> getFlowTestCases()
 		{
-			var spaces = CharCache.Spaces;
-			var spacesAndTabs = CharCache.SpacesAndTabs;
+			var spaces = CharStore.Spaces;
+			var spacesAndTabs = CharStore.SpacesAndTabs;
 			
 			foreach (var type in EnumCache.GetFlowTypes())
 			{

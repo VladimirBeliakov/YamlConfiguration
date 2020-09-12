@@ -31,10 +31,10 @@ namespace ProcessorTests
 
 		private static IEnumerable<BlockFlowTestCase> getTestCases()
 		{
-			var spaces = CharCache.Spaces;
+			var spaces = CharStore.Spaces;
 			var @break = Environment.NewLine;
 
-			foreach (var separateInLine in new[] { String.Empty }.Concat(CharCache.SeparateInLineCases))
+			foreach (var separateInLine in new[] { String.Empty }.Concat(CharStore.SeparateInLineCases))
 			{
 				foreach (var linePrefix in new[] { String.Empty, spaces + separateInLine })
 				{

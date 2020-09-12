@@ -86,10 +86,10 @@ namespace Processor
 		// TODO: When writing negative TagAnchor tests change this to (?![{Tag}{_flowIndicators}]){UriChar} to check if the tests fall with an error
 		internal static readonly string TagChar = $"(?:(?![{Tag}{_flowIndicators}]){UriChar})";
 
-		public static readonly string NonBreakChar =
+		internal static readonly string NonBreakChar =
 			$"(?:(?![{_lf + _cr + _byteOrderMark}]){PrintableChar})";
 
-		public static readonly string NonSpaceChar =
+		internal static readonly string NonSpaceChar =
 			$"(?:(?![{_lf + _cr + _byteOrderMark + _whiteSpaceChars}]){PrintableChar})";
 
 		internal static readonly string AnchorChar = $"(?:(?![{_flowIndicators}]){NonSpaceChar})";

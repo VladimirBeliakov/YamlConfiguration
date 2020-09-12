@@ -29,7 +29,7 @@ namespace ProcessorTests
 		{
 			var @break = Environment.NewLine;
 
-			foreach (var separateInLine in CharCache.SeparateInLineCases)
+			foreach (var separateInLine in CharStore.SeparateInLineCases)
 			{
 				yield return new TestCaseData(
 /* test value */	"#" + @break,

@@ -174,8 +174,11 @@ namespace Processor
 
 			private static readonly string _anchorProperty = $"{Characters.Anchor}({_anchorName})";
 
-			public static readonly string TagAnchorProperties = $"{_tagProperty}(?:{_separateInLine}{_anchorProperty})?";
-			public static readonly string AnchorTagProperties = $"{_anchorProperty}(?:{_separateInLine}{_tagProperty})?";
+			public static readonly string TagAnchorProperties =
+				$"^{_separateInLine}{_tagProperty}(?:{_separateInLine}{_anchorProperty})?{_separateInLine}";
+
+			public static readonly string AnchorTagProperties =
+				$"^{_separateInLine}{_anchorProperty}(?:{_separateInLine}{_tagProperty})?{_separateInLine}";
 		}
 	}
 }

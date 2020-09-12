@@ -88,11 +88,11 @@ namespace ProcessorTests
 
 		private static IEnumerable<RegexTestCase> getReservedDirectiveTestCases()
 		{
-			var chars = CharCache.Chars;
+			var chars = CharStore.Chars;
 			var directiveNames = new[] { "A", chars };
-			var separateInLines = CharCache.SeparateInLineCases;
+			var separateInLines = CharStore.SeparateInLineCases;
 			var directiveParameters = new[] { "A", chars };
-			var comments = CharCache.GetComments().ToList();
+			var comments = CharStore.GetComments().ToList();
 
 			var anyDirectiveName = directiveNames.First();
 			var anySeparateInLine = separateInLines.First();
@@ -143,7 +143,7 @@ namespace ProcessorTests
 		private static IEnumerable<string> getReservedDirectiveUnmatchableTestCases()
 		{
 			var @break = Environment.NewLine;
-			var tooLongCharRange = CharCache.Chars + "a";
+			var tooLongCharRange = CharStore.Chars + "a";
 
 			yield return $"% A A{@break}";
 			yield return $" %A A{@break}";
@@ -158,10 +158,10 @@ namespace ProcessorTests
 
 		private static IEnumerable<RegexTestCase> getYamlDirectiveTestCases()
 		{
-			var chars = CharCache.Chars;
-			var separateInLines = CharCache.SeparateInLineCases;
-			var digits = CharCache.Digits;
-			var comments = CharCache.GetComments().ToList();
+			var chars = CharStore.Chars;
+			var separateInLines = CharStore.SeparateInLineCases;
+			var digits = CharStore.Digits;
+			var comments = CharStore.GetComments().ToList();
 
 			var anySeparateInLine = separateInLines.First();
 			var anyDigit = digits.First();
@@ -201,7 +201,7 @@ namespace ProcessorTests
 		private static IEnumerable<string> getYamlDirectiveUnmatchableTestCases()
 		{
 			var @break = Environment.NewLine;
-			var tooLongDigitRange = CharCache.Digits + "a";
+			var tooLongDigitRange = CharStore.Digits + "a";
 
 			yield return $"YAML 1.2{@break}";
 			yield return $"%AML 1.2{@break}";
@@ -218,16 +218,16 @@ namespace ProcessorTests
 
 		private static IEnumerable<RegexTestCase> getTagDirectiveTestCases()
 		{
-			var tagHandleCases = CharCache.GetTagHandles().ToList();
+			var tagHandleCases = CharStore.GetTagHandles().ToList();
 			var tagPrefixCases = getLocalTagPrefixes().Concat(getGlobalTagPrefixes()).ToList();
-			var commentCases = CharCache.GetComments().ToList();
+			var commentCases = CharStore.GetComments().ToList();
 
-			var anySeparateInLine = CharCache.SeparateInLineCases.First();
+			var anySeparateInLine = CharStore.SeparateInLineCases.First();
 			var anyTagHandle = tagHandleCases.First();
 			var anyTagPrefix = tagPrefixCases.First();
 			var anyComment = commentCases.First();
 
-			foreach (var separateInLine in CharCache.SeparateInLineCases)
+			foreach (var separateInLine in CharStore.SeparateInLineCases)
 			{
 				yield return new RegexTestCase(
 					testValue: "%TAG" + separateInLine + anyTagHandle + separateInLine + anyTagPrefix + anyComment,
@@ -298,14 +298,14 @@ namespace ProcessorTests
 		{
 			yield return "!";
 
-			foreach (var uriCharGroup in CharCache.GetUriCharGroups())
+			foreach (var uriCharGroup in CharStore.GetUriCharGroups())
 				yield return "!" + uriCharGroup;
 		}
 
 		private static IEnumerable<string> getGlobalTagPrefixes()
 		{
-			var tagChars = CharCache.GetTagChars().ToList();
-			var uriCharGroups = CharCache.GetUriCharGroups().ToList();
+			var tagChars = CharStore.GetTagChars().ToList();
+			var uriCharGroups = CharStore.GetUriCharGroups().ToList();
 
 			var anyUriCharGroup = uriCharGroups.First();
 			var anyTagChar = tagChars.First();

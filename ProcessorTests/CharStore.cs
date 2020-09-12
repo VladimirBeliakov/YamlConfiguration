@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Processor;
-using ProcessorTests.Extensions;
 
 namespace ProcessorTests
 {
-	internal static class CharCache
+	internal static class CharStore
 	{
-		private static string getCharRange(string chars)
+		public static string GetCharRange(string chars)
 		{
 			return String.Join(
 				String.Empty,
@@ -16,15 +15,15 @@ namespace ProcessorTests
 			);
 		}
 
-		public static string Spaces = getCharRange(" ");
+		public static string Spaces = GetCharRange(" ");
 
-		public static string Tabs = getCharRange("\t");
+		public static string Tabs = GetCharRange("\t");
 
-		public static string SpacesAndTabs = getCharRange("\t ");
+		public static string SpacesAndTabs = GetCharRange("\t ");
 
-		public static string Chars = getCharRange("ABCD");
+		public static string Chars = GetCharRange("ABCD");
 
-		public static string Digits = getCharRange("0123456789");
+		public static string Digits = GetCharRange("0123456789");
 
 		public static IReadOnlyCollection<string> SeparateInLineCases = new[] { " ", "\t", Spaces, Tabs, SpacesAndTabs };
 
