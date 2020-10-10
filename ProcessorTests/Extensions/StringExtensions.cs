@@ -10,14 +10,14 @@ namespace ProcessorTests
 		public static IEnumerable<string> GroupBy(this IEnumerable<string> values, int valuesInGroup)
 		{
 			if (valuesInGroup < 1)
-				throw new InvalidOperationException($"{nameof(valuesInGroup)} must be greater than zero.");
+				throw new InvalidOperationException($"'{nameof(valuesInGroup)}' must be greater than zero.");
 
 			var listedValues = values.ToList();
 			var firstValueLength = listedValues.First().Length;
 
 			if (listedValues.Any(v => v.Length != firstValueLength))
 				throw new InvalidOperationException(
-					$"All value lengths of {nameof(listedValues)} must be equal to each other"
+					$"All value lengths of '{nameof(listedValues)}' must be equal to each other."
 				);
 
 			var oneGroupLength = firstValueLength * valuesInGroup;

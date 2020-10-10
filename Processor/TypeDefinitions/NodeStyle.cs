@@ -2,7 +2,7 @@
 {
 	internal enum NodeStyle : byte
 	{
-		Block = 0, // uses indentation
-		Flow = 1   // uses explicit indicators
+		Block = 1, // uses indentation
+		Flow = 2,  // uses explicit indicators
 	}
 }

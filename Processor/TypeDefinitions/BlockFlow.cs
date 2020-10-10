@@ -4,7 +4,9 @@ namespace Processor.TypeDefinitions
 	{
 		BlockIn = 1,
 		BlockOut = 2,
-		FlowIn = 3,
-		FlowOut = 4,
+		BlockKey = 3,
+		FlowIn = 4,
+		FlowOut = 5,
+		FlowKey = 6,
 	}
 }

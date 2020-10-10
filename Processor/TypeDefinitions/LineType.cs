@@ -1,22 +1,20 @@
-using System;
-
 namespace Processor.TypeDefinitions
 {
 	internal enum LineType : byte
 	{
-		Scalar,
-		ScalarToScalarMapping,
-		Sequence,
-		MappingOfMappings,
-		MappingBeginning,
-		ComplexMappingKey,
-		SequenceBeginning,
-		FlowSequence,
-		FlowMapping,
-		DocumentBeginning,
-		DocumentEnd,
-		AnchoredNode,
-		AliasedNode,
-		NestedElement,
+		Scalar = 1,
+		ScalarToScalarMapping = 2,
+		Sequence = 3,
+		MappingOfMappings = 4,
+		MappingBeginning = 5,
+		ComplexMappingKey = 6,
+		SequenceBeginning = 7,
+		FlowSequence = 8,
+		FlowMapping = 9,
+		DocumentBeginning = 10,
+		DocumentEnd = 11,
+		AnchoredNode = 12,
+		AliasedNode = 13,
+		NestedElement = 14,
 	}
 }

@@ -21,15 +21,16 @@ namespace Processor
 		#endregion
 
 		public const string SPACE = "\u0020";
-		private const string _basicLatinSubset = "\u0020-\u007E";
+		private static readonly string _basicLatinSubset = $"{SPACE}-\u007E";
 		private const string _del = "\u007F";
 		private const string _latinSupplementToHangulJamo = "\u00A0-\uD7FF";
 		private const string _byteOrderMark = "\uFEFF";
-		private const string _surrogateBlock = "\uD800-\uDFFF\uFFFE\uFFFF";
+		private const string _surrogateBlock = "\uD800-\uDFFF";
+		private const string _notChars = "\uFFFE\uFFFF";
 		private const string _privateUseAreaToSpecialsBeginning = "\uE000-\uFFFD";
 		// This is a workaround for using "[\U00010000-\U0010FFFF]" in regex.
 		private const string _linearBSyllabaryToSupplementaryPrivateUseArea = "[\uD800-\uDBFF][\uDC00-\uDFFF]";
-		private const string _basicLatinToSupplementaryPrivateUseArea = "\u0020-\U0010FFFF";
+		private static readonly string _basicLatinToLast16BitChar = $"{SPACE}-\uD7FF\uE000-\uFFFF";
 
 		#endregion
 
@@ -58,10 +59,60 @@ namespace Processor
 
 		#endregion
 
+		#region Escape Sequences
+
+		private const string _escape = "\\\\";
+		private const string _escapedNull = "0";
+		private const string _escapedBell = "a";
+		private const string _escapedBackspace = "b";
+		private const string _escapedHorizontalTab = "t";
+		private const string _escapedLineFeed = "n";
+		private const string _escapedVerticalTab = "v";
+		private const string _escapedFormFeed = "f";
+		private const string _escapedCarriageReturn = "r";
+		private const string _escapedEscape = "e";
+		private const string _escapedSpace = " ";
+		private const string _escapedDoubleQuote = "\"";
+		private const string _escapedSlash = "/";
+		private const string _escapedBackslash = "\\\\";
+		private const string _escapedNextLine = "N";
+		private const string _escapedNonBreakingSpace = "\u00A0";
+		private const string _escapedLineSeparator = "L";
+		private const string _escapedParagraphSeparator = "P";
+		private const string _escaped8Bit = "x";
+		private const string _escaped16Bit = "u";
+		private const string _escaped32Bit = "U";
+
+		public static readonly string EscapedChar =
+			$"(?:{_escape}[" +
+			$"{_escapedNull}" +
+			$"{_escapedBell}" +
+			$"{_escapedBackspace}" +
+			$"{_escapedHorizontalTab}" +
+			$"{_escapedLineFeed}" +
+			$"{_escapedVerticalTab}" +
+			$"{_escapedFormFeed}" +
+			$"{_escapedCarriageReturn}" +
+			$"{_escapedEscape}" +
+			$"{_escapedSpace}" +
+			$"{_escapedDoubleQuote}" +
+			$"{_escapedSlash}" +
+			$"{_escapedBackslash}" +
+			$"{_escapedNextLine}" +
+			$"{_escapedNonBreakingSpace}" +
+			$"{_escapedLineSeparator}" +
+			$"{_escapedParagraphSeparator}" +
+			$"{_escaped8Bit}" +
+			$"{_escaped16Bit}" +
+			$"{_escaped32Bit}" +
+			"])";
+
+		#endregion
+
 		public const string VersionSeparator = ".";
 
 		public static readonly string ForbiddenCharsRegex =
-			$"[{_c0ControlBlockExceptTabLfCr + _c1ControlBlockExceptNel + _del + _surrogateBlock}]";
+			$"[{_c0ControlBlockExceptTabLfCr + _c1ControlBlockExceptNel + _del + _surrogateBlock + _notChars}]";
 
 		public static readonly string PrintableChar =
 			$@"(?:[{TAB + _lf + _cr + _nel +
@@ -71,26 +122,28 @@ namespace Processor
 				"|" +
 				 $"{_linearBSyllabaryToSupplementaryPrivateUseArea})";
 
-		public static readonly string JsonCompatibleRegex = $"[{TAB + _basicLatinToSupplementaryPrivateUseArea}]";
+		public static readonly string JsonCompatibleChar =
+			$"(?:[{TAB + _basicLatinToLast16BitChar}]" +
+			"|" +
+			$"{_linearBSyllabaryToSupplementaryPrivateUseArea})";
 
 		public static readonly string FlowIndicatorsRegex =
 			$"[{CollectEntry + SequenceStart + SequenceEnd + MappingStart + MappingEnd}]";
 
 		public const string DecimalDigits = "0-9";
-		private static readonly string _whiteSpaceChars= $"{SPACE + TAB}";
+		internal static readonly string WhiteSpaceChars= $"{SPACE + TAB}";
 		private const string _asciiLetters = "A-Za-z";
 		private static readonly string _hexDigits = $"{DecimalDigits}A-Fa-f";
 
 		internal static readonly string WordChar = $"[{DecimalDigits}{_asciiLetters}-]";
 		internal static readonly string UriChar = $"(?:%[{_hexDigits}]{{2}}|{WordChar}|[#;\\/?:@&=+$,_.!~*'()\\[\\]”])";
-		// TODO: When writing negative TagAnchor tests change this to (?![{Tag}{_flowIndicators}]){UriChar} to check if the tests fall with an error
 		internal static readonly string TagChar = $"(?:(?![{Tag}{_flowIndicators}]){UriChar})";
 
 		internal static readonly string NonBreakChar =
 			$"(?:(?![{_lf + _cr + _byteOrderMark}]){PrintableChar})";
 
 		internal static readonly string NonSpaceChar =
-			$"(?:(?![{_lf + _cr + _byteOrderMark + _whiteSpaceChars}]){PrintableChar})";
+			$"(?:(?![{_lf + _cr + _byteOrderMark + WhiteSpaceChars}]){PrintableChar})";
 
 		internal static readonly string AnchorChar = $"(?:(?![{_flowIndicators}]){NonSpaceChar})";
 

@@ -11,11 +11,11 @@ namespace Processor
 
 		public static readonly string Spaces = $"{Characters.SPACE}{{1,{Characters.CharGroupLength}}}";
 
-		private static readonly string _indent = $"{Characters.SPACE}{{0,{Characters.CharGroupLength}}}";
+		private static readonly string _indent = $"(?:{Characters.SPACE}{{0,{Characters.CharGroupLength}}})";
 
 		private static readonly string _anchoredIndent = $"^{_indent}";
 
-		private static readonly string _separateInLine =
+		internal static readonly string SeparateInLine =
 			$"(?:^|[{Characters.SPACE}{Characters.TAB}]{{1,{Characters.CharGroupLength}}})";
 
 		private static readonly string _tagHandle =
@@ -32,7 +32,7 @@ namespace Processor
 					return indent;
 				case BlockFlow.FlowIn:
 				case BlockFlow.FlowOut:
-					return $"{indent}{_separateInLine}?";
+					return $"{indent}{SeparateInLine}?";
 				default:
 					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlow)} item {c}.");
 			}
@@ -71,7 +71,7 @@ namespace Processor
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
 			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
-			return $"{_separateInLine}?" +
+			return $"{SeparateInLine}?" +
 			TrimmedLine(BlockFlow.FlowIn) +
 			LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false);
 		}
@@ -81,14 +81,14 @@ namespace Processor
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
 			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
-			return $"{_separateInLine}?" +
+			return $"{SeparateInLine}?" +
 			BreakAsSpace(linePrefix: LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false));
 		}
 
 		#endregion
 
 		public static readonly string Comment =
-			$"(?:{_separateInLine}(?:#[^{Break}]{{0,{Characters.CharGroupLength * Characters.CharGroupLength}}})?)?" +
+			$"(?:{SeparateInLine}(?:#[^{Break}]{{0,{Characters.CharGroupLength * Characters.CharGroupLength}}})?)?" +
 			$"{Break}";
 
 		// TODO: Move the logic to a higher level.
@@ -107,7 +107,7 @@ namespace Processor
 						   $"(?:{Comment})*" +
 						   $"{LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false)}" +
 						   "|" +
-						   $"{_separateInLine})";
+						   $"{SeparateInLine})";
 //				case BlockFlow.BlockKey:
 //				case BlockFlow.FlowKey:
 //					return _separateInLine;
@@ -137,12 +137,12 @@ namespace Processor
 
 			public static readonly string Reserved =
 				$"^{Characters.Directive + _reservedDirectiveName}" +
-				$"{_separateInLine + _parameter}" +
+				$"{SeparateInLine + _parameter}" +
 				$"{Comment}";
 
 			public static readonly string Yaml =
 				$"^{Characters.Directive + _yamlDirectiveName}" +
-				$"{_separateInLine}" +
+				$"{SeparateInLine}" +
 				$"([{Characters.DecimalDigits}]{{1,{Characters.CharGroupLength}}}" +
 				$"{Characters.VersionSeparator}" +
 				$"[{Characters.DecimalDigits}]{{1,{Characters.CharGroupLength}}})" +
@@ -150,9 +150,9 @@ namespace Processor
 
 			public static readonly string Tag =
 				$"^{Characters.Directive + _tagDirectiveName}" +
-				$"{_separateInLine}" +
+				$"{SeparateInLine}" +
 				$"({_tagHandle})" +
-				$"{_separateInLine}" +
+				$"{SeparateInLine}" +
 				$"{_tagPrefix}" +
 				$"{Comment}";
 		}
@@ -170,15 +170,15 @@ namespace Processor
 
 			private static readonly string _tagProperty = $"({_verbatimTag}|{_shorthandTag}|{_nonSpecificTag})";
 
-			private static readonly string _anchorName = $"{Characters.AnchorChar}{{1,{Characters.CharGroupLength}}}";
+			internal static readonly string AnchorName = $"{Characters.AnchorChar}{{1,{Characters.CharGroupLength}}}";
 
-			private static readonly string _anchorProperty = $"{Characters.Anchor}({_anchorName})";
+			private static readonly string _anchorProperty = $"{Characters.Anchor}({AnchorName})";
 
 			public static readonly string TagAnchorProperties =
-				$"^{_separateInLine}{_tagProperty}(?:{_separateInLine}{_anchorProperty})?{_separateInLine}";
+				$"^{SeparateInLine}{_tagProperty}(?:{SeparateInLine}{_anchorProperty})?{SeparateInLine}";
 
 			public static readonly string AnchorTagProperties =
-				$"^{_separateInLine}{_anchorProperty}(?:{_separateInLine}{_tagProperty})?{_separateInLine}";
+				$"^{SeparateInLine}{_anchorProperty}(?:{SeparateInLine}{_tagProperty})?{SeparateInLine}";
 		}
 	}
 }

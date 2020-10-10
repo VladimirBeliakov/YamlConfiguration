@@ -201,7 +201,7 @@ namespace ProcessorTests
 		private static IEnumerable<string> getYamlDirectiveUnmatchableTestCases()
 		{
 			var @break = Environment.NewLine;
-			var tooLongDigitRange = CharStore.Digits + "a";
+			var tooLongDigitRange = CharStore.Digits + "0";
 
 			yield return $"YAML 1.2{@break}";
 			yield return $"%AML 1.2{@break}";

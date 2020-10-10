@@ -61,11 +61,11 @@ namespace ProcessorTests
 				{
 					case BlockFlow.BlockOut:
 					case BlockFlow.BlockIn:
-						yield return new TestCaseData(value, "^ {0,100}" + newLine);
+						yield return new TestCaseData(value, "^(?: {0,100})" + newLine);
 						break;
 					case BlockFlow.FlowOut:
 					case BlockFlow.FlowIn:
-						yield return new TestCaseData(value, "^ {0,100}(?:^|[ \t]{1,100})?" + newLine);
+						yield return new TestCaseData(value, "^(?: {0,100})(?:^|[ \t]{1,100})?" + newLine);
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();

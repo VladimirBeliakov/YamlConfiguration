@@ -2,9 +2,9 @@ namespace Processor.TypeDefinitions
 {
     public enum FailurePoint : byte
     {
-        IllFormedStream = 0,
-        UnresolvedTag = 1,
-        UnrecognizedTag = 2,
-        UnavailableTag = 3,
+        IllFormedStream = 1,
+        UnresolvedTag = 2,
+        UnrecognizedTag = 3,
+        UnavailableTag = 4,
     }
 }

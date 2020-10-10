@@ -2,8 +2,8 @@
 {
 	internal enum FlowScalarStyle : byte
 	{
-		Plain = 0,
-		SingleQuoted = 1,
-		DoubleQuoted = 2
+		Plain = 1,
+		SingleQuoted = 2,
+		DoubleQuoted = 3,
 	}
 }

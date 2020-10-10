@@ -106,14 +106,6 @@ namespace ProcessorTests
 			var latinSupplementToHangulJamo = getCharSequence(0x00A0, 0xD7FF);
 			var privateUseAreaToSpecialsBeginning = getCharSequence(0xE000, 0xFFFD);
 
-			var highSurrogates = getCharSequence(0xD800, 0xDBFF);
-			var lowSurrogates = getCharSequence(0xDC00, 0xDFFF);
-
-			var linearBSyllabaryToSupplementaryPrivateUseArea =
-				from highSurrogate in highSurrogates
-				from lowSurrogate in lowSurrogates
-				select new String(new[] { highSurrogate, lowSurrogate });
-
 			var oneCharGroups = basicLatinSubset
 				.Concat(latinSupplementToHangulJamo)
 				.Concat(privateUseAreaToSpecialsBeginning)
@@ -125,15 +117,18 @@ namespace ProcessorTests
 				.Except(excludedChars)
 				.GroupBy(Characters.CharGroupLength);
 
-			var surrogatePairGroups =
-				linearBSyllabaryToSupplementaryPrivateUseArea
-					.Except(excludedChars)
-					.GroupBy(Characters.CharGroupLength);
+			var surrogatePairGroups = SurrogatePairs.Except(excludedChars).GroupBy(Characters.CharGroupLength);
 
 			return oneCharGroups.Concat(surrogatePairGroups);
 		}
 
-		private static IEnumerable<char> getCharSequence(int start, int end)
+		public static readonly IReadOnlyCollection<string> EscapedChars = new[]
+		{
+			"\\0", "\\a", "\\b", "\\t", "\\n", "\\v", "\\f", "\\r", "\\e", "\\ ", "\\\"",
+			"\\/", "\\\\", "\\N", "\\\u00A0", "\\L", "\\P", "\\x", "\\u", "\\U",
+		};
+
+		public static IEnumerable<char> getCharSequence(int start, int end)
 		{
 			return Enumerable.Range(start, end - start + 1).Select(c => (char) c);
 		}
@@ -152,7 +147,22 @@ namespace ProcessorTests
 			}
 		);
 
-		private static readonly IReadOnlyCollection<string> _flowIndicators = new[] { ",", "[", "]", "{", "}" };
+		private static readonly IEnumerable<string> _nonBreakableDoubleCharsWithoutEscapedAndSurrogates =
+			getCharSequence(start: 0x0020, end: 0xD7FF)
+				.Concat(getCharSequence(start: 0xE000, end: 0xFFFF))
+				.Append('\t')
+				.Except(new[] { '\\', '\"' }).Select(c => c.ToString());
+
+		public static readonly IReadOnlyCollection<string> SurrogatePairs =
+			(from highSurrogate in getCharSequence(start: 0xD800, end: 0xDBFF)
+			 from lowSurrogate in getCharSequence(start: 0xDC00, end: 0xDFFF)
+			 select new String(new[] { highSurrogate, lowSurrogate }))
+			.ToList();
+
+		public static readonly IReadOnlyCollection<string> NonSpaceDoubleCharsWithoutEscapedAndSurrogates =
+			_nonBreakableDoubleCharsWithoutEscapedAndSurrogates.Except(new[] { " ", "\t" }).ToList();
+
+		private static readonly IEnumerable<string> _flowIndicators = new[] { ",", "[", "]", "{", "}" };
 
 		public static readonly IEnumerable<string> WordChars = _decimalDigits.Concat(_asciiLetters);
 	}

@@ -2,16 +2,16 @@
 {
 	internal enum Tag : byte
 	{
-		Sequence = 0,
-		Mapping = 1,
-		String = 2,
-		Integer = 3,
-		Float = 4,
-		Null = 5,
-		Binary = 6,
-		Omap = 7,
-		Set = 8,
-		Timestamp = 9,
-		Global = 10
+		Sequence = 1,
+		Mapping = 2,
+		String = 3,
+		Integer = 4,
+		Float = 5,
+		Null = 6,
+		Binary = 7,
+		Omap = 8,
+		Set = 9,
+		Timestamp = 10,
+		Global = 11,
 	}
 }

@@ -9,7 +9,7 @@ namespace ProcessorTests
 	{
 		public static IEnumerable<BlockFlow> GetBlockAndFlowTypes()
 		{
-			return Enum.GetValues(typeof(BlockFlow)).Cast<BlockFlow>();
+			return Enum.GetValues(typeof(BlockFlow)).Cast<BlockFlow>().Except(GetKeys());
 		}
 
 		public static IEnumerable<BlockFlow> GetBlockTypes()
@@ -21,6 +21,12 @@ namespace ProcessorTests
 		{
 			yield return BlockFlow.FlowIn;
 			yield return BlockFlow.FlowOut;
+		}
+
+		private static IEnumerable<BlockFlow> GetKeys()
+		{
+			yield return BlockFlow.BlockKey;
+			yield return BlockFlow.FlowKey;
 		}
 	}
 }

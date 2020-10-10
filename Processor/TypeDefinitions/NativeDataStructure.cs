@@ -2,8 +2,8 @@
 {
 	internal enum NativeDataStructure : byte
 	{
-		Scalar = 0,
-		Mapping = 1,
-		Sequence = 2
+		Scalar = 1,
+		Mapping = 2,
+		Sequence = 3,
 	}
 }
