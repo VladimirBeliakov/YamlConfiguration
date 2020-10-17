@@ -30,7 +30,8 @@ namespace Processor
 		private const string _privateUseAreaToSpecialsBeginning = "\uE000-\uFFFD";
 		// This is a workaround for using "[\U00010000-\U0010FFFF]" in regex.
 		private const string _linearBSyllabaryToSupplementaryPrivateUseArea = "[\uD800-\uDBFF][\uDC00-\uDFFF]";
-		private static readonly string _basicLatinToLast16BitChar = $"{SPACE}-\uD7FF\uE000-\uFFFF";
+		private static readonly string _basicLatinToLast16BitChar =
+			$"{SPACE}-\uD7FF{_privateUseAreaToSpecialsBeginning}{_notChars}";
 
 		#endregion
 

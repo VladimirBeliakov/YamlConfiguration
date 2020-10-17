@@ -4,14 +4,14 @@ namespace ProcessorTests
 {
 	public class MultiLineTestCase
 	{
-		public MultiLineTestCase(OneLineTestCase firstLine, params OneLineTestCase[] nextLines)
+		public MultiLineTestCase(MultiLineOneLineTestCase firstLine, params MultiLineOneLineTestCase[] nextLines)
 		{
 			FirstLine = firstLine;
 			NextLines = nextLines;
 		}
 
-		public OneLineTestCase FirstLine { get; }
+		public MultiLineOneLineTestCase FirstLine { get; }
 
-		public IEnumerable<OneLineTestCase> NextLines { get; }
+		public IEnumerable<MultiLineOneLineTestCase> NextLines { get; }
 	}
 }

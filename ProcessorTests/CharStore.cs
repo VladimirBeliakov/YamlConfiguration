@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Processor;
 
 namespace ProcessorTests
@@ -117,18 +118,12 @@ namespace ProcessorTests
 				.Except(excludedChars)
 				.GroupBy(Characters.CharGroupLength);
 
-			var surrogatePairGroups = SurrogatePairs.Except(excludedChars).GroupBy(Characters.CharGroupLength);
+			var surrogatePairGroups = SurrogatePairs.Value.Except(excludedChars).GroupBy(Characters.CharGroupLength);
 
 			return oneCharGroups.Concat(surrogatePairGroups);
 		}
 
-		public static readonly IReadOnlyCollection<string> EscapedChars = new[]
-		{
-			"\\0", "\\a", "\\b", "\\t", "\\n", "\\v", "\\f", "\\r", "\\e", "\\ ", "\\\"",
-			"\\/", "\\\\", "\\N", "\\\u00A0", "\\L", "\\P", "\\x", "\\u", "\\U",
-		};
-
-		public static IEnumerable<char> getCharSequence(int start, int end)
+		private static IEnumerable<char> getCharSequence(int start, int end)
 		{
 			return Enumerable.Range(start, end - start + 1).Select(c => (char) c);
 		}
@@ -147,20 +142,39 @@ namespace ProcessorTests
 			}
 		);
 
-		private static readonly IEnumerable<string> _nonBreakableDoubleCharsWithoutEscapedAndSurrogates =
-			getCharSequence(start: 0x0020, end: 0xD7FF)
-				.Concat(getCharSequence(start: 0xE000, end: 0xFFFF))
-				.Append('\t')
-				.Except(new[] { '\\', '\"' }).Select(c => c.ToString());
+		public static readonly Lazy<IReadOnlyCollection<string>> NbDoubleCharsWithoutEscapedAndSurrogates =
+			new Lazy<IReadOnlyCollection<string>>(
+				() =>
+					getCharSequence(start: 0x0020, end: 0xD7FF)
+						.Concat(getCharSequence(start: 0xE000, end: 0xFFFF))
+						.Append('\t')
+						.Except(new[] { '\\', '\"' }).Select(c => c.ToString())
+						.ToList(),
+				LazyThreadSafetyMode.ExecutionAndPublication
+			);
 
-		public static readonly IReadOnlyCollection<string> SurrogatePairs =
-			(from highSurrogate in getCharSequence(start: 0xD800, end: 0xDBFF)
-			 from lowSurrogate in getCharSequence(start: 0xDC00, end: 0xDFFF)
-			 select new String(new[] { highSurrogate, lowSurrogate }))
-			.ToList();
+		public static readonly Lazy<IReadOnlyCollection<string>> SurrogatePairs =
+			new Lazy<IReadOnlyCollection<string>>(
+				() =>
+					(from highSurrogate in getCharSequence(start: 0xD800, end: 0xDBFF)
+					 from lowSurrogate in getCharSequence(start: 0xDC00, end: 0xDFFF)
+					 select new String(new[] { highSurrogate, lowSurrogate }))
+					.ToList(),
+				LazyThreadSafetyMode.ExecutionAndPublication
+			);
 
-		public static readonly IReadOnlyCollection<string> NonSpaceDoubleCharsWithoutEscapedAndSurrogates =
-			_nonBreakableDoubleCharsWithoutEscapedAndSurrogates.Except(new[] { " ", "\t" }).ToList();
+		public static readonly IReadOnlyCollection<string> EscapedChars = new[]
+		{
+			"\\0", "\\a", "\\b", "\\t", "\\n", "\\v", "\\f", "\\r", "\\e", "\\ ", "\\\"",
+			"\\/", "\\\\", "\\N", "\\\u00A0", "\\L", "\\P", "\\x", "\\u", "\\U",
+		};
+
+		public static readonly Lazy<IReadOnlyCollection<string>> NsDoubleCharsWithoutEscapedAndSurrogates =
+			new Lazy<IReadOnlyCollection<string>>(
+				() =>
+					NbDoubleCharsWithoutEscapedAndSurrogates.Value.Except(new[] { " ", "\t" }).ToList(),
+				LazyThreadSafetyMode.ExecutionAndPublication
+			);
 
 		private static readonly IEnumerable<string> _flowIndicators = new[] { ",", "[", "]", "{", "}" };
 

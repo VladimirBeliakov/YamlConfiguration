@@ -10,20 +10,13 @@ namespace Processor.FlowStyles
 		private static readonly string _jsonWithoutSlashAndDoubleQuote =
 			$"(?:(?![\\\\\"]){Characters.JsonCompatibleChar})";
 
-		private static readonly string _nonBreakableDoubleChar =
+		private static readonly string _nbDoubleChar =
 			$"(?:{Characters.EscapedChar}|{_jsonWithoutSlashAndDoubleQuote})";
 
-		private static readonly string _nonSpaceDoubleChar =
-			$"(?:(?![{Characters.WhiteSpaceChars}]){_nonBreakableDoubleChar})";
+		private static readonly string _nbDoubleOneLine =
+			$"\"({_nbDoubleChar}{{0,{Characters.CharGroupLength}}})\"";
 
-		private static readonly string _nbNsDoubleInLine =
-			$"(?:[{Characters.WhiteSpaceChars}]{{0,{Characters.CharGroupLength}}}" +
-			$"{_nonSpaceDoubleChar}){{0,{Characters.CharGroupLength}}}";
-
-		private static readonly string _nonBreakableDoubleOneLine =
-			$"\"({_nonBreakableDoubleChar}{{0,{Characters.CharGroupLength}}})\"";
-
-		private static readonly Regex _oneLineRegex = new Regex(_nonBreakableDoubleOneLine, RegexOptions.Compiled);
+		private static readonly Regex _oneLineRegex = new Regex(_nbDoubleOneLine, RegexOptions.Compiled);
 
 		// case BlockFlow.BlockKey
 		// case BlockFlow.FlowKey
@@ -35,7 +28,7 @@ namespace Processor.FlowStyles
 
 			if (match.Success)
 			{
-				extractedValue = match.Value;
+				extractedValue = match.Groups[1].Captures[0].Value;
 				return true;
 			}
 
@@ -52,7 +45,14 @@ namespace Processor.FlowStyles
 			private static readonly string _doubleEscapeSequenceBeginning =
 				$"(?:({BasicStructures.SeparateInLine}?)\\\\{BasicStructures.Break})";
 
-			public static readonly string _nonBreakableDoubleFirstLine = $"^\"({_nbNsDoubleInLine})";
+			private static readonly string _nonSpaceDoubleChar =
+				$"(?:(?![{Characters.WhiteSpaceChars}]){_nbDoubleChar})";
+
+			private static readonly string _nbNsDoubleInLine =
+				$"(?:[{Characters.WhiteSpaceChars}]{{0,{Characters.CharGroupLength}}}" +
+				$"{_nonSpaceDoubleChar}){{0,{Characters.CharGroupLength}}}";
+
+			private static readonly string _nbDoubleFirstLine = $"^\"({_nbNsDoubleInLine})";
 
 			private static readonly string _emptyLineWithoutBreak = BasicStructures.LinePrefix(BlockFlow.FlowIn);
 
@@ -60,12 +60,12 @@ namespace Processor.FlowStyles
 				BasicStructures.LinePrefix(BlockFlow.FlowIn) + $"({_nonSpaceDoubleChar + _nbNsDoubleInLine})";
 
 			private static readonly Regex _firstLineWithoutEscapedBreakRegex = new Regex(
-				_nonBreakableDoubleFirstLine + _foldedLineSequenceBeginning,
+				_nbDoubleFirstLine + _foldedLineSequenceBeginning,
 				RegexOptions.Compiled
 			);
 
 			private static readonly Regex _firstLineWithEscapedBreakRegex = new Regex(
-				_nonBreakableDoubleFirstLine + _doubleEscapeSequenceBeginning,
+				_nbDoubleFirstLine + _doubleEscapeSequenceBeginning,
 				RegexOptions.Compiled
 			);
 

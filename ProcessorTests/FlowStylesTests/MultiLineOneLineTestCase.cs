@@ -2,9 +2,9 @@ using Processor.FlowStyles;
 
 namespace ProcessorTests
 {
-	public class OneLineTestCase
+	public class MultiLineOneLineTestCase
 	{
-		public OneLineTestCase(string testValue, ProcessedLineResult result)
+		public MultiLineOneLineTestCase(string testValue, ProcessedLineResult result)
 		{
 			TestValue = testValue;
 			Result = result;
