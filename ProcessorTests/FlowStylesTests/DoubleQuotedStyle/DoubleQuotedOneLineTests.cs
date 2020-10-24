@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -7,39 +8,41 @@ using Processor.FlowStyles;
 namespace ProcessorTests
 {
 	[TestFixture]
-	public class OneLineTests
+	public class DoubleQuotedOneLineTests
 	{
 		[TestCaseSource(nameof(getPositiveOneLineTestCases))]
-		public void ValidOneLine_ReturnsTrueAndExtractedValue(RegexTestCase testCase)
+		public void ValidOneDoubleQuotedLine_ReturnsTrueAndExtractedValue(Tuple<string, string> testCase)
 		{
-			var isSuccess = DoubleQuotedStyles.TryProcessOneLine(testCase.TestValue, out var extractedValue);
+			var (testValue, expectedExtractedValue) = testCase;
+
+			var isSuccess = DoubleQuotedStyle.TryProcessOneLine(testValue, out var extractedValue);
 
 			Assert.True(isSuccess);
-			Assert.That(extractedValue, Is.EqualTo(testCase.WholeMatch));
+			Assert.That(extractedValue, Is.EqualTo(expectedExtractedValue));
 		}
 
 		[TestCaseSource(nameof(getNegativeOneLineCases))]
-		public void InvalidOneLine_ReturnsFalseAndNullAsExtractedValue(string testCase)
+		public void InvalidOneDoubleQuotedLine_ReturnsFalseAndNullAsExtractedValue(string testCase)
 		{
-			var isSuccess = DoubleQuotedStyles.TryProcessOneLine(testCase, out var extractedValue);
+			var isSuccess = DoubleQuotedStyle.TryProcessOneLine(testCase, out var extractedValue);
 
 			Assert.False(isSuccess);
 			Assert.Null(extractedValue);
 		}
 
-		private static IEnumerable<RegexTestCase> getPositiveOneLineTestCases()
+		private static IEnumerable<Tuple<string, string>> getPositiveOneLineTestCases()
 		{
 			var chars = CharStore.Chars;
 
 			var nbDoubleOneLines =
-				CharStore.NbDoubleCharsWithoutEscapedAndSurrogates.Value.GroupBy(Characters.CharGroupLength)
+				CharStore.NbNsDoubleCharsWithoutEscapedAndSurrogates.Value.GroupBy(Characters.CharGroupLength)
 					.Concat(CharStore.SurrogatePairs.Value.GroupBy(Characters.CharGroupLength))
 					.Concat(CharStore.EscapedChars.GroupBy(Characters.CharGroupLength))
 					.Append(string.Empty);
 
 			foreach (var nbDoubleOneLine in nbDoubleOneLines)
 			{
-				yield return new RegexTestCase(
+				yield return Tuple.Create(
 					chars + "\"" + nbDoubleOneLine + "\"" + chars,
 					nbDoubleOneLine
 				);

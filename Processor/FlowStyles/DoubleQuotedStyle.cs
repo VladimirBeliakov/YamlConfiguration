@@ -5,7 +5,7 @@ using Processor.TypeDefinitions;
 
 namespace Processor.FlowStyles
 {
-	public class DoubleQuotedStyles
+	public class DoubleQuotedStyle
 	{
 		private static readonly string _jsonWithoutSlashAndDoubleQuote =
 			$"(?:(?![\\\\\"]){Characters.JsonCompatibleChar})";

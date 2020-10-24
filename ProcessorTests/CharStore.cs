@@ -26,7 +26,8 @@ namespace ProcessorTests
 
 		public static string Digits = GetCharRange("0123456789");
 
-		public static IReadOnlyCollection<string> SeparateInLineCases = new[] { " ", "\t", Spaces, Tabs, SpacesAndTabs };
+		public static IReadOnlyCollection<string>
+			SeparateInLineCases = new[] { " ", "\t", Spaces, Tabs, SpacesAndTabs };
 
 		public static IEnumerable<string> GetTagHandles()
 		{
@@ -123,7 +124,7 @@ namespace ProcessorTests
 			return oneCharGroups.Concat(surrogatePairGroups);
 		}
 
-		private static IEnumerable<char> getCharSequence(int start, int end)
+		public static IEnumerable<char> getCharSequence(int start, int end)
 		{
 			return Enumerable.Range(start, end - start + 1).Select(c => (char) c);
 		}
@@ -142,14 +143,28 @@ namespace ProcessorTests
 			}
 		);
 
-		public static readonly Lazy<IReadOnlyCollection<string>> NbDoubleCharsWithoutEscapedAndSurrogates =
+		private static readonly Lazy<IReadOnlyCollection<string>> _nbDoubleCharsWithoutEscapedAndSurrogates =
+			new Lazy<IReadOnlyCollection<string>>(
+				() => getJsonCharsWithoutSurrogates(new[] { '\\', '\"' }).ToList(),
+				LazyThreadSafetyMode.ExecutionAndPublication
+			);
+
+		public static readonly Lazy<IReadOnlyCollection<string>> NbNsDoubleCharsWithoutEscapedAndSurrogates =
 			new Lazy<IReadOnlyCollection<string>>(
 				() =>
-					getCharSequence(start: 0x0020, end: 0xD7FF)
-						.Concat(getCharSequence(start: 0xE000, end: 0xFFFF))
-						.Append('\t')
-						.Except(new[] { '\\', '\"' }).Select(c => c.ToString())
-						.ToList(),
+					_nbDoubleCharsWithoutEscapedAndSurrogates.Value.Except(new[] { " ", "\t" }).ToList(),
+				LazyThreadSafetyMode.ExecutionAndPublication
+			);
+
+		public static readonly Lazy<IReadOnlyCollection<string>> _nbSingleCharsWithoutSurrogates =
+			new Lazy<IReadOnlyCollection<string>>(
+				() => getJsonCharsWithoutSurrogates(new[] { '\'' }).ToList(),
+				LazyThreadSafetyMode.ExecutionAndPublication
+			);
+
+		public static readonly Lazy<IReadOnlyCollection<string>> NbNsSingleCharsWithoutSurrogates =
+			new Lazy<IReadOnlyCollection<string>>(
+				() => _nbSingleCharsWithoutSurrogates.Value.Except(new[] { " ", "\t" }).ToList(),
 				LazyThreadSafetyMode.ExecutionAndPublication
 			);
 
@@ -169,12 +184,14 @@ namespace ProcessorTests
 			"\\/", "\\\\", "\\N", "\\\u00A0", "\\L", "\\P", "\\x", "\\u", "\\U",
 		};
 
-		public static readonly Lazy<IReadOnlyCollection<string>> NsDoubleCharsWithoutEscapedAndSurrogates =
-			new Lazy<IReadOnlyCollection<string>>(
-				() =>
-					NbDoubleCharsWithoutEscapedAndSurrogates.Value.Except(new[] { " ", "\t" }).ToList(),
-				LazyThreadSafetyMode.ExecutionAndPublication
-			);
+		private static IEnumerable<string> getJsonCharsWithoutSurrogates(IEnumerable<char> andTheseChars)
+		{
+			return getCharSequence(start: 0x0020, end: 0xD7FF)
+				.Concat(getCharSequence(start: 0xE000, end: 0xFFFF))
+				.Append('\t')
+				.Except(andTheseChars)
+				.Select(c => c.ToString());
+		}
 
 		private static readonly IEnumerable<string> _flowIndicators = new[] { ",", "[", "]", "{", "}" };
 

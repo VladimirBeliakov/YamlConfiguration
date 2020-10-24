@@ -148,6 +148,6 @@ namespace Processor
 
 		internal static readonly string AnchorChar = $"(?:(?![{_flowIndicators}]){NonSpaceChar})";
 
-		public const int CharGroupLength = 100;
+		public const int CharGroupLength = 1000;
 	}
 }
