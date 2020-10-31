@@ -56,7 +56,14 @@ namespace Processor
 		public const string Directive = "\u0025";		// %
 		public const string ReservedChar1 = "\u0040";	// @
 		public const string ReservedChar2 = "\u0060";	// `
-		private const string _flowIndicators = ",\\[\\]{}";
+
+		public static readonly string FlowIndicators =
+			$@"{CollectEntry}\{SequenceStart}\{SequenceEnd}{MappingStart}{MappingEnd}";
+
+		public static readonly string CIndicators =
+			$"{SequenceEntry}{MappingKey}{MappingValue}{CollectEntry}{SequenceStart}{SequenceEnd}" +
+			$"{MappingStart}{MappingEnd}{Comment}{Anchor}{Alias}{Tag}{Literal}{Folded}{SingleQuote}{DoubleQuote}" +
+			$"{Directive}{ReservedChar1}{ReservedChar2}";
 
 		#endregion
 
@@ -138,15 +145,26 @@ namespace Processor
 
 		internal static readonly string WordChar = $"[{DecimalDigits}{_asciiLetters}-]";
 		internal static readonly string UriChar = $"(?:%[{_hexDigits}]{{2}}|{WordChar}|[#;\\/?:@&=+$,_.!~*'()\\[\\]”])";
-		internal static readonly string TagChar = $"(?:(?![{Tag}{_flowIndicators}]){UriChar})";
 
-		internal static readonly string NonBreakChar =
-			$"(?:(?![{_lf + _cr + _byteOrderMark}]){PrintableChar})";
+		internal static readonly string TagChar = RegexPatternBuilder.BuildWithExclusiveChars(
+			exclusiveChars: Tag + FlowIndicators,
+			inclusiveChars: UriChar
+		);
 
-		internal static readonly string NonSpaceChar =
-			$"(?:(?![{_lf + _cr + _byteOrderMark + WhiteSpaceChars}]){PrintableChar})";
+		internal static readonly string NbChar = RegexPatternBuilder.BuildWithExclusiveChars(
+			exclusiveChars: _lf + _cr + _byteOrderMark,
+			inclusiveChars: PrintableChar
+		);
 
-		internal static readonly string AnchorChar = $"(?:(?![{_flowIndicators}]){NonSpaceChar})";
+		internal static readonly string NsChar = RegexPatternBuilder.BuildWithExclusiveChars(
+			exclusiveChars: _lf + _cr + _byteOrderMark + WhiteSpaceChars,
+			inclusiveChars: PrintableChar
+		);
+
+		internal static readonly string AnchorChar = RegexPatternBuilder.BuildWithExclusiveChars(
+			exclusiveChars: FlowIndicators,
+			inclusiveChars: NsChar
+		);
 
 		public const int CharGroupLength = 1000;
 	}

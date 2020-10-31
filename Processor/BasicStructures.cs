@@ -122,10 +122,10 @@ namespace Processor
 			private const string _tagDirectiveName = "TAG";
 
 			private static readonly string _reservedDirectiveName =
-				$"({Characters.NonSpaceChar}{{1,{Characters.CharGroupLength}}})";
+				$"({Characters.NsChar}{{1,{Characters.CharGroupLength}}})";
 
 			private static readonly string _parameter =
-				$"({Characters.NonSpaceChar}{{1,{Characters.CharGroupLength}}})";
+				$"({Characters.NsChar}{{1,{Characters.CharGroupLength}}})";
 
 			private static readonly string _localTagPrefix =
 				$"{Characters.Tag}{Characters.UriChar}{{0,{Characters.CharGroupLength}}}";
