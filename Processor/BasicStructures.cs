@@ -9,14 +9,14 @@ namespace Processor
 		// TODO: Define the break code by the file parsed.
 		public static readonly string Break = Environment.NewLine;
 
-		public static readonly string Spaces = $"{Characters.SPACE}{{1,{Characters.CharGroupLength}}}";
+		public static readonly string Spaces = $"{Characters.Space}{{1,{Characters.CharGroupLength}}}";
 
-		private static readonly string _indent = $"(?:{Characters.SPACE}{{0,{Characters.CharGroupLength}}})";
+		private static readonly string _indent = $"(?:{Characters.Space}{{0,{Characters.CharGroupLength}}})";
 
 		private static readonly string _anchoredIndent = $"^{_indent}";
 
 		internal static readonly string SeparateInLine =
-			$"(?:^|[{Characters.SPACE}{Characters.TAB}]{{1,{Characters.CharGroupLength}}})";
+			$"(?:^|[{Characters.Space}{Characters.Tab}]{{1,{Characters.CharGroupLength}}})";
 
 		private static readonly string _tagHandle =
 			$"{Characters.Tag}{Characters.WordChar}{{0,{Characters.CharGroupLength}}}{Characters.Tag}?";
@@ -122,10 +122,10 @@ namespace Processor
 			private const string _tagDirectiveName = "TAG";
 
 			private static readonly string _reservedDirectiveName =
-				$"({Characters.NsChar}{{1,{Characters.CharGroupLength}}})";
+				$"({Characters.NsChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}})";
 
 			private static readonly string _parameter =
-				$"({Characters.NsChar}{{1,{Characters.CharGroupLength}}})";
+				$"({Characters.NsChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}})";
 
 			private static readonly string _localTagPrefix =
 				$"{Characters.Tag}{Characters.UriChar}{{0,{Characters.CharGroupLength}}}";
@@ -164,13 +164,14 @@ namespace Processor
 			private static readonly string _verbatimTag = $"!<{Characters.UriChar}{{1,{Characters.CharGroupLength}}}>";
 
 			private static readonly string _shorthandTag =
-				$"{_tagHandle}{Characters.TagChar}{{1,{Characters.CharGroupLength}}}";
+				$"{_tagHandle}{Characters.TagChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}}";
 
 			private static readonly string _nonSpecificTag = $"{Characters.Tag}";
 
 			private static readonly string _tagProperty = $"({_verbatimTag}|{_shorthandTag}|{_nonSpecificTag})";
 
-			internal static readonly string AnchorName = $"{Characters.AnchorChar}{{1,{Characters.CharGroupLength}}}";
+			internal static readonly string AnchorName =
+				$"{Characters.AnchorChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}}";
 
 			private static readonly string _anchorProperty = $"{Characters.Anchor}({AnchorName})";
 

@@ -6,7 +6,7 @@ namespace Processor
 
 		#region C0ControlBlock
 
-		public const string TAB = "\u0009";
+		public const string Tab = "\u0009";
 		private const string _c0ControlBlockExceptTabLfCr = "\u0000-\u0008\u000B\u000C\u000E-\u001F";
 		private const string _lf = "\u000A";
 		private const string _cr = "\u000D";
@@ -20,8 +20,8 @@ namespace Processor
 
 		#endregion
 
-		public const string SPACE = "\u0020";
-		private static readonly string _basicLatinSubset = $"{SPACE}-\u007E";
+		public const string Space = "\u0020";
+		private static readonly string _basicLatinSubset = $"{Space}-\u007E";
 		private const string _del = "\u007F";
 		private const string _latinSupplementToHangulJamo = "\u00A0-\uD7FF";
 		private const string _byteOrderMark = "\uFEFF";
@@ -31,7 +31,7 @@ namespace Processor
 		// This is a workaround for using "[\U00010000-\U0010FFFF]" in regex.
 		private const string _linearBSyllabaryToSupplementaryPrivateUseArea = "[\uD800-\uDBFF][\uDC00-\uDFFF]";
 		private static readonly string _basicLatinToLast16BitChar =
-			$"{SPACE}-\uD7FF{_privateUseAreaToSpecialsBeginning}{_notChars}";
+			$"{Space}-\uD7FF{_privateUseAreaToSpecialsBeginning}{_notChars}";
 
 		#endregion
 
@@ -61,7 +61,7 @@ namespace Processor
 			$@"{CollectEntry}\{SequenceStart}\{SequenceEnd}{MappingStart}{MappingEnd}";
 
 		public static readonly string CIndicators =
-			$"{SequenceEntry}{MappingKey}{MappingValue}{CollectEntry}{SequenceStart}{SequenceEnd}" +
+			$@"\{SequenceEntry}{MappingKey}{MappingValue}{CollectEntry}\{SequenceStart}\{SequenceEnd}" +
 			$"{MappingStart}{MappingEnd}{Comment}{Anchor}{Alias}{Tag}{Literal}{Folded}{SingleQuote}{DoubleQuote}" +
 			$"{Directive}{ReservedChar1}{ReservedChar2}";
 
@@ -92,76 +92,106 @@ namespace Processor
 		private const string _escaped32Bit = "U";
 
 		public static readonly string EscapedChar =
-			$"(?:{_escape}[" +
-			$"{_escapedNull}" +
-			$"{_escapedBell}" +
-			$"{_escapedBackspace}" +
-			$"{_escapedHorizontalTab}" +
-			$"{_escapedLineFeed}" +
-			$"{_escapedVerticalTab}" +
-			$"{_escapedFormFeed}" +
-			$"{_escapedCarriageReturn}" +
-			$"{_escapedEscape}" +
-			$"{_escapedSpace}" +
-			$"{_escapedDoubleQuote}" +
-			$"{_escapedSlash}" +
-			$"{_escapedBackslash}" +
-			$"{_escapedNextLine}" +
-			$"{_escapedNonBreakingSpace}" +
-			$"{_escapedLineSeparator}" +
-			$"{_escapedParagraphSeparator}" +
-			$"{_escaped8Bit}" +
-			$"{_escaped16Bit}" +
-			$"{_escaped32Bit}" +
-			"])";
+			$"(?:{_escape}" +
+			RegexPatternBuilder.BuildCharSet(
+				_escapedNull,
+				_escapedBell,
+				_escapedBackspace,
+				_escapedHorizontalTab,
+				_escapedLineFeed,
+				_escapedVerticalTab,
+				_escapedFormFeed,
+				_escapedCarriageReturn,
+				_escapedEscape,
+				_escapedSpace,
+				_escapedDoubleQuote,
+				_escapedSlash,
+				_escapedBackslash,
+				_escapedNextLine,
+				_escapedNonBreakingSpace,
+				_escapedLineSeparator,
+				_escapedParagraphSeparator,
+				_escaped8Bit,
+				_escaped16Bit,
+				_escaped32Bit
+			) + ")";
 
 		#endregion
 
 		public const string VersionSeparator = ".";
 
 		public static readonly string ForbiddenCharsRegex =
-			$"[{_c0ControlBlockExceptTabLfCr + _c1ControlBlockExceptNel + _del + _surrogateBlock + _notChars}]";
+			RegexPatternBuilder.BuildCharSet(
+				_c0ControlBlockExceptTabLfCr,
+				_c1ControlBlockExceptNel,
+				_del,
+				_surrogateBlock,
+				_notChars
+			);
 
 		public static readonly string PrintableChar =
-			$@"(?:[{TAB + _lf + _cr + _nel +
-				 _basicLatinSubset +
-				 _latinSupplementToHangulJamo +
-				 _privateUseAreaToSpecialsBeginning}]" +
-				"|" +
-				 $"{_linearBSyllabaryToSupplementaryPrivateUseArea})";
+			RegexPatternBuilder.BuildAlternation(
+				RegexPatternBuilder.BuildCharSet(
+					Tab,
+					_lf,
+					_cr,
+					_nel,
+					_basicLatinSubset,
+					_latinSupplementToHangulJamo,
+					_privateUseAreaToSpecialsBeginning
+				),
+				_linearBSyllabaryToSupplementaryPrivateUseArea
+			);
 
 		public static readonly string JsonCompatibleChar =
-			$"(?:[{TAB + _basicLatinToLast16BitChar}]" +
-			"|" +
-			$"{_linearBSyllabaryToSupplementaryPrivateUseArea})";
+			RegexPatternBuilder.BuildAlternation(
+				RegexPatternBuilder.BuildCharSet(Tab, _basicLatinToLast16BitChar),
+				_linearBSyllabaryToSupplementaryPrivateUseArea
+			);
 
-		public static readonly string FlowIndicatorsRegex =
-			$"[{CollectEntry + SequenceStart + SequenceEnd + MappingStart + MappingEnd}]";
+		public static readonly string FlowIndicatorsRegex = RegexPatternBuilder.BuildCharSet(
+			CollectEntry,
+			$@"\{SequenceStart}",
+			$@"\{SequenceEnd}",
+			MappingStart,
+			MappingEnd
+		);
 
 		public const string DecimalDigits = "0-9";
-		internal static readonly string WhiteSpaceChars= $"{SPACE + TAB}";
+		internal static readonly string SWhite= $"{Space + Tab}";
 		private const string _asciiLetters = "A-Za-z";
 		private static readonly string _hexDigits = $"{DecimalDigits}A-Fa-f";
 
-		internal static readonly string WordChar = $"[{DecimalDigits}{_asciiLetters}-]";
-		internal static readonly string UriChar = $"(?:%[{_hexDigits}]{{2}}|{WordChar}|[#;\\/?:@&=+$,_.!~*'()\\[\\]”])";
+		internal static readonly string WordChar =
+			RegexPatternBuilder.BuildCharSet(
+				DecimalDigits,
+				_asciiLetters,
+				SequenceEntry
+			);
 
-		internal static readonly string TagChar = RegexPatternBuilder.BuildWithExclusiveChars(
+		internal static readonly string UriChar =
+			RegexPatternBuilder.BuildAlternation(
+				"%" + RegexPatternBuilder.BuildCharSet(_hexDigits) + "{2}",
+				WordChar,
+				RegexPatternBuilder.BuildCharSet("#;\\/?:@&=+$,_.!~*'()\\[\\]”")
+			);
+
+		internal static readonly RegexPattern TagChar = RegexPatternBuilder.BuildExclusive(
 			exclusiveChars: Tag + FlowIndicators,
 			inclusiveChars: UriChar
 		);
 
-		internal static readonly string NbChar = RegexPatternBuilder.BuildWithExclusiveChars(
+		internal static readonly RegexPattern NbChar = RegexPatternBuilder.BuildExclusive(
 			exclusiveChars: _lf + _cr + _byteOrderMark,
 			inclusiveChars: PrintableChar
 		);
 
-		internal static readonly string NsChar = RegexPatternBuilder.BuildWithExclusiveChars(
-			exclusiveChars: _lf + _cr + _byteOrderMark + WhiteSpaceChars,
-			inclusiveChars: PrintableChar
+		internal static readonly RegexPattern NsChar = RegexPatternBuilder.BuildExclusive(
+			exclusiveChars: SWhite,
+			inclusiveChars: NbChar
 		);
 
-		internal static readonly string AnchorChar = RegexPatternBuilder.BuildWithExclusiveChars(
+		internal static readonly RegexPattern AnchorChar = RegexPatternBuilder.BuildExclusive(
 			exclusiveChars: FlowIndicators,
 			inclusiveChars: NsChar
 		);

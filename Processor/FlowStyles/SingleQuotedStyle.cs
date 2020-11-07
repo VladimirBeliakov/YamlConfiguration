@@ -41,13 +41,13 @@ namespace Processor.FlowStyles
 		public class MultiLine
 		{
 			private static readonly string _nsSingleChar =
-				$"(?:(?![{Characters.WhiteSpaceChars}]){_nbSingleChar})";
+				$"(?:(?![{Characters.SWhite}]){_nbSingleChar})";
 
 			private static readonly string _foldedLineSequenceBeginning =
 				$"(?:{BasicStructures.SeparateInLine}?{BasicStructures.Break})";
 
 			private static readonly string _nbNsSingleInLine =
-				$"(?:[{Characters.WhiteSpaceChars}]{{0,{Characters.CharGroupLength}}}" +
+				$"(?:[{Characters.SWhite}]{{0,{Characters.CharGroupLength}}}" +
 				$"{_nsSingleChar}){{0,{Characters.CharGroupLength}}}";
 
 			private static readonly string _nbNsSingleFirstLine = $"^'({_nbNsSingleInLine})";

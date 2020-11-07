@@ -20,7 +20,7 @@ namespace Processor.FlowStyles
 
 		// case BlockFlow.BlockKey
 		// case BlockFlow.FlowKey
-		public static bool TryProcessOneLine(string value, out string extractedValue)
+		public static bool TryProcessOneLine(string value, out string? extractedValue)
 		{
 			extractedValue = null;
 
@@ -46,10 +46,10 @@ namespace Processor.FlowStyles
 				$"(?:({BasicStructures.SeparateInLine}?)\\\\{BasicStructures.Break})";
 
 			private static readonly string _nonSpaceDoubleChar =
-				$"(?:(?![{Characters.WhiteSpaceChars}]){_nbDoubleChar})";
+				$"(?:(?![{Characters.SWhite}]){_nbDoubleChar})";
 
 			private static readonly string _nbNsDoubleInLine =
-				$"(?:[{Characters.WhiteSpaceChars}]{{0,{Characters.CharGroupLength}}}" +
+				$"(?:[{Characters.SWhite}]{{0,{Characters.CharGroupLength}}}" +
 				$"{_nonSpaceDoubleChar}){{0,{Characters.CharGroupLength}}}";
 
 			private static readonly string _nbDoubleFirstLine = $"^\"({_nbNsDoubleInLine})";
