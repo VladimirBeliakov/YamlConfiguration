@@ -213,7 +213,7 @@ namespace ProcessorTests
 
 			var tagProperties = verbatimTags.Concat(shorthandTags).Append(nonSpecificTag).ToList();
 			var separateInLines = CharStore.SeparateInLineCases;
-			var anchorNames = CharStore.GetAnchorCharGroups().ToList();
+			var anchorNames = CharStore.GetNsCharGroups(CharStore.FlowIndicators).ToList();
 
 			var anyTagProperty = tagProperties.First();
 			var anySeparateInLine = separateInLines.First();

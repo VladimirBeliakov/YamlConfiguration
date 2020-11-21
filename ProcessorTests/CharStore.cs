@@ -8,13 +8,19 @@ namespace ProcessorTests
 {
 	internal static class CharStore
 	{
-		public static string GetCharRange(string chars)
-		{
-			return String.Join(
-				String.Empty,
-				Enumerable.Repeat(chars, Characters.CharGroupLength / chars.Length)
-			);
-		}
+		private static readonly IEnumerable<string> _decimalDigits =
+			new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+
+		private static readonly IEnumerable<string> _hexLetters =
+			new[] { "A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f" };
+
+		private static readonly IEnumerable<string> _asciiLetters = _hexLetters.Concat(
+			new[]
+			{
+				"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+				"g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+			}
+		);
 
 		public static string Spaces = GetCharRange(" ");
 
@@ -26,8 +32,31 @@ namespace ProcessorTests
 
 		public static string Digits = GetCharRange("0123456789");
 
-		public static IReadOnlyCollection<string>
-			SeparateInLineCases = new[] { " ", "\t", Spaces, Tabs, SpacesAndTabs };
+		public static IReadOnlyCollection<string> SeparateInLineCases =
+			new[] { " ", "\t", Spaces, Tabs, SpacesAndTabs };
+
+		public static readonly IEnumerable<string> FlowIndicators = new[] { ",", "[", "]", "{", "}" };
+
+		public static readonly IEnumerable<string> CIndicators = new[]
+		{
+			"-", "?", ":", ",", "[", "]", "{", "}", "#", "&", "*", "!", "|", ">", "'", "\"", "%", "@", "`"
+		};
+
+		public static readonly IEnumerable<string> WordChars = _decimalDigits.Concat(_asciiLetters);
+
+		public static readonly IReadOnlyCollection<string> EscapedChars = new[]
+		{
+			"\\0", "\\a", "\\b", "\\t", "\\n", "\\v", "\\f", "\\r", "\\e", "\\ ", "\\\"",
+			"\\/", "\\\\", "\\N", "\\\u00A0", "\\L", "\\P", "\\x", "\\u", "\\U",
+		};
+
+		public static string GetCharRange(string chars)
+		{
+			return String.Join(
+				String.Empty,
+				Enumerable.Repeat(chars, Characters.CharGroupLength / chars.Length)
+			);
+		}
 
 		public static IEnumerable<string> GetTagHandles()
 		{
@@ -78,13 +107,13 @@ namespace ProcessorTests
 
 		public static IEnumerable<string> GetTagChars()
 		{
-			var notAllowedChars = _flowIndicators.Append("!");
+			var notAllowedChars = FlowIndicators.Append("!");
 			var uriChars = GetUriCharsWithoutHexNumbers().Concat(GetHexNumbers());
 
 			return uriChars.Except(notAllowedChars);
 		}
 
-		public static IEnumerable<string> GetAnchorCharGroups()
+		public static IEnumerable<string> GetNsCharGroups(IEnumerable<string> excludedChars = null)
 		{
 			const string lf = "\u000A";
 			const string cr = "\u000D";
@@ -92,8 +121,10 @@ namespace ProcessorTests
 			const string space = " ";
 			const string tab = "\t";
 
+			var localExcludedChars = excludedChars ?? Enumerable.Empty<string>();
+
 			return GetPrintableCharGroups(
-				excludedChars: _flowIndicators.Concat(new[] { lf, cr, byteOrderMark, space, tab }).ToList()
+				excludedChars: localExcludedChars.Concat(new[] { lf, cr, byteOrderMark, space, tab }).ToList()
 			);
 		}
 
@@ -123,25 +154,6 @@ namespace ProcessorTests
 
 			return oneCharGroups.Concat(surrogatePairGroups);
 		}
-
-		public static IEnumerable<char> getCharSequence(int start, int end)
-		{
-			return Enumerable.Range(start, end - start + 1).Select(c => (char) c);
-		}
-
-		private static readonly IEnumerable<string> _decimalDigits =
-			new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-
-		private static readonly IEnumerable<string> _hexLetters =
-			new[] { "A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f" };
-
-		private static readonly IEnumerable<string> _asciiLetters = _hexLetters.Concat(
-			new[]
-			{
-				"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-				"g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
-			}
-		);
 
 		private static readonly Lazy<IReadOnlyCollection<string>> _nbDoubleCharsWithoutEscapedAndSurrogates =
 			new Lazy<IReadOnlyCollection<string>>(
@@ -178,12 +190,6 @@ namespace ProcessorTests
 				LazyThreadSafetyMode.ExecutionAndPublication
 			);
 
-		public static readonly IReadOnlyCollection<string> EscapedChars = new[]
-		{
-			"\\0", "\\a", "\\b", "\\t", "\\n", "\\v", "\\f", "\\r", "\\e", "\\ ", "\\\"",
-			"\\/", "\\\\", "\\N", "\\\u00A0", "\\L", "\\P", "\\x", "\\u", "\\U",
-		};
-
 		private static IEnumerable<string> getJsonCharsWithoutSurrogates(IEnumerable<char> andTheseChars)
 		{
 			return getCharSequence(start: 0x0020, end: 0xD7FF)
@@ -193,8 +199,9 @@ namespace ProcessorTests
 				.Select(c => c.ToString());
 		}
 
-		private static readonly IEnumerable<string> _flowIndicators = new[] { ",", "[", "]", "{", "}" };
-
-		public static readonly IEnumerable<string> WordChars = _decimalDigits.Concat(_asciiLetters);
+		public static IEnumerable<char> getCharSequence(int start, int end)
+		{
+			return Enumerable.Range(start, end - start + 1).Select(c => (char) c);
+		}
 	}
 }
