@@ -159,13 +159,13 @@ namespace ProcessorTests
 			const int groupItemCount = Characters.CharGroupLength;
 			const int whiteCharGroupCount = groupItemCount / 2;
 
-			var nonSpaceChar = nonSpaceChars.First();
-			var nonSpaceCharLength = nonSpaceChar.Length;
+			var anyNonSpaceChar = nonSpaceChars.First();
+			var nonSpaceCharLength = anyNonSpaceChar.Length;
 			var nonSpaceCharGroupCount = nonSpaceCharLength * groupItemCount / 2;
 			var oneGroupLength = nonSpaceCharLength + whiteCharGroupCount + nonSpaceCharGroupCount;
 
 			var sb = new StringBuilder(oneGroupLength);
-			sb.Append(nonSpaceChar);
+			sb.Append(anyNonSpaceChar);
 
 			var isEvenIteration = false;
 			foreach (var item in nonSpaceChars)
@@ -186,20 +186,20 @@ namespace ProcessorTests
 				{
 					yield return sb.ToString();
 					sb.Clear();
-					sb.Append(nonSpaceChar);
+					sb.Append(anyNonSpaceChar);
 				}
 			}
 
 			if (sb.Length > 0)
 				yield return sb.ToString();
 
-			var prependedChar = isFirstLine ? string.Empty : nonSpaceChar;
+			var prependedChar = isFirstLine ? string.Empty : anyNonSpaceChar;
 			yield return prependedChar + string.Join(
 				string.Empty,
-				Enumerable.Repeat(CharStore.SpacesAndTabs + nonSpaceChar, groupItemCount)
+				Enumerable.Repeat(CharStore.SpacesAndTabs + anyNonSpaceChar, groupItemCount)
 			);
 
-			yield return string.Join(string.Empty, nonSpaceChars.Take(groupItemCount));
+			yield return prependedChar + string.Join(string.Empty, nonSpaceChars.Take(groupItemCount));
 		}
 
 		protected static IEnumerable<string> GetFirstLineNegativeTestCases(bool isDoubleQuote)
