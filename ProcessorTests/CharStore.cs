@@ -113,7 +113,7 @@ namespace ProcessorTests
 			return uriChars.Except(notAllowedChars);
 		}
 
-		public static IEnumerable<string> GetNsCharGroups(IEnumerable<string> excludedChars = null)
+		public static IEnumerable<string> GetNsCharGroups(IEnumerable<string>? excludedChars = null)
 		{
 			const string lf = "\u000A";
 			const string cr = "\u000D";
@@ -121,32 +121,29 @@ namespace ProcessorTests
 			const string space = " ";
 			const string tab = "\t";
 
-			var localExcludedChars = excludedChars ?? Enumerable.Empty<string>();
+			var allExcludedChars =
+				(excludedChars ?? Enumerable.Empty<string>()).Concat(new[] { lf, cr, byteOrderMark, space, tab });
 
-			return GetPrintableCharGroups(
-				excludedChars: localExcludedChars.Concat(new[] { lf, cr, byteOrderMark, space, tab }).ToList()
-			);
+			return GetPrintableCharGroups(excludedChars: allExcludedChars.ToList());
+		}
+
+		public static IEnumerable<string> GetNsCharsWithoutSurrogates(IEnumerable<string>? excludedChars = null)
+		{
+			const string lf = "\u000A";
+			const string cr = "\u000D";
+			const string byteOrderMark = "\uFEFF";
+			const string space = " ";
+			const string tab = "\t";
+
+			var allExcludedChars =
+				(excludedChars ?? Enumerable.Empty<string>()).Concat(new[] { lf, cr, byteOrderMark, space, tab });
+
+			return _printableCharsWithoutSurrogates.Value.Except(allExcludedChars);
 		}
 
 		public static IEnumerable<string> GetPrintableCharGroups(IReadOnlyCollection<string> excludedChars)
 		{
-			const string tag = "\u0009";
-			const string lf = "\u000A";
-			const string cr = "\u000D";
-			const string nel = "\u0085";
-
-			var basicLatinSubset = getCharSequence(0x20, 0x7E);
-			var latinSupplementToHangulJamo = getCharSequence(0x00A0, 0xD7FF);
-			var privateUseAreaToSpecialsBeginning = getCharSequence(0xE000, 0xFFFD);
-
-			var oneCharGroups = basicLatinSubset
-				.Concat(latinSupplementToHangulJamo)
-				.Concat(privateUseAreaToSpecialsBeginning)
-				.Select(c => c.ToString())
-				.Append(tag)
-				.Append(lf)
-				.Append(cr)
-				.Append(nel)
+			var oneCharGroups = _printableCharsWithoutSurrogates.Value
 				.Except(excludedChars)
 				.GroupBy(Characters.CharGroupLength);
 
@@ -154,6 +151,31 @@ namespace ProcessorTests
 
 			return oneCharGroups.Concat(surrogatePairGroups);
 		}
+
+		private static readonly Lazy<IReadOnlyCollection<string>> _printableCharsWithoutSurrogates =
+			new Lazy<IReadOnlyCollection<string>>(
+				() =>
+				{
+					const char tag = '\u0009';
+					const char lf = '\u000A';
+					const char cr = '\u000D';
+					const char nel = '\u0085';
+
+					var basicLatinSubset = getCharSequence(0x20, 0x7E);
+					var latinSupplementToHangulJamo = getCharSequence(0x00A0, 0xD7FF);
+					var privateUseAreaToSpecialsBeginning = getCharSequence(0xE000, 0xFFFD);
+
+					return basicLatinSubset
+						.Concat(latinSupplementToHangulJamo)
+						.Concat(privateUseAreaToSpecialsBeginning)
+						.Append(tag)
+						.Append(lf)
+						.Append(cr)
+						.Append(nel)
+						.Select(c => c.ToString()).ToList();
+				},
+				LazyThreadSafetyMode.ExecutionAndPublication
+			);
 
 		private static readonly Lazy<IReadOnlyCollection<string>> _nbDoubleCharsWithoutEscapedAndSurrogates =
 			new Lazy<IReadOnlyCollection<string>>(

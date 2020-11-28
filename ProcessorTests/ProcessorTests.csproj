@@ -5,6 +5,7 @@
 
         <IsPackable>false</IsPackable>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

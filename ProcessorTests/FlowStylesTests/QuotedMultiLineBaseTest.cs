@@ -158,11 +158,13 @@ namespace ProcessorTests
 		{
 			const int groupItemCount = Characters.CharGroupLength;
 			const int whiteCharGroupCount = groupItemCount / 2;
+			const string tab = "\t";
+			const string space = " ";
 
 			var anyNonSpaceChar = nonSpaceChars.First();
 			var nonSpaceCharLength = anyNonSpaceChar.Length;
-			var nonSpaceCharGroupCount = nonSpaceCharLength * groupItemCount / 2;
-			var oneGroupLength = nonSpaceCharLength + whiteCharGroupCount + nonSpaceCharGroupCount;
+			var nonSpaceCharGroupLength = nonSpaceCharLength * groupItemCount / 2;
+			var oneGroupLength = nonSpaceCharLength + whiteCharGroupCount + nonSpaceCharGroupLength;
 
 			var sb = new StringBuilder(oneGroupLength);
 			sb.Append(anyNonSpaceChar);
@@ -175,7 +177,7 @@ namespace ProcessorTests
 						$"All value lengths of {nameof(nonSpaceChars)} must be equal to each other."
 					);
 
-				var whiteChar = isEvenIteration ? "\t" : " ";
+				var whiteChar = isEvenIteration ? tab : space;
 
 				sb.Append(whiteChar);
 				sb.Append(item);
