@@ -61,7 +61,7 @@ namespace Processor
 			$@"{CollectEntry}\{SequenceStart}\{SequenceEnd}{MappingStart}{MappingEnd}";
 
 		public static readonly string CIndicators =
-			$@"\{SequenceEntry}{MappingKey}{MappingValue}{CollectEntry}\{SequenceStart}\{SequenceEnd}" +
+			$@"{SequenceEntry}{MappingKey}{MappingValue}{CollectEntry}\{SequenceStart}\{SequenceEnd}" +
 			$"{MappingStart}{MappingEnd}{Comment}{Anchor}{Alias}{Tag}{Literal}{Folded}{SingleQuote}{DoubleQuote}" +
 			$"{Directive}{ReservedChar1}{ReservedChar2}";
 
