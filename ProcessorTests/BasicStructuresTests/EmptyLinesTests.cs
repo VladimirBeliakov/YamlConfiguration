@@ -12,7 +12,7 @@ namespace ProcessorTests
 	public class EmptyLinesTests
 	{
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
-		public void EmptyLine_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, string expectedRegex)
+		public void EmptyLine_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, RegexPattern expectedRegex)
 		{
 			var actualRegex = BasicStructures.EmptyLine(value);
 
@@ -61,11 +61,14 @@ namespace ProcessorTests
 				{
 					case BlockFlow.BlockOut:
 					case BlockFlow.BlockIn:
-						yield return new TestCaseData(value, "^(?: {0,1000})" + newLine);
+						yield return new TestCaseData(value, (RegexPattern) ("^(?: ){0,1000}" + newLine));
 						break;
 					case BlockFlow.FlowOut:
 					case BlockFlow.FlowIn:
-						yield return new TestCaseData(value, "^(?: {0,1000})(?:^|[ \t]{1,1000})?" + newLine);
+						yield return new TestCaseData(
+							value,
+							(RegexPattern) ("^(?: ){0,1000}(?:(?:^|[ \t]{1,1000}))?" + newLine)
+						);
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();

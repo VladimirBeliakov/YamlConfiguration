@@ -61,7 +61,7 @@ namespace Processor.FlowStyles
 			);
 
 		private static RegexPattern getNbNsPlainInLine(BlockFlow blockFlow) =>
-			(RegexPatternBuilder.BuildCharSet(Characters.SWhite).WithLimitingRepetition() + getNsPlainChar(blockFlow))
+			(RegexPatternBuilder.BuildCharSet(Characters.SWhites).WithLimitingRepetition() + getNsPlainChar(blockFlow))
 				.WithLimitingRepetition();
 
 		private static RegexPattern getNsPlainOneLine(BlockFlow blockFlow) =>

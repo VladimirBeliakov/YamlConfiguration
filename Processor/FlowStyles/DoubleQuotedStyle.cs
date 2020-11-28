@@ -46,10 +46,10 @@ namespace Processor.FlowStyles
 				$"(?:({BasicStructures.SeparateInLine}?)\\\\{BasicStructures.Break})";
 
 			private static readonly string _nonSpaceDoubleChar =
-				$"(?:(?![{Characters.SWhite}]){_nbDoubleChar})";
+				$"(?:(?![{Characters.SWhites}]){_nbDoubleChar})";
 
 			private static readonly string _nbNsDoubleInLine =
-				$"(?:[{Characters.SWhite}]{{0,{Characters.CharGroupLength}}}" +
+				$"(?:[{Characters.SWhites}]{{0,{Characters.CharGroupLength}}}" +
 				$"{_nonSpaceDoubleChar}){{0,{Characters.CharGroupLength}}}";
 
 			private static readonly string _nbDoubleFirstLine = $"^\"({_nbNsDoubleInLine})";

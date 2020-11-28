@@ -12,7 +12,7 @@ namespace ProcessorTests
 	public class LinePrefixTests
 	{
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
-		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, string expectedRegex)
+		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, RegexPattern expectedRegex)
 		{
 			var actualRegex = BasicStructures.LinePrefix(value);
 
@@ -49,11 +49,11 @@ namespace ProcessorTests
 				{
 					case BlockFlow.BlockOut:
 					case BlockFlow.BlockIn:
-						yield return new TestCaseData(value, "^(?: {0,1000})");
+						yield return new TestCaseData(value, (RegexPattern) "^(?: ){0,1000}");
 						break;
 					case BlockFlow.FlowOut:
 					case BlockFlow.FlowIn:
-						yield return new TestCaseData(value, "^(?: {0,1000})(?:^|[ \t]{1,1000})?");
+						yield return new TestCaseData(value, (RegexPattern) "^(?: ){0,1000}(?:(?:^|[ \t]{1,1000}))?");
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();

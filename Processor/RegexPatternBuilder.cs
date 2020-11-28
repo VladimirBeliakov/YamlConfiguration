@@ -23,11 +23,17 @@ namespace Processor
 
 		public static RegexPattern AsCapturingGroup(this RegexPattern pattern) => new RegexPattern($"({pattern})");
 
+		public static RegexPattern AsOptional(this RegexPattern pattern) => new RegexPattern($"(?:{pattern})?");
+
 		public static RegexPattern WithLimitingRepetition(
 			this RegexPattern pattern,
 			int min = 0,
 			int max = Characters.CharGroupLength
 		) => new RegexPattern($"(?:{pattern}){{{min},{max}}}");
+
+		public static RegexPattern WithAnchorAtBeginning(this RegexPattern pattern) => new RegexPattern($"^{pattern}");
+
+		public static RegexPattern WithAnchorAtEnd(this RegexPattern pattern) => new RegexPattern($"{pattern}$");
 
 		private static string join(IEnumerable<string> items, string? separator = null) =>
 			String.Join(separator ?? String.Empty, items);

@@ -7,21 +7,21 @@ namespace Processor
 	public static class BasicStructures
 	{
 		// TODO: Define the break code by the file parsed.
-		public static readonly string Break = Environment.NewLine;
+		public static readonly RegexPattern Break = (RegexPattern) Environment.NewLine;
 
-		public static readonly string Spaces = $"{Characters.Space}{{1,{Characters.CharGroupLength}}}";
+		public static readonly RegexPattern Spaces = Characters.Space.WithLimitingRepetition(min: 1);
 
-		private static readonly string _indent = $"(?:{Characters.Space}{{0,{Characters.CharGroupLength}}})";
+		private static readonly RegexPattern _indent = Characters.Space.WithLimitingRepetition();
 
-		private static readonly string _anchoredIndent = $"^{_indent}";
+		private static readonly RegexPattern _anchoredIndent = _indent.WithAnchorAtBeginning();
 
-		internal static readonly string SeparateInLine =
-			$"(?:^|[{Characters.Space}{Characters.Tab}]{{1,{Characters.CharGroupLength}}})";
+		internal static readonly RegexPattern SeparateInLine =
+			(RegexPattern) $"(?:^|[{Characters.Space}{Characters.Tab}]{{1,{Characters.CharGroupLength}}})";
 
 		private static readonly string _tagHandle =
 			$"{Characters.Tag}{Characters.WordChar}{{0,{Characters.CharGroupLength}}}{Characters.Tag}?";
 
-		public static string LinePrefix(BlockFlow c, bool useAnchoredIndent = true)
+		public static RegexPattern LinePrefix(BlockFlow c, bool useAnchoredIndent = true)
 		{
 			var indent = useAnchoredIndent ? _anchoredIndent : _indent;
 
@@ -32,15 +32,15 @@ namespace Processor
 					return indent;
 				case BlockFlow.FlowIn:
 				case BlockFlow.FlowOut:
-					return $"{indent}{SeparateInLine}?";
+					return indent + SeparateInLine.AsOptional();
 				default:
 					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlow)} item {c}.");
 			}
 		}
 
-		public static string EmptyLine(BlockFlow c, bool useAnchoredIndent = true)
+		public static RegexPattern EmptyLine(BlockFlow c, bool useAnchoredIndent = true)
 		{
-			return $"{LinePrefix(c, useAnchoredIndent)}{Break}";
+			return LinePrefix(c, useAnchoredIndent) + Break;
 		}
 
 		#region Folded Line Regexes

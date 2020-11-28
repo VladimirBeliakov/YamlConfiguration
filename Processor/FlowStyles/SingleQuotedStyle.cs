@@ -6,22 +6,25 @@ namespace Processor.FlowStyles
 {
 	public class SingleQuotedStyle
 	{
-		private const string _quotedQuote = "''";
+		private static readonly RegexPattern _quotedQuote = Characters.SingleQuote + Characters.SingleQuote;
 
-		private static readonly string _jsonWithoutSingleQuote =
-			$"(?:(?![']){Characters.JsonCompatibleChar})";
+		private static readonly RegexPattern _jsonWithoutSingleQuote =
+			RegexPatternBuilder.BuildExclusive(
+				exclusiveChars: Characters.SingleQuote,
+				inclusiveChars: Characters.JsonCompatibleChar
+			);
 
-		private static readonly string _nbSingleChar =
-			$"(?:{_quotedQuote}|{_jsonWithoutSingleQuote})";
+		private static readonly RegexPattern _nbSingleChar =
+			RegexPatternBuilder.BuildAlternation(_quotedQuote, _jsonWithoutSingleQuote);
 
 		private static readonly string _nbSingleOneLine =
-			$"'({_nbSingleChar}{{0,{Characters.CharGroupLength}}})'";
+			Characters.SingleQuote + _nbSingleChar.WithLimitingRepetition().AsCapturingGroup() + Characters.SingleQuote;
 
 		private static readonly Regex _oneLineRegex = new Regex(_nbSingleOneLine, RegexOptions.Compiled);
 
 		// case BlockFlow.BlockKey
 		// case BlockFlow.FlowKey
-		public static bool TryProcessOneLine(string value, out string extractedValue)
+		public static bool TryProcessOneLine(string value, out string? extractedValue)
 		{
 			extractedValue = null;
 
@@ -40,22 +43,26 @@ namespace Processor.FlowStyles
 		// case BlockFlow.FlowOut
 		public class MultiLine
 		{
-			private static readonly string _nsSingleChar =
-				$"(?:(?![{Characters.SWhite}]){_nbSingleChar})";
+			private static readonly RegexPattern _nsSingleChar =
+				RegexPatternBuilder.BuildExclusive(
+					exclusiveChars: Characters.SWhites,
+					inclusiveChars: _nbSingleChar
+				);
 
-			private static readonly string _foldedLineSequenceBeginning =
-				$"(?:{BasicStructures.SeparateInLine}?{BasicStructures.Break})";
+			private static readonly RegexPattern _foldedLineSequenceBeginning =
+				BasicStructures.SeparateInLine.AsOptional() + BasicStructures.Break;
 
-			private static readonly string _nbNsSingleInLine =
-				$"(?:[{Characters.SWhite}]{{0,{Characters.CharGroupLength}}}" +
-				$"{_nsSingleChar}){{0,{Characters.CharGroupLength}}}";
+			private static readonly RegexPattern _nbNsSingleInLine =
+				(RegexPatternBuilder.BuildCharSet(Characters.SWhites).WithLimitingRepetition() + _nsSingleChar)
+				.WithLimitingRepetition();
 
-			private static readonly string _nbNsSingleFirstLine = $"^'({_nbNsSingleInLine})";
+			private static readonly RegexPattern _nbNsSingleFirstLine =
+				Characters.SingleQuote.WithAnchorAtBeginning() + _nbNsSingleInLine.AsCapturingGroup();
 
-			private static readonly string _emptyLineWithoutBreak = BasicStructures.LinePrefix(BlockFlow.FlowIn);
+			private static readonly RegexPattern _emptyLineWithoutBreak = BasicStructures.LinePrefix(BlockFlow.FlowIn);
 
-			private static readonly string _nonEmptyLine =
-				BasicStructures.LinePrefix(BlockFlow.FlowIn) + $"({_nsSingleChar + _nbNsSingleInLine})";
+			private static readonly RegexPattern _nonEmptyLine =
+				BasicStructures.LinePrefix(BlockFlow.FlowIn) + (_nsSingleChar + _nbNsSingleInLine).AsCapturingGroup();
 
 			private static readonly Regex _firstLineBreakRegex = new Regex(
 				_nbNsSingleFirstLine + _foldedLineSequenceBeginning,
@@ -71,11 +78,13 @@ namespace Processor.FlowStyles
 				new Regex(_nonEmptyLine + _foldedLineSequenceBeginning, RegexOptions.Compiled);
 
 			private static readonly Regex _lastEmptyLineRegex = new Regex(
-				_emptyLineWithoutBreak + "'$",
+				_emptyLineWithoutBreak + Characters.SingleQuote.WithAnchorAtEnd(),
 				RegexOptions.Compiled
 			);
 			private static readonly Regex _lastNonEmptyLineRegex = new Regex(
-				_nonEmptyLine + $"({BasicStructures.SeparateInLine}?)" + "'$",
+				_nonEmptyLine +
+				BasicStructures.SeparateInLine.AsOptional().AsCapturingGroup() +
+				Characters.SingleQuote.WithAnchorAtEnd(),
 				RegexOptions.Compiled
 			);
 

@@ -6,7 +6,7 @@ namespace Processor
 
 		#region C0ControlBlock
 
-		public const string Tab = "\u0009";
+		public static readonly RegexPattern Tab = (RegexPattern) "\u0009";
 		private const string _c0ControlBlockExceptTabLfCr = "\u0000-\u0008\u000B\u000C\u000E-\u001F";
 		private const string _lf = "\u000A";
 		private const string _cr = "\u000D";
@@ -20,7 +20,7 @@ namespace Processor
 
 		#endregion
 
-		public const string Space = "\u0020";
+		public static readonly RegexPattern Space = (RegexPattern) "\u0020";
 		private static readonly string _basicLatinSubset = $"{Space}-\u007E";
 		private const string _del = "\u007F";
 		private const string _latinSupplementToHangulJamo = "\u00A0-\uD7FF";
@@ -37,25 +37,25 @@ namespace Processor
 
 		#region Indicator Characters
 
-		public const string SequenceEntry = "\u002D";	// -
-		public const string MappingKey = "\u003F";		// ?
-		public const string MappingValue = "\u003A";	// :
-		public const string CollectEntry = "\u002C";	// ,
-		public const string SequenceStart = "\u005B";	// [
-		public const string SequenceEnd = "\u005D";		// ]
-		public const string MappingStart = "\u007B";	// {
-		public const string MappingEnd = "\u007D";		// }
-		public const string Comment = "\u0023";			// #
-		public const string Anchor = "\u0026";			// &
-		public const string Alias = "\u002A";			// *
-		public const string Tag = "\u0021";				// !
-		public const string Literal = "\u007C";			// |
-		public const string Folded = "\u003E";			// >
-		public const string SingleQuote = "\u0027";		// '
-		public const string DoubleQuote = "\u0022";		// "
-		public const string Directive = "\u0025";		// %
-		public const string ReservedChar1 = "\u0040";	// @
-		public const string ReservedChar2 = "\u0060";	// `
+		public static readonly RegexPattern SequenceEntry = (RegexPattern) "\u002D";	// -
+		public static readonly RegexPattern MappingKey = (RegexPattern) "\u003F";		// ?
+		public static readonly RegexPattern MappingValue = (RegexPattern) "\u003A";		// :
+		public static readonly RegexPattern CollectEntry = (RegexPattern) "\u002C";		// ,
+		public static readonly RegexPattern SequenceStart = (RegexPattern) "\u005B";	// [
+		public static readonly RegexPattern SequenceEnd = (RegexPattern) "\u005D";		// ]
+		public static readonly RegexPattern MappingStart = (RegexPattern) "\u007B";		// {
+		public static readonly RegexPattern MappingEnd = (RegexPattern) "\u007D";		// }
+		public static readonly RegexPattern Comment = (RegexPattern) "\u0023";			// #
+		public static readonly RegexPattern Anchor = (RegexPattern) "\u0026";			// &
+		public static readonly RegexPattern Alias = (RegexPattern) "\u002A";			// *
+		public static readonly RegexPattern Tag = (RegexPattern) "\u0021";				// !
+		public static readonly RegexPattern Literal = (RegexPattern) "\u007C";			// |
+		public static readonly RegexPattern Folded = (RegexPattern) "\u003E";			// >
+		public static readonly RegexPattern SingleQuote = (RegexPattern) "\u0027";		// '
+		public static readonly RegexPattern DoubleQuote = (RegexPattern) "\u0022";		// "
+		public static readonly RegexPattern Directive = (RegexPattern) "\u0025";		// %
+		public static readonly RegexPattern ReservedChar1 = (RegexPattern) "\u0040";	// @
+		public static readonly RegexPattern ReservedChar2 = (RegexPattern) "\u0060";	// `
 
 		public static readonly string FlowIndicators =
 			$@"{CollectEntry}\{SequenceStart}\{SequenceEnd}{MappingStart}{MappingEnd}";
@@ -143,7 +143,7 @@ namespace Processor
 				_linearBSyllabaryToSupplementaryPrivateUseArea
 			);
 
-		public static readonly string JsonCompatibleChar =
+		public static readonly RegexPattern JsonCompatibleChar =
 			RegexPatternBuilder.BuildAlternation(
 				RegexPatternBuilder.BuildCharSet(Tab, _basicLatinToLast16BitChar),
 				_linearBSyllabaryToSupplementaryPrivateUseArea
@@ -158,7 +158,7 @@ namespace Processor
 		);
 
 		public const string DecimalDigits = "0-9";
-		internal static readonly string SWhite= $"{Space + Tab}";
+		internal static readonly RegexPattern SWhites = Space + Tab;
 		private const string _asciiLetters = "A-Za-z";
 		private static readonly string _hexDigits = $"{DecimalDigits}A-Fa-f";
 
@@ -187,7 +187,7 @@ namespace Processor
 		);
 
 		internal static readonly RegexPattern NsChar = RegexPatternBuilder.BuildExclusive(
-			exclusiveChars: SWhite,
+			exclusiveChars: SWhites,
 			inclusiveChars: NbChar
 		);
 
