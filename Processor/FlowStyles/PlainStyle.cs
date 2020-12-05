@@ -65,17 +65,15 @@ namespace Processor.FlowStyles
 				.WithLimitingRepetition();
 
 		private static RegexPattern getNsPlainOneLine(BlockFlow blockFlow) =>
-			(getNsPlainFirst(blockFlow) + getNbNsPlainInLine(blockFlow)).AsCapturingGroup();
+			(getNsPlainFirst(blockFlow) + getNbNsPlainInLine(blockFlow)).WithAnchorAtBeginning().WithAnchorAtEnd();
 
 		private static readonly Regex _blockKeyOneLineRegex = new Regex(getNsPlainOneLine(BlockFlow.BlockKey));
 		private static readonly Regex _flowKeyOneLineRegex = new Regex(getNsPlainOneLine(BlockFlow.FlowKey));
 
 		// case BlockFlow.BlockKey
 		// case BlockFlow.FlowKey
-		public static bool TryProcessOneLine(string value, BlockFlow blockFlow, out string? extractedValue)
+		public static bool IsOneLine(string value, BlockFlow blockFlow)
 		{
-			extractedValue = null;
-
 			var regex = blockFlow switch
 			{
 				BlockFlow.BlockKey => _blockKeyOneLineRegex,
@@ -83,19 +81,11 @@ namespace Processor.FlowStyles
 				_ => throw new ArgumentOutOfRangeException(
 					nameof(blockFlow),
 					blockFlow,
-					$"Only {nameof(BlockFlow.BlockKey)} and {nameof(BlockFlow.FlowKey)} can be processed."
+					$"Only {BlockFlow.BlockKey} and {BlockFlow.FlowKey} can be processed."
 				)
 			};
 
-			var match = regex.Match(value);
-
-			if (match.Success)
-			{
-				extractedValue = match.Groups[1].Captures[0].Value;
-				return true;
-			}
-
-			return false;
+			return regex.Match(value).Success;
 		}
 	}
 }

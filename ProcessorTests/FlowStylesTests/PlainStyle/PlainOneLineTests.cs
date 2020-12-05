@@ -13,36 +13,22 @@ namespace ProcessorTests
 	public class PlainOneLineTests
 	{
 		[TestCaseSource(nameof(getPositiveTestCases), new object[] { BlockFlow.BlockKey })]
-		public void ValidOnePlainLineInBlockKey_ReturnsTrueAndExtractedValue(Tuple<string, string> testCase)
+		public void ValidOnePlainLineInBlockKey_ReturnsTrueAndExtractedValue(string testValue)
 		{
-			var (testValue, expectedExtractedValue) = testCase;
-
-			var isSuccess = PlainStyle.TryProcessOneLine(testValue, BlockFlow.BlockKey, out var extractedValue);
+			var isSuccess = PlainStyle.IsOneLine(testValue, BlockFlow.BlockKey);
 
 			Assert.True(isSuccess);
-			Assert.That(extractedValue, Is.EqualTo(expectedExtractedValue));
 		}
 
 		[TestCaseSource(nameof(getPositiveTestCases), new object[] { BlockFlow.FlowKey })]
-		public void ValidOnePlainLineInFlowKey_ReturnsTrueAndExtractedValue(Tuple<string, string> testCase)
+		public void ValidOnePlainLineInFlowKey_ReturnsTrueAndExtractedValue(string testValue)
 		{
-			var (testValue, expectedExtractedValue) = testCase;
-
-			var isSuccess = PlainStyle.TryProcessOneLine(testValue, BlockFlow.FlowKey, out var extractedValue);
+			var isSuccess = PlainStyle.IsOneLine(testValue, BlockFlow.FlowKey);
 
 			Assert.True(isSuccess);
-			Assert.That(extractedValue, Is.EqualTo(expectedExtractedValue));
 		}
 
-		private static IEnumerable<Tuple<string, string>> getPositiveTestCases(BlockFlow blockFlow)
-		{
-			var space = CharStore.Spaces.First();
-
-			foreach (var nbNsPlainInLine in getNbNsPlainInLines(blockFlow))
-				yield return Tuple.Create(space + nbNsPlainInLine + space, nbNsPlainInLine);
-		}
-
-		private static IEnumerable<string> getNbNsPlainInLines(BlockFlow blockFlow)
+		private static IEnumerable<string> getPositiveTestCases(BlockFlow blockFlow)
 		{
 			var excludedChars = blockFlow switch
 			{
@@ -51,7 +37,7 @@ namespace ProcessorTests
 				_ => throw new ArgumentOutOfRangeException(
 					nameof(blockFlow),
 					blockFlow,
-					$"Only {nameof(BlockFlow.BlockKey)} and {nameof(BlockFlow.FlowKey)} can be processed."
+					$"Only {BlockFlow.BlockKey} and {BlockFlow.FlowKey} can be processed."
 				)
 			};
 
