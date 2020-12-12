@@ -7,14 +7,17 @@ namespace Processor.FlowStyles
 {
 	public class DoubleQuotedStyle
 	{
-		private static readonly string _jsonWithoutSlashAndDoubleQuote =
-			$"(?:(?![\\\\\"]){Characters.JsonCompatibleChar})";
+		private static readonly RegexPattern _jsonWithoutSlashAndDoubleQuote =
+			RegexPatternBuilder.BuildExclusive(
+					exclusiveChars: Characters.EscapedBackslash + Characters.DoubleQuote,
+					inclusiveChars: Characters.JsonCompatibleChar
+				);
 
-		private static readonly string _nbDoubleChar =
-			$"(?:{Characters.EscapedChar}|{_jsonWithoutSlashAndDoubleQuote})";
+		private static readonly RegexPattern _nbDoubleChar =
+			RegexPatternBuilder.BuildAlternation(Characters.EscapedChar, _jsonWithoutSlashAndDoubleQuote);
 
 		private static readonly string _nbDoubleOneLine =
-			$"\"({_nbDoubleChar}{{0,{Characters.CharGroupLength}}})\"";
+			Characters.DoubleQuote + _nbDoubleChar.WithLimitingRepetition().AsCapturingGroup() + Characters.DoubleQuote;
 
 		private static readonly Regex _oneLineRegex = new Regex(_nbDoubleOneLine, RegexOptions.Compiled);
 
@@ -39,25 +42,32 @@ namespace Processor.FlowStyles
 		// case BlockFlow.FlowOut
 		public class MultiLine
 		{
-			private static readonly string _foldedLineSequenceBeginning =
-				$"(?:{BasicStructures.SeparateInLine}?{BasicStructures.Break})";
+			private static readonly RegexPattern _foldedLineSequenceBeginning =
+				BasicStructures.SeparateInLine.AsOptional() + BasicStructures.Break;
 
-			private static readonly string _doubleEscapeSequenceBeginning =
-				$"(?:({BasicStructures.SeparateInLine}?)\\\\{BasicStructures.Break})";
+			private static readonly RegexPattern _doubleEscapeSequenceBeginning =
+				BasicStructures.SeparateInLine.AsOptional().AsCapturingGroup() +
+				Characters.EscapedBackslash + BasicStructures.Break;
 
-			private static readonly string _nonSpaceDoubleChar =
-				$"(?:(?![{Characters.SWhites}]){_nbDoubleChar})";
+			private static readonly RegexPattern _nonSpaceDoubleChar =
+				RegexPatternBuilder.BuildExclusive(
+						exclusiveChars: Characters.SWhites,
+						inclusiveChars: _nbDoubleChar
+					);
 
-			private static readonly string _nbNsDoubleInLine =
-				$"(?:[{Characters.SWhites}]{{0,{Characters.CharGroupLength}}}" +
-				$"{_nonSpaceDoubleChar}){{0,{Characters.CharGroupLength}}}";
+			private static readonly RegexPattern _nbNsDoubleInLine =
+				(
+					RegexPatternBuilder.BuildCharSet(Characters.SWhites).WithLimitingRepetition() +
+					_nonSpaceDoubleChar
+				).WithLimitingRepetition();
 
-			private static readonly string _nbDoubleFirstLine = $"^\"({_nbNsDoubleInLine})";
+			private static readonly RegexPattern _nbDoubleFirstLine =
+					(Characters.DoubleQuote + _nbNsDoubleInLine.AsCapturingGroup()).WithAnchorAtBeginning();
 
-			private static readonly string _emptyLineWithoutBreak = BasicStructures.LinePrefix(BlockFlow.FlowIn);
+			private static readonly RegexPattern _emptyLineWithoutBreak = BasicStructures.LinePrefix(BlockFlow.FlowIn);
 
-			private static readonly string _nonEmptyLine =
-				BasicStructures.LinePrefix(BlockFlow.FlowIn) + $"({_nonSpaceDoubleChar + _nbNsDoubleInLine})";
+			private static readonly RegexPattern _nonEmptyLine = BasicStructures.LinePrefix(BlockFlow.FlowIn) +
+														   (_nonSpaceDoubleChar + _nbNsDoubleInLine).AsCapturingGroup();
 
 			private static readonly Regex _firstLineWithoutEscapedBreakRegex = new Regex(
 				_nbDoubleFirstLine + _foldedLineSequenceBeginning,
@@ -81,11 +91,15 @@ namespace Processor.FlowStyles
 				new Regex(_nonEmptyLine + _doubleEscapeSequenceBeginning, RegexOptions.Compiled);
 
 			private static readonly Regex _lastEmptyLineRegex = new Regex(
-				_emptyLineWithoutBreak + "\"$",
+				(_emptyLineWithoutBreak + Characters.DoubleQuote).WithAnchorAtEnd(),
 				RegexOptions.Compiled
 			);
 			private static readonly Regex _lastNonEmptyLineRegex = new Regex(
-				_nonEmptyLine + $"({BasicStructures.SeparateInLine}?)" + "\"$",
+				(
+					_nonEmptyLine +
+					BasicStructures.SeparateInLine.AsOptional().AsCapturingGroup() +
+					Characters.DoubleQuote
+				).WithAnchorAtEnd(),
 				RegexOptions.Compiled
 			);
 

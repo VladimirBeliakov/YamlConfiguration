@@ -7,7 +7,7 @@ using Processor.FlowStyles;
 
 namespace Processor.Tests
 {
-	[TestFixture]
+	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class DoubleQuotedOneLineTests
 	{
 		[TestCaseSource(nameof(getPositiveOneLineTestCases))]

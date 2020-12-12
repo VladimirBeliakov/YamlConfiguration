@@ -80,9 +80,9 @@ namespace Processor
 		private const string _escapedCarriageReturn = "r";
 		private const string _escapedEscape = "e";
 		private const string _escapedSpace = " ";
-		private const string _escapedDoubleQuote = "\"";
+		public static readonly RegexPattern EscapedDoubleQuote = (RegexPattern) "\"";
 		private const string _escapedSlash = "/";
-		private const string _escapedBackslash = "\\\\";
+		public static readonly RegexPattern EscapedBackslash = (RegexPattern) "\\\\";
 		private const string _escapedNextLine = "N";
 		private const string _escapedNonBreakingSpace = "\u00A0";
 		private const string _escapedLineSeparator = "L";
@@ -104,9 +104,9 @@ namespace Processor
 				_escapedCarriageReturn,
 				_escapedEscape,
 				_escapedSpace,
-				_escapedDoubleQuote,
+				EscapedDoubleQuote,
 				_escapedSlash,
-				_escapedBackslash,
+				EscapedBackslash,
 				_escapedNextLine,
 				_escapedNonBreakingSpace,
 				_escapedLineSeparator,
