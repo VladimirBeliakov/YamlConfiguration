@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Processor\Processor.csproj" />
+      <ProjectReference Include="..\..\src\Processor\Processor.csproj" />
     </ItemGroup>
 
 </Project>
