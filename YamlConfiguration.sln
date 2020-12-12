@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Processor", "Processor\Processor.csproj", "{52816FE6-7CA7-4ECF-ACD5-35D9562A91F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Processor", "src\Processor\Processor.csproj", "{52816FE6-7CA7-4ECF-ACD5-35D9562A91F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessorTests", "ProcessorTests\ProcessorTests.csproj", "{49A318C5-673F-46CE-935B-30A17D20C2A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessorTests", "tests\ProcessorTests\ProcessorTests.csproj", "{49A318C5-673F-46CE-935B-30A17D20C2A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
