@@ -69,30 +69,30 @@ namespace Processor
 
 		#region Escape Sequences
 
-		private const string _escape = "\\\\";
-		private const string _escapedNull = "0";
-		private const string _escapedBell = "a";
-		private const string _escapedBackspace = "b";
-		private const string _escapedHorizontalTab = "t";
-		private const string _escapedLineFeed = "n";
-		private const string _escapedVerticalTab = "v";
-		private const string _escapedFormFeed = "f";
-		private const string _escapedCarriageReturn = "r";
-		private const string _escapedEscape = "e";
-		private const string _escapedSpace = " ";
+		private static readonly RegexPattern _escape = (RegexPattern) "\\\\";
+		private static readonly RegexPattern _escapedNull = (RegexPattern) "0";
+		private static readonly RegexPattern _escapedBell = (RegexPattern) "a";
+		private static readonly RegexPattern _escapedBackspace = (RegexPattern) "b";
+		private static readonly RegexPattern _escapedHorizontalTab = (RegexPattern) "t";
+		private static readonly RegexPattern _escapedLineFeed = (RegexPattern) "n";
+		private static readonly RegexPattern _escapedVerticalTab = (RegexPattern) "v";
+		private static readonly RegexPattern _escapedFormFeed = (RegexPattern) "f";
+		private static readonly RegexPattern _escapedCarriageReturn = (RegexPattern) "r";
+		private static readonly RegexPattern _escapedEscape = (RegexPattern) "e";
+		private static readonly RegexPattern _escapedSpace = (RegexPattern) " ";
 		public static readonly RegexPattern EscapedDoubleQuote = (RegexPattern) "\"";
-		private const string _escapedSlash = "/";
+		private static readonly RegexPattern _escapedSlash = (RegexPattern) "/";
 		public static readonly RegexPattern EscapedBackslash = (RegexPattern) "\\\\";
-		private const string _escapedNextLine = "N";
-		private const string _escapedNonBreakingSpace = "\u00A0";
-		private const string _escapedLineSeparator = "L";
-		private const string _escapedParagraphSeparator = "P";
-		private const string _escaped8Bit = "x";
-		private const string _escaped16Bit = "u";
-		private const string _escaped32Bit = "U";
+		private static readonly RegexPattern _escapedNextLine = (RegexPattern) "N";
+		private static readonly RegexPattern _escapedNonBreakingSpace = (RegexPattern) "\u00A0";
+		private static readonly RegexPattern _escapedLineSeparator = (RegexPattern) "L";
+		private static readonly RegexPattern _escapedParagraphSeparator = (RegexPattern) "P";
+		private static readonly RegexPattern _escaped8Bit = (RegexPattern) "x";
+		private static readonly RegexPattern _escaped16Bit = (RegexPattern) "u";
+		private static readonly RegexPattern _escaped32Bit = (RegexPattern) "U";
 
-		public static readonly string EscapedChar =
-			$"(?:{_escape}" +
+		public static readonly RegexPattern EscapedChar =
+			(_escape +
 			RegexPatternBuilder.BuildCharSet(
 				_escapedNull,
 				_escapedBell,
@@ -114,7 +114,7 @@ namespace Processor
 				_escaped8Bit,
 				_escaped16Bit,
 				_escaped32Bit
-			) + ")";
+			)).AsNonCapturingGroup();
 
 		#endregion
 
