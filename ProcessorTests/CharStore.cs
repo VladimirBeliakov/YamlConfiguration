@@ -39,8 +39,8 @@ namespace ProcessorTests
 
 		public static readonly IEnumerable<string> CIndicators = new[]
 		{
-			"-", "?", ":", ",", "[", "]", "{", "}", "#", "&", "*", "!", "|", ">", "'", "\"", "%", "@", "`"
-		};
+			"-", "?", ":", "#", "&", "*", "!", "|", ">", "'", "\"", "%", "@", "`"
+		}.Concat(FlowIndicators);
 
 		public static readonly IEnumerable<string> WordChars = _decimalDigits.Concat(_asciiLetters);
 

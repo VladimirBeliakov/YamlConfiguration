@@ -28,6 +28,22 @@ namespace ProcessorTests
 			Assert.True(isSuccess);
 		}
 
+		[TestCaseSource(nameof(getNegativeTextCases), new object[] { BlockFlow.BlockKey })]
+		public void InvalidOnePlainLineInBlockKey_ReturnsFalse(string testCase)
+		{
+			var result = PlainStyle.IsOneLine(testCase, BlockFlow.BlockKey);
+
+			Assert.False(result);
+		}
+
+		[TestCaseSource(nameof(getNegativeTextCases), new object[] { BlockFlow.FlowKey })]
+		public void InvalidOnePlainLineInFlowKey_ReturnsFalse(string testCase)
+		{
+			var result = PlainStyle.IsOneLine(testCase, BlockFlow.FlowKey);
+
+			Assert.False(result);
+		}
+
 		private static IEnumerable<string> getPositiveTestCases(BlockFlow blockFlow)
 		{
 			var excludedChars = blockFlow switch
@@ -117,9 +133,9 @@ namespace ProcessorTests
 			if (sb.Length > 0)
 				yield return sb.ToString();
 
-			yield return anyNsPlainFirst + string.Join(
-				string.Empty,
-				Enumerable.Repeat(CharStore.SpacesAndTabs + anyNsPlainChar, groupItemCount)
+			yield return anyNsPlainFirst + Helpers.RepeatAndJoin(
+				CharStore.SpacesAndTabs + anyNsPlainChar,
+				groupItemCount
 			);
 
 			var anyNsPlainCharGroup = string.Join(string.Empty, nsPlainChars.Take(groupItemCount));
@@ -136,6 +152,67 @@ namespace ProcessorTests
 
 			yield return anyNsPlainFirst + comment + comment;
 			yield return mappingValue + mappingValue + anyNsPlainSafe;
+		}
+
+		private static IEnumerable<string> getNegativeTextCases(BlockFlow blockFlow)
+		{
+			const string nsChar = "a";
+			const string whiteChar = " ";
+			const string invalidNsChar = whiteChar;
+			const string nsPlainFirst = nsChar;
+			const string nsPlainChar = nsChar;
+			const string comment = "#";
+			const string mappingKey = "?";
+			const string mappingValue = ":";
+			const string sequenceEntry = "-";
+			const string nsPlainSafe = "a";
+
+			IReadOnlyCollection<string> invalidNsPlainSafes = blockFlow switch
+			{
+				BlockFlow.BlockKey => new[] { " " },
+				BlockFlow.FlowKey => CharStore.FlowIndicators.ToList(),
+				_ => throw new ArgumentOutOfRangeException(
+					nameof(blockFlow),
+					blockFlow,
+					$"Only {BlockFlow.BlockKey} and {BlockFlow.FlowKey} can be processed."
+				)
+			};
+
+			// Invalid ns plain first
+			var conditionalNsPlainFirsts = new[] { mappingKey, mappingValue, sequenceEntry };
+
+			foreach (var inValidNsPlainFirst in CharStore.CIndicators.Except(conditionalNsPlainFirsts))
+				yield return inValidNsPlainFirst + nsPlainSafe;
+
+			foreach (var invalidNsPlainFirst in conditionalNsPlainFirsts)
+				yield return invalidNsPlainFirst + whiteChar + nsPlainSafe;
+
+			// Too many white chars
+			var tooManyWhiteChars = CharStore.SpacesAndTabs + " ";
+			var nsPlainInLine = tooManyWhiteChars + nsPlainChar;
+			yield return nsPlainFirst + nsPlainInLine;
+
+			// Too many ns plain chars
+			var tooManyNsPlainChars = Helpers.RepeatAndJoin(nsPlainChar, Characters.CharGroupLength + 1);
+			yield return nsPlainFirst + tooManyNsPlainChars;
+
+			// Too long ns plain in line
+			var tooLongNsPlainInLine =
+				Helpers.RepeatAndJoin(whiteChar + nsPlainChar, Characters.CharGroupLength) + whiteChar;
+			yield return nsPlainFirst + tooLongNsPlainInLine;
+
+			// Ns plain in line with a white space but without ns plain char
+			const string invalidNsPlainInLine = whiteChar;
+			yield return nsPlainFirst + invalidNsPlainInLine;
+
+			// Invalid ns plain char
+			yield return nsPlainFirst + invalidNsChar + comment;
+
+			foreach (var invalidNsPlainSafe in invalidNsPlainSafes)
+			{
+				yield return nsPlainFirst + invalidNsPlainSafe;
+				yield return nsPlainFirst + mappingValue + invalidNsPlainSafe;
+			}
 		}
 	}
 }
