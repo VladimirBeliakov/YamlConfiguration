@@ -88,8 +88,9 @@ namespace Processor
 		#endregion
 
 		public static readonly string Comment =
-			$"(?:{SeparateInLine}(?:#[^{Break}]{{0,{Characters.CharGroupLength * Characters.CharGroupLength}}})?)?" +
-			$"{Break}";
+			(SeparateInLine +
+			 (Characters.Comment + RegexPatternBuilder.BuildNegatedCharSet(Break).WithLimitingRepetition()).AsOptional()
+			).AsOptional() + Break;
 
 		// TODO: Move the logic to a higher level.
 		public static string SeparateLines(BlockFlow c)

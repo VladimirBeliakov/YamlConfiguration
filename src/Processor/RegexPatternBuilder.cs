@@ -10,6 +10,8 @@ namespace Processor
 
 		public static RegexPattern BuildCharSet(params string[] items) => new RegexPattern($"[{join(items)}]");
 
+		public static RegexPattern BuildNegatedCharSet(params string[] items) => new RegexPattern($"[^{join(items)}]");
+
 		public static RegexPattern BuildAlternation(params string[] items) =>
 			new RegexPattern($"(?:{join(items, separator: "|")})");
 
