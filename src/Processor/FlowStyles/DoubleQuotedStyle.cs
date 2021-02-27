@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
 using System.Text.RegularExpressions;
-using Processor.TypeDefinitions;
+using YamlConfiguration.Processor.TypeDefinitions;
 
-namespace Processor.FlowStyles
+namespace YamlConfiguration.Processor.FlowStyles
 {
 	public class DoubleQuotedStyle
 	{

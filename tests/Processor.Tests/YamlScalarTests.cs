@@ -1,9 +1,9 @@
 using System;
 using NUnit.Framework;
-using Processor.Exceptions;
-using Processor.TypeDefinitions;
+using YamlConfiguration.Processor.Exceptions;
+using YamlConfiguration.Processor.TypeDefinitions;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class YamlScalarTests

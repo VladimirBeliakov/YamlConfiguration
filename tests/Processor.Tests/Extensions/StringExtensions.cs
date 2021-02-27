@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	internal static class StringExtensions
 	{

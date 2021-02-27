@@ -1,4 +1,4 @@
-namespace Processor.TypeDefinitions
+namespace YamlConfiguration.Processor.TypeDefinitions
 {
     public enum FailurePoint : byte
     {

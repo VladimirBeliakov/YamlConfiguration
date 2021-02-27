@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Processor.TypeDefinitions;
+using YamlConfiguration.Processor.TypeDefinitions;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	internal static class EnumCache
 	{

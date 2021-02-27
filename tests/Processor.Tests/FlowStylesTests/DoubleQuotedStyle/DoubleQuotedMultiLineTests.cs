@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Processor.FlowStyles;
+using YamlConfiguration.Processor.FlowStyles;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class DoubleQuotedMultiLineTests : QuotedMultiLineBaseTest

@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Processor;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	// TODO: Leaving the test for informational purposes only. Will be deleted when the BreakAsSpace logic
 	// is moved to upper levels

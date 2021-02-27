@@ -1,4 +1,4 @@
-﻿namespace Processor.TypeDefinitions
+﻿namespace YamlConfiguration.Processor.TypeDefinitions
 {
 	internal enum FlowScalarStyle : byte
 	{

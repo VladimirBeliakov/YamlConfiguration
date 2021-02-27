@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Processor;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	internal static class CharStore
 	{

@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Processor;
-using Processor.TypeDefinitions;
+using YamlConfiguration.Processor.TypeDefinitions;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	// TODO: Leaving the test for informational purposes only. Will be deleted when the FlowFoldedLineWithBreakAsSpace
 	// logic is moved to upper levels

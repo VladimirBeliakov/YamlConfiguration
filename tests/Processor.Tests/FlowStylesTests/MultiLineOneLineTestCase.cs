@@ -1,6 +1,6 @@
-using Processor.FlowStyles;
+using YamlConfiguration.Processor.FlowStyles;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	public class MultiLineOneLineTestCase
 	{

@@ -1,8 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>netcoreapp5.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <AssemblyName>YamlConfiguration.Processor</AssemblyName>
+        <RootNamespace>YamlConfiguration.Processor</RootNamespace>
+        <LangVersion>9</LangVersion>
     </PropertyGroup>
 
 </Project>

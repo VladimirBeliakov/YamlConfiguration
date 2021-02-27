@@ -1,8 +1,8 @@
-using Processor.TypeDefinitions;
 using System;
 using System.Text.RegularExpressions;
+using YamlConfiguration.Processor.TypeDefinitions;
 
-namespace Processor.FlowStyles
+namespace YamlConfiguration.Processor.FlowStyles
 {
 	public class SingleQuotedStyle
 	{

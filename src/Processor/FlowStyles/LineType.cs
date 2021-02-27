@@ -1,4 +1,4 @@
-namespace Processor.FlowStyles
+namespace YamlConfiguration.Processor.FlowStyles
 {
 	public enum LineType : byte
 	{

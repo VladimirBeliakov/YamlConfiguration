@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Processor;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class CommentTests

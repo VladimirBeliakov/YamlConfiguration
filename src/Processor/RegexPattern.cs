@@ -1,6 +1,6 @@
 using System;
 
-namespace Processor
+namespace YamlConfiguration.Processor
 {
 	public class RegexPattern : IEquatable<RegexPattern>
 	{

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	public class MultiLineTestCase
 	{

@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	public static class Helpers
 	{

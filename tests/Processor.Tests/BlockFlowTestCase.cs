@@ -1,6 +1,6 @@
-using Processor.TypeDefinitions;
+using YamlConfiguration.Processor.TypeDefinitions;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	public class BlockFlowTestCase
 	{

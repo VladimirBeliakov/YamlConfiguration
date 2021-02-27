@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using NUnit.Framework;
-using Processor;
-using Processor.FlowStyles;
+using YamlConfiguration.Processor.FlowStyles;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class SingleQuotedMultiLineTests : QuotedMultiLineBaseTest

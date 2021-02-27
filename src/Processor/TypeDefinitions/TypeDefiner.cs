@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Processor.TypeDefinitions
+namespace YamlConfiguration.Processor.TypeDefinitions
 {
 	public class TypeDefiner
 	{

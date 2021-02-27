@@ -1,6 +1,6 @@
 using System;
 
-namespace Processor.Exceptions
+namespace YamlConfiguration.Processor.Exceptions
 {
 	public class InvalidYamlMappingException : Exception
 	{

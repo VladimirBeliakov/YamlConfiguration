@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Processor.Exceptions;
+using YamlConfiguration.Processor.Exceptions;
 
-namespace Processor.TypeDefinitions
+namespace YamlConfiguration.Processor.TypeDefinitions
 {
 	public class YamlMapping
 	{

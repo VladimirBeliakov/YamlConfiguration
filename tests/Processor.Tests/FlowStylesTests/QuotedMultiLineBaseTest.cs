@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Processor;
-using Processor.FlowStyles;
+using YamlConfiguration.Processor.FlowStyles;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	public abstract class QuotedMultiLineBaseTest
 	{

@@ -1,4 +1,4 @@
-namespace Processor
+namespace YamlConfiguration.Processor
 {
 	public static class EscapeSequences
 	{

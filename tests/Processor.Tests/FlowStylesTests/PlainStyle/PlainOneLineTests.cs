@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Processor;
-using Processor.FlowStyles;
-using Processor.TypeDefinitions;
+using YamlConfiguration.Processor.FlowStyles;
+using YamlConfiguration.Processor.TypeDefinitions;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class PlainOneLineTests

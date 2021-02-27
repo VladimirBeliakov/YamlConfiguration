@@ -1,8 +1,7 @@
 using System;
-using Processor.TypeDefinitions;
-using static Processor.BasicStructures;
+using YamlConfiguration.Processor.TypeDefinitions;
 
-namespace Processor
+namespace YamlConfiguration.Processor
 {
 	public static class BasicStructures
 	{

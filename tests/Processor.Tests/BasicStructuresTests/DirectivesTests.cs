@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Processor;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class DirectivesTests
@@ -21,9 +20,9 @@ namespace Processor.Tests
 					Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 					Assert.That(match.Groups.Count, Is.EqualTo(3));
 					Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
-					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures[0]));
+					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures?.FirstOrDefault()));
 					Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(1));
-					Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(testCase.Captures[1]));
+					Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(testCase.Captures?.ElementAtOrDefault(1)));
 				}
 			);
 		}
@@ -47,7 +46,7 @@ namespace Processor.Tests
 					Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 					Assert.That(match.Groups.Count, Is.EqualTo(2));
 					Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
-					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures[0]));
+					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures?.FirstOrDefault()));
 				}
 			);
 		}
@@ -71,9 +70,9 @@ namespace Processor.Tests
 					Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 					Assert.That(match.Groups.Count, Is.EqualTo(3));
 					Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
-					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures[0]));
+					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures?.FirstOrDefault()));
 					Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(1));
-					Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(testCase.Captures[1]));
+					Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(testCase.Captures?.ElementAtOrDefault(1)));
 				}
 			);
 		}

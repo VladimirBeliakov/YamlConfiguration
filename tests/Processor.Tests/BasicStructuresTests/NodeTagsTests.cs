@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using NUnit.Framework;
-using Processor;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class NodeTagsTests
@@ -22,8 +21,8 @@ namespace Processor.Tests
 					Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 					Assert.That(match.Groups.Count, Is.EqualTo(3));
 					Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
-					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures[0]));
-					if (testCase.Captures[1] != null)
+					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures?.FirstOrDefault()));
+					if (testCase.Captures?.ElementAtOrDefault(1) != null)
 					{
 						Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(1));
 						Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(testCase.Captures[1]));
@@ -43,8 +42,8 @@ namespace Processor.Tests
 					Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 					Assert.That(match.Groups.Count, Is.EqualTo(3));
 					Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
-					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures[0]));
-					if (testCase.Captures[1] != null)
+					Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.Captures?.FirstOrDefault()));
+					if (testCase.Captures?.ElementAtOrDefault(1) != null)
 					{
 						Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(1));
 						Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(testCase.Captures[1]));
@@ -115,14 +114,14 @@ namespace Processor.Tests
 				testValue: anySeparateInLine + anyTagProperty + anySeparateInLine + chars,
 				wholeMatch: anySeparateInLine + anyTagProperty + anySeparateInLine,
 				anyTagProperty,
-				null
+				null!
 			);
 
 			yield return new RegexTestCase(
 				testValue: anyTagProperty + anySeparateInLine + chars,
 				wholeMatch: anyTagProperty + anySeparateInLine ,
 				anyTagProperty,
-				null
+				null!
 			);
 		}
 
@@ -172,14 +171,14 @@ namespace Processor.Tests
 				testValue: anySeparateInLine + "&" + anyAnchorName + anySeparateInLine + chars,
 				wholeMatch: anySeparateInLine + "&" + anyAnchorName + anySeparateInLine,
 				anyAnchorName,
-				null
+				null!
 			);
 
 			yield return new RegexTestCase(
 				testValue: "&" + anyAnchorName + anySeparateInLine + chars,
 				wholeMatch: "&" + anyAnchorName + anySeparateInLine,
 				anyAnchorName,
-				null
+				null!
 			);
 		}
 

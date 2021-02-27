@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Processor;
 
-namespace Processor.Tests
+namespace YamlConfiguration.Processor.Tests
 {
 	// TODO: Add more characters to the test cases.
 	[TestFixture, Parallelizable(ParallelScope.All)]
