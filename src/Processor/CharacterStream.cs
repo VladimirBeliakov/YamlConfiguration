@@ -1,102 +1,90 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
 {
-	public class CharacterStream : IAsyncEnumerable<char>
+	public class CharacterStream : IAsyncDisposable
 	{
 		private readonly Stream _stream;
+		private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+		private readonly byte[] _buffer = new byte[4096];
+
+		private int _currentBufferBytePosition;
+		private int _bufferLength;
+		private bool _isDisposed;
 
 		public CharacterStream(Stream stream)
 		{
 			_stream = stream;
 		}
 
-		public IAsyncEnumerator<char> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+		public ValueTask DisposeAsync()
 		{
-			return new StreamEnumerator(_stream, cancellationToken);
+			dispose();
+			return ValueTask.CompletedTask;
 		}
 
-		private class StreamEnumerator : IAsyncEnumerator<char>
+		public async ValueTask<char?> Read() => (char?) await read();
+
+		private async ValueTask<byte?> read()
 		{
-			private readonly CancellationTokenSource _cts;
-			private readonly Stream _stream;
-			private readonly byte[] _buffer = new byte[4096];
+			if (_isDisposed)
+				throw new InvalidOperationException("Can't read a disposed stream.");
 
-			private int _currentBufferBytePosition;
-			private int _bufferLength;
+			if (tryGetBufferCurrentByte(out var currentByte))
+				return currentByte;
 
-			private byte _currentByte;
+			var bytesRead = await _stream.ReadAsync(_buffer, _cts.Token);
 
-			public char Current => (char) _currentByte;
-
-			public StreamEnumerator(Stream stream, CancellationToken token)
+			if (bytesRead == 0)
 			{
-				_stream = stream;
-				_cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+				dispose();
+				return null;
 			}
 
-			public async ValueTask<bool> MoveNextAsync()
+			_bufferLength = bytesRead;
+
+			return getBufferCurrentByte();
+		}
+
+		private bool tryGetBufferCurrentByte(out byte currentByte)
+		{
+			if (_bufferLength > 0 && _currentBufferBytePosition <= getBufferLastItemPosition())
 			{
-				if (tryGetBufferCurrentByte(out var currentByte))
-				{
-					_currentByte = currentByte;
-					return true;
-				}
-
-				var bytesRead = await _stream.ReadAsync(_buffer, _cts.Token);
-
-				if (bytesRead == 0)
-					return false;
-
-				_bufferLength = bytesRead;
-
-				_currentByte = getBufferCurrentByte();
+				currentByte = getBufferCurrentByte();
 
 				return true;
 			}
 
-			public ValueTask DisposeAsync()
-			{
-				_cts.Cancel();
-				_stream.Dispose();
+			_currentBufferBytePosition = 0;
+			_bufferLength = 0;
 
-				return ValueTask.CompletedTask;
-			}
+			currentByte = default;
 
-			private bool tryGetBufferCurrentByte(out byte currentByte)
-			{
-				if (_bufferLength > 0 && _currentBufferBytePosition <= getBufferLastItemPosition())
-				{
-					currentByte = getBufferCurrentByte();
+			return false;
+		}
 
-					return true;
-				}
+		private byte getBufferCurrentByte()
+		{
+			if (_currentBufferBytePosition > getBufferLastItemPosition())
+				throw new InvalidOperationException("Can't read over the size of the buffer.");
 
-				_currentBufferBytePosition = 0;
-				_bufferLength = 0;
+			var currentByte = _buffer[_currentBufferBytePosition];
 
-				currentByte = default;
+			_currentBufferBytePosition++;
 
-				return false;
-			}
+			return currentByte;
+		}
 
-			private byte getBufferCurrentByte()
-			{
-				if (_currentBufferBytePosition > getBufferLastItemPosition())
-					throw new InvalidOperationException("Can't read over the size of the buffer.");
+		private int getBufferLastItemPosition() => _bufferLength - 1;
 
-				var currentByte = _buffer[_currentBufferBytePosition];
-
-				_currentBufferBytePosition++;
-
-				return currentByte;
-			}
-
-			private int getBufferLastItemPosition() => _bufferLength - 1;
+		private void dispose()
+		{
+			_cts.Cancel();
+			_stream.Dispose();
+			_isDisposed = true;
 		}
 	}
 }

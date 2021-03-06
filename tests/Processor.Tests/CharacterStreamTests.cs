@@ -13,11 +13,12 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var charArray = new[] { 'a', 'b', 'c' };
 			var stream = new MemoryStream(charArray.Select(_ => (byte) _).ToArray());
-			var characterStream = new CharacterStream(stream);
+			await using var characterStream = new CharacterStream(stream);
 
 			var charsRead = new List<char>();
-			await foreach (var charRead in characterStream)
-				charsRead.Add(charRead);
+			char? charRead;
+			while ((charRead = await characterStream.Read()) != null)
+				charsRead.Add(charRead.Value);
 
 			CollectionAssert.AreEqual(charArray, charsRead);
 		}
