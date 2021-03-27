@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
 {
-	public class CharacterStream : IAsyncDisposable
+	internal class CharacterStream : IAsyncDisposable
 	{
 		private readonly Stream _stream;
 		private readonly CancellationTokenSource _cts = new CancellationTokenSource();
@@ -20,13 +20,20 @@ namespace YamlConfiguration.Processor
 			_stream = stream;
 		}
 
-		public ValueTask DisposeAsync()
+		public ValueTask DisposeAsync() => dispose();
+
+		public async ValueTask<char> Peek()
 		{
-			dispose();
-			return ValueTask.CompletedTask;
+			if (_isDisposed)
+				throw new InvalidOperationException("Can't peek a disposed stream.");
+
+			if (_bufferLength == 0)
+				await fillBuffer().ConfigureAwait(false);
+
+			return (char) getCurrentByte();
 		}
 
-		public async ValueTask<char?> Read() => (char?) await read();
+		public async ValueTask<char?> Read() => (char?) await read().ConfigureAwait(false);
 
 		private async ValueTask<byte?> read()
 		{
@@ -36,24 +43,34 @@ namespace YamlConfiguration.Processor
 			if (tryGetBufferCurrentByte(out var currentByte))
 				return currentByte;
 
-			var bytesRead = await _stream.ReadAsync(_buffer, _cts.Token);
+			await fillBuffer().ConfigureAwait(false);
 
-			if (bytesRead == 0)
+			if (_bufferLength == 0)
 			{
-				dispose();
+				await dispose().ConfigureAwait(false);
 				return null;
 			}
 
-			_bufferLength = bytesRead;
-
-			return getBufferCurrentByte();
+			return getBufferCurrentByteAndAdvance();
 		}
+
+		private async ValueTask fillBuffer()
+		{
+			var bytesRead = await _stream.ReadAsync(_buffer, _cts.Token).ConfigureAwait(false);
+
+			if (bytesRead == 0)
+				await dispose().ConfigureAwait(false);
+
+			_bufferLength = bytesRead;
+		}
+
+		private byte getCurrentByte() => _buffer[_currentBufferBytePosition];
 
 		private bool tryGetBufferCurrentByte(out byte currentByte)
 		{
 			if (_bufferLength > 0 && _currentBufferBytePosition <= getBufferLastItemPosition())
 			{
-				currentByte = getBufferCurrentByte();
+				currentByte = getBufferCurrentByteAndAdvance();
 
 				return true;
 			}
@@ -66,12 +83,12 @@ namespace YamlConfiguration.Processor
 			return false;
 		}
 
-		private byte getBufferCurrentByte()
+		private byte getBufferCurrentByteAndAdvance()
 		{
 			if (_currentBufferBytePosition > getBufferLastItemPosition())
 				throw new InvalidOperationException("Can't read over the size of the buffer.");
 
-			var currentByte = _buffer[_currentBufferBytePosition];
+			var currentByte = getCurrentByte();
 
 			_currentBufferBytePosition++;
 
@@ -80,10 +97,10 @@ namespace YamlConfiguration.Processor
 
 		private int getBufferLastItemPosition() => _bufferLength - 1;
 
-		private void dispose()
+		private async ValueTask dispose()
 		{
 			_cts.Cancel();
-			_stream.Dispose();
+			await _stream.DisposeAsync().ConfigureAwait(false);
 			_isDisposed = true;
 		}
 	}
