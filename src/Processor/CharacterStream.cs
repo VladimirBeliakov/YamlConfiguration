@@ -13,7 +13,8 @@ namespace YamlConfiguration.Processor
 
 		private int _currentBufferBytePosition;
 		private int _bufferLength;
-		private bool _isDisposed;
+
+		public bool IsDisposed { get; private set; }
 
 		public CharacterStream(Stream stream)
 		{
@@ -24,7 +25,7 @@ namespace YamlConfiguration.Processor
 
 		public async ValueTask<char> Peek()
 		{
-			if (_isDisposed)
+			if (IsDisposed)
 				throw new InvalidOperationException("Can't peek a disposed stream.");
 
 			if (_bufferLength == 0)
@@ -37,7 +38,7 @@ namespace YamlConfiguration.Processor
 
 		private async ValueTask<byte?> read()
 		{
-			if (_isDisposed)
+			if (IsDisposed)
 				throw new InvalidOperationException("Can't read a disposed stream.");
 
 			if (tryGetBufferCurrentByte(out var currentByte))
@@ -101,7 +102,7 @@ namespace YamlConfiguration.Processor
 		{
 			_cts.Cancel();
 			await _stream.DisposeAsync().ConfigureAwait(false);
-			_isDisposed = true;
+			IsDisposed = true;
 		}
 	}
 }

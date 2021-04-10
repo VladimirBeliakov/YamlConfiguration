@@ -6,7 +6,7 @@ namespace YamlConfiguration.Processor
 	public static class BasicStructures
 	{
 		// TODO: Define the break code by the file parsed.
-		public static readonly RegexPattern Break = (RegexPattern) Environment.NewLine;
+		public static readonly RegexPattern Break = (RegexPattern) '\n';
 
 		public static readonly RegexPattern Spaces = Characters.Space.WithLimitingRepetition(min: 1);
 

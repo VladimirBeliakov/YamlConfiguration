@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace YamlConfiguration.Processor
 {
@@ -15,7 +16,17 @@ namespace YamlConfiguration.Processor
 
 		public static implicit operator string(RegexPattern pattern) => pattern._regexValue;
 
+		public static implicit operator char(RegexPattern pattern)
+		{
+			if (pattern._regexValue.Length == 1)
+				return pattern._regexValue.Single();
+
+			throw new InvalidCastException($"Can't cast multi char pattern {pattern} to one char.");
+		}
+
 		public static explicit operator RegexPattern(string rawValue) => new RegexPattern(rawValue);
+
+		public static explicit operator RegexPattern(char rawValue) => new RegexPattern(rawValue.ToString());
 
 		public static RegexPattern operator +(RegexPattern pattern1, RegexPattern pattern2) =>
 			new RegexPattern(pattern1._regexValue + pattern2._regexValue);
