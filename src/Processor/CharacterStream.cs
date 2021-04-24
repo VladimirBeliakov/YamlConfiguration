@@ -39,7 +39,7 @@ namespace YamlConfiguration.Processor
 		private async ValueTask<byte?> read()
 		{
 			if (IsDisposed)
-				throw new InvalidOperationException("Can't read a disposed stream.");
+				return null;
 
 			if (tryGetBufferCurrentByte(out var currentByte))
 				return currentByte;

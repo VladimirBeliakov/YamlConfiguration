@@ -14,7 +14,7 @@ namespace YamlConfiguration.Processor.Tests
 			var stream = new MemoryStream(new[] { '#', 'a', '\n', 'b' }.Select(c => (byte) c).ToArray());
 			var charStream = getCharStream(stream);
 
-			await new CommentParser().Process(charStream);
+			await new OneLineCommentParser().Process(charStream);
 
 			var actualCurrentStreamChar = await charStream.Peek();
 
@@ -27,7 +27,7 @@ namespace YamlConfiguration.Processor.Tests
 			var stream = new MemoryStream(new[] { 'a', '#', '\n', 'b' }.Select(c => (byte) c).ToArray());
 			var charStream = getCharStream(stream);
 
-			await new CommentParser().Process(charStream);
+			await new OneLineCommentParser().Process(charStream);
 
 			var actualCurrentStreamChar = await charStream.Peek();
 
@@ -40,7 +40,7 @@ namespace YamlConfiguration.Processor.Tests
 			var stream = new MemoryStream(new[] { '#', 'a', 'b' }.Select(c => (byte) c).ToArray());
 			var charStream = getCharStream(stream);
 
-			await new CommentParser().Process(charStream);
+			await new OneLineCommentParser().Process(charStream);
 
 			Assert.True(charStream.IsDisposed);
 		}

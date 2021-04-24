@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
 {
-	internal interface ICommentParser
+	internal interface IOneLineCommentParser
 	{
 		ValueTask Process(ICharacterStream charStream);
 	}

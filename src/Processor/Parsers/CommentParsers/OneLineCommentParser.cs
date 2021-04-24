@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
 {
-	internal class CommentParser : ICommentParser
+	internal class OneLineCommentParser : IOneLineCommentParser
 	{
 		// TODO: Allow for the \n\r Windows type break.
 		private static readonly char _breakChar = BasicStructures.Break;
