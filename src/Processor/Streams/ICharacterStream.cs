@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
@@ -6,8 +7,8 @@ namespace YamlConfiguration.Processor
 	{
 		ValueTask<char> Peek();
 
-		ValueTask<char?> Read();
+		ValueTask<IReadOnlyCollection<char>> Peek(int charCount);
 
-		bool IsDisposed { get; }
+		ValueTask<char?> Read();
 	}
 }

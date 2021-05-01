@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,17 +36,6 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.That(actualCurrentStreamChar, Is.EqualTo('a'));
 		}
 
-		[Test]
-		public async Task Process_StreamDoesNotEndWithLineBreak_StreamIsDisposed()
-		{
-			var stream = new MemoryStream(new[] { '#', 'a', 'b' }.Select(c => (byte) c).ToArray());
-			var charStream = getCharStream(stream);
-
-			await new OneLineCommentParser().Process(charStream);
-
-			Assert.True(charStream.IsDisposed);
-		}
-
 		private static ICharacterStream getCharStream(Stream stream) =>
 			new TestStreamWrapper(new CharacterStream(stream));
 
@@ -57,9 +48,15 @@ namespace YamlConfiguration.Processor.Tests
 				_charStream = charStream;
 			}
 
-			public bool IsDisposed => _charStream.IsDisposed;
+			public ValueTask<char> Peek()
+			{
+				throw new NotImplementedException();
+			}
 
-			public ValueTask<char> Peek() => _charStream.Peek();
+			public ValueTask<IReadOnlyCollection<char>> Peek(int charCount)
+			{
+				throw new NotImplementedException();
+			}
 
 			public ValueTask<char?> Read() => _charStream.Read();
 		}

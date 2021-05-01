@@ -25,36 +25,6 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task PeeksCharsFromStream()
-		{
-			var charArray = new[] { 'a', 'b', 'c' };
-			var stream = createStreamFrom(charArray);
-			await using var characterStream = new CharacterStream(stream);
-
-			var char1 = await characterStream.Peek();
-			await characterStream.Read();
-			var char2 = await characterStream.Peek();
-			await characterStream.Read();
-			var char3 = await characterStream.Peek();
-			await characterStream.Read();
-
-			CollectionAssert.AreEqual(charArray, new[] { char1, char2, char3 });
-		}
-
-		[Test]
-		public async Task PeekingDoesNotCauseStreamToAdvance()
-		{
-			var charArray = new[] { 'a', 'b' };
-			var stream = createStreamFrom(charArray);
-			await using var characterStream = new CharacterStream(stream);
-
-			var char1 = await characterStream.Peek();
-			var char2 = await characterStream.Peek();
-
-			Assert.That('a', Is.EqualTo(char1).And.EqualTo(char2));
-		}
-
-		[Test]
 		public async Task StreamDisposed_ReturnsNull()
 		{
 			var charArray = new[] { 'a' };

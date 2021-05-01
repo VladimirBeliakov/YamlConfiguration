@@ -23,17 +23,6 @@ namespace YamlConfiguration.Processor
 
 		public ValueTask DisposeAsync() => dispose();
 
-		public async ValueTask<char> Peek()
-		{
-			if (IsDisposed)
-				throw new InvalidOperationException("Can't peek a disposed stream.");
-
-			if (_bufferLength == 0)
-				await fillBuffer().ConfigureAwait(false);
-
-			return (char) getCurrentByte();
-		}
-
 		public async ValueTask<char?> Read() => (char?) await read().ConfigureAwait(false);
 
 		private async ValueTask<byte?> read()
