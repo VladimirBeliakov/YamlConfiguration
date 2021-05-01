@@ -54,6 +54,19 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.That('a', Is.EqualTo(char1).And.EqualTo(char2));
 		}
 
+		[Test]
+		public async Task StreamDisposed_ReturnsNull()
+		{
+			var charArray = new[] { 'a' };
+			var stream = createStreamFrom(charArray);
+			await using var characterStream = new CharacterStream(stream);
+
+			await characterStream.DisposeAsync();
+			var nullResult = await characterStream.Read();
+
+			Assert.Null(nullResult);
+		}
+
 		private Stream createStreamFrom(IEnumerable<char> chars)
 		{
 			return new MemoryStream(chars.Select(_ => (byte) _).ToArray());

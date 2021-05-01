@@ -11,7 +11,7 @@ namespace YamlConfiguration.Processor
 		private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 		private readonly byte[] _buffer = new byte[4096];
 
-		private int _currentBufferBytePosition;
+		private int _currentBytePosition;
 		private int _bufferLength;
 
 		public bool IsDisposed { get; private set; }
@@ -41,7 +41,7 @@ namespace YamlConfiguration.Processor
 			if (IsDisposed)
 				return null;
 
-			if (tryGetBufferCurrentByte(out var currentByte))
+			if (tryGetCurrentByteFromBuffer(out var currentByte))
 				return currentByte;
 
 			await fillBuffer().ConfigureAwait(false);
@@ -65,19 +65,16 @@ namespace YamlConfiguration.Processor
 			_bufferLength = bytesRead;
 		}
 
-		private byte getCurrentByte() => _buffer[_currentBufferBytePosition];
+		private byte getCurrentByte() => _buffer[_currentBytePosition];
 
-		private bool tryGetBufferCurrentByte(out byte currentByte)
+		private bool tryGetCurrentByteFromBuffer(out byte currentByte)
 		{
-			if (_bufferLength > 0 && _currentBufferBytePosition <= getBufferLastItemPosition())
+			if (_bufferLength > 0)
 			{
 				currentByte = getBufferCurrentByteAndAdvance();
 
 				return true;
 			}
-
-			_currentBufferBytePosition = 0;
-			_bufferLength = 0;
 
 			currentByte = default;
 
@@ -86,17 +83,21 @@ namespace YamlConfiguration.Processor
 
 		private byte getBufferCurrentByteAndAdvance()
 		{
-			if (_currentBufferBytePosition > getBufferLastItemPosition())
-				throw new InvalidOperationException("Can't read over the size of the buffer.");
-
 			var currentByte = getCurrentByte();
 
-			_currentBufferBytePosition++;
+			var bufferLastCharPosition = _bufferLength - 1;
+			if (_currentBytePosition == bufferLastCharPosition)
+			{
+				_currentBytePosition = 0;
+				_bufferLength = 0;
+			}
+			else
+			{
+				_currentBytePosition++;
+			}
 
 			return currentByte;
 		}
-
-		private int getBufferLastItemPosition() => _bufferLength - 1;
 
 		private async ValueTask dispose()
 		{
