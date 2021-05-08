@@ -5,31 +5,29 @@ namespace YamlConfiguration.Processor
 {
 	internal class Document
 	{
-		private readonly Encoding? _encoding;
-
-		private readonly List<Directive> _directives = new List<Directive>();
-
-		private readonly List<INode> _nodes = new List<INode>();
-
-		private readonly Dictionary<string, INode> _anchors = new Dictionary<string, INode>();
-
-		public Document(DocumentType type, bool withSuffix, Encoding? encoding = null)
+		public Document(
+			DocumentType type,
+			IReadOnlyCollection<Directive> directives,
+			IReadOnlyCollection<INode> nodes,
+			bool withSuffix,
+			Encoding? encoding
+		)
 		{
-			_encoding = encoding;
 			Type = type;
+			Directives = directives;
+			Nodes = nodes;
 			WithSuffix = withSuffix;
+			Encoding = encoding ?? Encoding.UTF8;
 		}
 
 		public DocumentType Type { get; }
 
+		public IReadOnlyCollection<Directive> Directives { get; }
+
+		public IReadOnlyCollection<INode> Nodes { get; }
+
 		public bool WithSuffix { get; }
 
-		public void Add(Directive directive) => _directives.Add(directive);
-
-		public void Add(INode node) => _nodes.Add(node);
-
-		public void Add(Anchor anchor) => _anchors.Add(anchor.Name, anchor.Value);
-
-		public INode? TryGetAnchor(string name) => _anchors.TryGetValue(name, out var node) ? node : null;
+		public Encoding? Encoding { get; }
 	}
 }
