@@ -1,3 +1,5 @@
+using System;
+
 namespace YamlConfiguration.Processor
 {
 	public static class Characters
@@ -6,17 +8,17 @@ namespace YamlConfiguration.Processor
 
 		#region C0ControlBlock
 
-		public static readonly RegexPattern Tab = (RegexPattern) "\u0009";
+		public static readonly RegexPattern Tab = (RegexPattern) '\u0009';
 		private const string _c0ControlBlockExceptTabLfCr = "\u0000-\u0008\u000B\u000C\u000E-\u001F";
-		private const string _lf = "\u000A";
-		private const string _cr = "\u000D";
+		private const char _lf = '\u000A';
+		private const char _cr = '\u000D';
 
 		#endregion
 
 		#region C1ControlBlock
 
 		private const string _c1ControlBlockExceptNel = "\u0080-\u0084\u0086-\u009F";
-		private const string _nel = "\u0085";
+		private const char _nel = '\u0085';
 
 		#endregion
 
@@ -24,7 +26,7 @@ namespace YamlConfiguration.Processor
 		private static readonly string _basicLatinSubset = $"{Space}-\u007E";
 		private const string _del = "\u007F";
 		private const string _latinSupplementToHangulJamo = "\u00A0-\uD7FF";
-		private const string _byteOrderMark = "\uFEFF";
+		internal const char ByteOrderMark = '\uFEFF';
 		private const string _surrogateBlock = "\uD800-\uDFFF";
 		private const string _notChars = "\uFFFE\uFFFF";
 		private const string _privateUseAreaToSpecialsBeginning = "\uE000-\uFFFD";
@@ -133,9 +135,7 @@ namespace YamlConfiguration.Processor
 			RegexPatternBuilder.BuildAlternation(
 				RegexPatternBuilder.BuildCharSet(
 					Tab,
-					_lf,
-					_cr,
-					_nel,
+					new String(new [] { _lf, _cr, _nel }),
 					_basicLatinSubset,
 					_latinSupplementToHangulJamo,
 					_privateUseAreaToSpecialsBeginning
@@ -182,7 +182,7 @@ namespace YamlConfiguration.Processor
 		);
 
 		internal static readonly RegexPattern NbChar = RegexPatternBuilder.BuildExclusive(
-			exclusiveChars: _lf + _cr + _byteOrderMark,
+			exclusiveChars: new String(new [] { _lf, _cr, ByteOrderMark }),
 			inclusiveChars: PrintableChar
 		);
 
