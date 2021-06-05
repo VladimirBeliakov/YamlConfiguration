@@ -9,15 +9,13 @@ namespace YamlConfiguration.Processor
 			DocumentType type,
 			IReadOnlyCollection<Directive> directives,
 			IReadOnlyCollection<INode> nodes,
-			bool withSuffix,
-			Encoding? encoding
+			bool withSuffix
 		)
 		{
 			Type = type;
 			Directives = directives;
 			Nodes = nodes;
 			WithSuffix = withSuffix;
-			Encoding = encoding ?? Encoding.UTF8;
 		}
 
 		public DocumentType Type { get; }
@@ -27,7 +25,5 @@ namespace YamlConfiguration.Processor
 		public IReadOnlyCollection<INode> Nodes { get; }
 
 		public bool WithSuffix { get; }
-
-		public Encoding? Encoding { get; }
 	}
 }

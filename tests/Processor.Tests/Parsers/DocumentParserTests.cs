@@ -14,30 +14,6 @@ namespace YamlConfiguration.Processor.Tests
 		private static readonly Fixture _fixture = new Fixture();
 
 		[Test]
-		public async Task Process_PrefixDoesNotSpecifyEncoding_ReturnsDocumentWithUTF8()
-		{
-			var documentPrefixParser = A.Fake<IDocumentPrefixParser>();
-			A.CallTo(() => documentPrefixParser.Process(A<ICharacterStream>._)).Returns(null);
-
-			var document = await createDocumentParser(documentPrefixParser: documentPrefixParser).Process(_charStream);
-
-			Assert.That(document!.Encoding, Is.EqualTo(Encoding.UTF8));
-		}
-
-		[TestCase("UTF-32")]
-		[TestCase("ASCII")]
-		public async Task Process_PrefixSpecifiesEncoding_ReturnsDocumentWithSpecifiedEncoding(string encodingName)
-		{
-			var encoding = Encoding.GetEncoding(encodingName);
-			var documentPrefixParser = A.Fake<IDocumentPrefixParser>();
-			A.CallTo(() => documentPrefixParser.Process(A<ICharacterStream>._)).Returns(encoding);
-
-			var document = await createDocumentParser(documentPrefixParser: documentPrefixParser).Process(_charStream);
-
-			Assert.That(document!.Encoding, Is.EqualTo(encoding));
-		}
-
-		[Test]
 		public void Process_WithDirectivesAndWithoutDirectiveEnd_ThrowsNoDirectiveEnd()
 		{
 			var directiveParser = A.Fake<IDirectiveParser>();
@@ -57,7 +33,7 @@ namespace YamlConfiguration.Processor.Tests
 			var directiveParser = A.Fake<IDirectiveParser>();
 			A.CallTo(() => nodeParser.Process(A<ICharacterStream>._)).Returns(Array.Empty<INode>());
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(Array.Empty<Directive>(), isDirectiveEndPresent: true)
+				new DirectiveParseResult(Array.Empty<Directive>(), isDirectiveEndPresent: false)
 			);
 
 			var documentParser = createDocumentParser(directiveParser: directiveParser, nodeParser: nodeParser);
@@ -70,9 +46,13 @@ namespace YamlConfiguration.Processor.Tests
 		public void Process_WithoutNodesAndWithDirectiveEnd_ThrowsNoNodes()
 		{
 			var nodeParser = A.Fake<INodeParser>();
+			var directiveParser = A.Fake<IDirectiveParser>();
 			A.CallTo(() => nodeParser.Process(A<ICharacterStream>._)).Returns(Array.Empty<INode>());
+			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
+				new DirectiveParseResult(Array.Empty<Directive>(), isDirectiveEndPresent: true)
+			);
 
-			var documentParser = createDocumentParser(nodeParser: nodeParser);
+			var documentParser = createDocumentParser(nodeParser: nodeParser, directiveParser: directiveParser);
 
 			Assert.ThrowsAsync<NoNodesException>(() => documentParser.Process(_charStream).AsTask());
 		}

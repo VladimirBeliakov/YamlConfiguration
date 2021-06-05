@@ -25,7 +25,7 @@ namespace YamlConfiguration.Processor
 
 		public async ValueTask<Document?> Process(ICharacterStream charStream)
 		{
-			var encoding = await _documentPrefixParser.Process(charStream).ConfigureAwait(false);
+			await _documentPrefixParser.Process(charStream).ConfigureAwait(false);
 
 			var directiveParseResult = await _directiveParser.Process(charStream).ConfigureAwait(false);
 
@@ -39,7 +39,7 @@ namespace YamlConfiguration.Processor
 
 			if (nodes.Count == 0)
 			{
-				if (!isDirectiveEndPresent)
+				if (isDirectiveEndPresent)
 					throw new NoNodesException("A directive end must be followed by at least one node.");
 
 				return null;
@@ -58,7 +58,7 @@ namespace YamlConfiguration.Processor
 
 			var withSuffix = await _documentSuffixParser.Process(charStream).ConfigureAwait(false);
 
-			return new Document(documentType, directives, nodes, withSuffix, encoding);
+			return new Document(documentType, directives, nodes, withSuffix);
 		}
 	}
 }

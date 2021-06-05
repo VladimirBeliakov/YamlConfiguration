@@ -103,7 +103,7 @@ namespace Sandbox
 		}
 
 		private static Document createDocument(DocumentType type = DocumentType.Bare, bool withSuffix = true) =>
-			new Document(type, Array.Empty<Directive>(), Array.Empty<INode>(), withSuffix, Encoding.UTF8);
+			new Document(type, Array.Empty<Directive>(), Array.Empty<INode>(), withSuffix);
 
 		private static IReadOnlyCollection<DocumentType> _notExplicitDocumentTypes =
 			Enum.GetValues<DocumentType>().Where(dt => dt != DocumentType.Explicit).ToList();
