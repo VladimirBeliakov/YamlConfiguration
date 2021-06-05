@@ -7,12 +7,13 @@ namespace YamlConfiguration.Processor
 		// TODO: Allow for the \n\r Windows type break.
 		private static readonly char _breakChar = BasicStructures.Break;
 
-		public async ValueTask Process(ICharacterStream charStream)
+		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
 		{
 			var peekedChar = await charStream.Peek().ConfigureAwait(false);
 
+			// TODO: Add skipping white spaces.
 			if (peekedChar != Characters.Comment)
-				return;
+				return false;
 
 			char? charRead;
 			do
@@ -20,6 +21,8 @@ namespace YamlConfiguration.Processor
 				charRead = await charStream.Read().ConfigureAwait(false);
 
 			} while (charRead.HasValue && charRead != _breakChar);
+
+			return true;
 		}
 	}
 }

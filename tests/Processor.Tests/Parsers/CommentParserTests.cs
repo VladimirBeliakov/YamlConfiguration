@@ -16,7 +16,7 @@ namespace YamlConfiguration.Processor.Tests
 			var stream = new MemoryStream(new[] { '#', 'a', '\n', 'b' }.Select(c => (byte) c).ToArray());
 			var charStream = getCharStream(stream);
 
-			await new OneLineCommentParser().Process(charStream);
+			await new OneLineCommentParser().TryProcess(charStream);
 
 			var actualCurrentStreamChar = await charStream.Peek();
 
@@ -29,7 +29,7 @@ namespace YamlConfiguration.Processor.Tests
 			var stream = new MemoryStream(new[] { 'a', '#', '\n', 'b' }.Select(c => (byte) c).ToArray());
 			var charStream = getCharStream(stream);
 
-			await new OneLineCommentParser().Process(charStream);
+			await new OneLineCommentParser().TryProcess(charStream);
 
 			var actualCurrentStreamChar = await charStream.Peek();
 
