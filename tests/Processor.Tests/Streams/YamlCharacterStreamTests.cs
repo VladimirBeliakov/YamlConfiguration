@@ -205,8 +205,8 @@ namespace YamlConfiguration.Processor.Tests
 			yield return (new [] { 0x01 }, 0);
 		}
 
-		private static YamlCharacterStream createStreamFrom(byte[] chars) =>
-			new YamlCharacterStream(new MemoryStream(chars));
+		private static YamlCharacterStream createStreamFrom(byte[] bytes) =>
+			new YamlCharacterStream(new MemoryStream(bytes));
 
 		private static readonly IEnumerable<char> _asciiCharsExceptNullByte =
 			Enumerable.Range(1, SByte.MaxValue).Select(i => (char) i);
