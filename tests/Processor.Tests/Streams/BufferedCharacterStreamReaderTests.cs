@@ -12,7 +12,7 @@ namespace YamlConfiguration.Processor.Tests
 	{
 		[TestCase(1, new[] { 'a' })]
 		[TestCase(2, new[] { 'a', 'b' })]
-		public async Task PickChars_ReturnsCorrectChar(int charCount, char[] expectedChars)
+		public async Task Peek_PickChars_ReturnsCorrectChar(int charCount, char[] expectedChars)
 		{
 			var charArray = new[] { 'a', 'b', 'c' };
 			var stream = createStreamReaderFrom(charArray);
@@ -25,7 +25,7 @@ namespace YamlConfiguration.Processor.Tests
 
 		[TestCase(1, new[] { 'a' })]
 		[TestCase(2, new[] { 'a', 'b' })]
-		public async Task ReadChars_ReturnsCorrectChars(int charCount, char[] expectedChars)
+		public async Task Read_ReadChars_ReturnsCorrectChars(int charCount, char[] expectedChars)
 		{
 			var charArray = new[] { 'a', 'b', 'c' };
 			var stream = createStreamReaderFrom(charArray);
@@ -40,7 +40,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task PeekTwoCharsAndThenReadTwoChars_PeekDoesNotAdvanceStream()
+		public async Task Read_PeekTwoCharsAndThenReadTwoChars_PeekDoesNotAdvanceStream()
 		{
 			var charArray = new[] { 'a', 'b' };
 			var stream = createStreamReaderFrom(charArray);
@@ -59,7 +59,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task PeekOneCharsAndThenReadTwoChar_PeekDoesNotAdvanceStream()
+		public async Task Read_PeekOneCharsAndThenReadTwoChar_PeekDoesNotAdvanceStream()
 		{
 			var charArray = new[] { 'a', 'b' };
 			var stream = createStreamReaderFrom(charArray);
@@ -78,7 +78,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task PeekTwoCharsAndThenPeekOneChar_PeekDoesNotAdvanceStream()
+		public async Task Peek_PeekTwoCharsAndThenPeekOneChar_PeekDoesNotAdvanceStream()
 		{
 			var charArray = new[] { 'a', 'b' };
 			var stream = createStreamReaderFrom(charArray);
@@ -91,7 +91,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task PeekTwoCharsAndThenPeekTwoChars_PeekDoesNotAdvanceStream()
+		public async Task Peek_PeekTwoCharsAndThenPeekTwoChars_PeekDoesNotAdvanceStream()
 		{
 			var charArray = new[] { 'a', 'b' };
 			var stream = createStreamReaderFrom(charArray);
@@ -104,7 +104,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task PeekMoreCharsThanStreamHas_ReturnsOnlyAvailableChars()
+		public async Task Peek_PeekMoreCharsThanStreamHas_ReturnsOnlyAvailableChars()
 		{
 			var charArray = new[] { 'a' };
 			var stream = createStreamReaderFrom(charArray);
@@ -116,7 +116,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task ReadMoreCharsThanStreamHas_ReturnsOnlyAvailableChars()
+		public async Task Read_ReadMoreCharsThanStreamHas_ReturnsOnlyAvailableChars()
 		{
 			var charArray = new[] { 'a' };
 			var stream = createStreamReaderFrom(charArray);
@@ -134,13 +134,76 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public void PeekZeroChars_Throws()
+		public void Peek_PeekZeroChars_Throws()
 		{
 			var charArray = new[] { 'a' };
 			var stream = createStreamReaderFrom(charArray);
 			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
 
 			Assert.ThrowsAsync<InvalidOperationException>(() => bufferedStreamReader.Peek(0).AsTask());
+		}
+
+		[Test]
+		public async Task ReadLine_PeekOneCharBeforeBreak_PeekDoesNotAdvanceStream()
+		{
+			var charArray = new[] { 'a', 'b', 'c', '\n', 'd' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+			await bufferedStreamReader.Peek(1);
+
+			var actualLine = await bufferedStreamReader.ReadLine();
+
+			Assert.That(actualLine, Is.EqualTo("abc"));
+		}
+
+		[Test]
+		public async Task ReadLine_PeekAllCharsInLine_PeekDoesNotAdvanceStream()
+		{
+			var charArray = new[] { 'a', 'b', 'c', '\n', 'd' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+			await bufferedStreamReader.Peek(charArray.Length);
+
+			var actualLine = await bufferedStreamReader.ReadLine();
+
+			Assert.That(actualLine, Is.EqualTo("abc"));
+		}
+
+		[Test]
+		public async Task ReadLine_PeekAllCharsInLineAndNoBreakInStream_PeekDoesNotAdvanceStream()
+		{
+			var charArray = new[] { 'a', 'b', 'c' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+			await bufferedStreamReader.Peek(charArray.Length);
+
+			var actualLine = await bufferedStreamReader.ReadLine();
+
+			Assert.That(actualLine, Is.EqualTo("abc"));
+		}
+
+		[Test]
+		public async Task ReadLine_LineWithBreakAndNoPeeking_ReturnsCharsBeforeBreak()
+		{
+			var charArray = new[] { 'a', 'b', 'c', '\n', 'd' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+
+			var actualLine = await bufferedStreamReader.ReadLine();
+
+			Assert.That(actualLine, Is.EqualTo("abc"));
+		}
+
+		[Test]
+		public async Task ReadLine_LineWithoutBreakAndNoPeeking_ReturnsAllCharsInStream()
+		{
+			var charArray = new[] { 'a', 'b', 'c', 'd' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+
+			var actualLine = await bufferedStreamReader.ReadLine();
+
+			Assert.That(actualLine, Is.EqualTo("abcd"));
 		}
 
 		private static CharacterStreamReader createStreamReaderFrom(IEnumerable<char> chars)

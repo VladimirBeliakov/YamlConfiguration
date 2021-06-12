@@ -59,6 +59,11 @@ namespace YamlConfiguration.Processor.Tests
 			}
 
 			public ValueTask<char?> Read() => _charStream.Read();
+
+			public ValueTask<string> ReadLine()
+			{
+				throw new NotImplementedException();
+			}
 		}
 	}
 }

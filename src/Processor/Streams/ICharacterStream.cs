@@ -10,5 +10,7 @@ namespace YamlConfiguration.Processor
 		ValueTask<IReadOnlyCollection<char>> Peek(int charCount);
 
 		ValueTask<char?> Read();
+
+		ValueTask<string> ReadLine();
 	}
 }

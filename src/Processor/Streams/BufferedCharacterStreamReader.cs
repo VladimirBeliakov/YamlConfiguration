@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
@@ -50,6 +51,26 @@ namespace YamlConfiguration.Processor
 			var charRead = await _streamReader.Read().ConfigureAwait(false);
 
 			return charRead;
+		}
+
+		public async ValueTask<string> ReadLine()
+		{
+			var @break = BasicStructures.Break;
+			var sb = new StringBuilder();
+
+			while (_buffer.Count > 0)
+			{
+				if (_buffer.Peek() != @break)
+					sb.Append(_buffer.Dequeue());
+				else
+					return sb.ToString();
+			}
+
+			char? charRead;
+			while ((charRead = await _streamReader.Read().ConfigureAwait(false)) != @break && charRead is not null)
+				sb.Append(charRead.Value);
+
+			return sb.ToString();
 		}
 
 		public void Dispose()
