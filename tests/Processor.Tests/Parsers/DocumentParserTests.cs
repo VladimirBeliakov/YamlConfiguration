@@ -16,9 +16,9 @@ namespace YamlConfiguration.Processor.Tests
 		[Test]
 		public void Process_WithDirectivesAndWithoutDirectiveEnd_ThrowsNoDirectiveEnd()
 		{
-			var directiveParser = A.Fake<IDirectiveParser>();
+			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(new[] { create<Directive>() }, isDirectiveEndPresent: false)
+				new DirectiveParseResult(new[] { create<IDirective>() }, isDirectiveEndPresent: false)
 			);
 
 			var documentParser = createDocumentParser(directiveParser: directiveParser);
@@ -30,10 +30,10 @@ namespace YamlConfiguration.Processor.Tests
 		public async Task Process_WithoutNodesAndWithoutDirectiveEnd_ReturnsNull()
 		{
 			var nodeParser = A.Fake<INodeParser>();
-			var directiveParser = A.Fake<IDirectiveParser>();
+			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => nodeParser.Process(A<ICharacterStream>._)).Returns(Array.Empty<INode>());
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(Array.Empty<Directive>(), isDirectiveEndPresent: false)
+				new DirectiveParseResult(Array.Empty<IDirective>(), isDirectiveEndPresent: false)
 			);
 
 			var documentParser = createDocumentParser(directiveParser: directiveParser, nodeParser: nodeParser);
@@ -46,10 +46,10 @@ namespace YamlConfiguration.Processor.Tests
 		public void Process_WithoutNodesAndWithDirectiveEnd_ThrowsNoNodes()
 		{
 			var nodeParser = A.Fake<INodeParser>();
-			var directiveParser = A.Fake<IDirectiveParser>();
+			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => nodeParser.Process(A<ICharacterStream>._)).Returns(Array.Empty<INode>());
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(Array.Empty<Directive>(), isDirectiveEndPresent: true)
+				new DirectiveParseResult(Array.Empty<IDirective>(), isDirectiveEndPresent: true)
 			);
 
 			var documentParser = createDocumentParser(nodeParser: nodeParser, directiveParser: directiveParser);
@@ -60,9 +60,9 @@ namespace YamlConfiguration.Processor.Tests
 		[Test]
 		public async Task Process_WithDirectivesAndWithDirectiveEnd_ReturnsDirectiveDocument()
 		{
-			var directiveParser = A.Fake<IDirectiveParser>();
+			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(new[] { create<Directive>() }, isDirectiveEndPresent: true)
+				new DirectiveParseResult(new[] { create<IDirective>() }, isDirectiveEndPresent: true)
 			);
 
 			var document = await createDocumentParser(directiveParser: directiveParser).Process(_charStream);
@@ -73,9 +73,9 @@ namespace YamlConfiguration.Processor.Tests
 		[Test]
 		public async Task Process_WithoutDirectivesAndWithDirectiveEnd_ReturnsExplicitDocument()
 		{
-			var directiveParser = A.Fake<IDirectiveParser>();
+			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(Array.Empty<Directive>(), isDirectiveEndPresent: true)
+				new DirectiveParseResult(Array.Empty<IDirective>(), isDirectiveEndPresent: true)
 			);
 
 			var document = await createDocumentParser(directiveParser: directiveParser).Process(_charStream);
@@ -86,9 +86,9 @@ namespace YamlConfiguration.Processor.Tests
 		[Test]
 		public async Task Process_WithoutDirectivesAndWithoutDirectiveEnd_ReturnsBareDocument()
 		{
-			var directiveParser = A.Fake<IDirectiveParser>();
+			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(Array.Empty<Directive>(), isDirectiveEndPresent: false)
+				new DirectiveParseResult(Array.Empty<IDirective>(), isDirectiveEndPresent: false)
 			);
 
 			var document = await createDocumentParser(directiveParser: directiveParser).Process(_charStream);
@@ -110,9 +110,9 @@ namespace YamlConfiguration.Processor.Tests
 		public async Task Process_WithDirectivesAndWithNodes_ReturnsSameDirectivesAndNodes()
 		{
 			var nodes = new[] { A.Dummy<INode>() };
-			var directives = new[] { create<Directive>() };
+			var directives = new[] { create<IDirective>() };
 			var nodeParser = A.Fake<INodeParser>();
-			var directiveParser = A.Fake<IDirectiveParser>();
+			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => nodeParser.Process(A<ICharacterStream>._)).Returns(nodes);
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
 				new DirectiveParseResult(directives, isDirectiveEndPresent: true)
@@ -131,7 +131,7 @@ namespace YamlConfiguration.Processor.Tests
 
 		private static DocumentParser createDocumentParser(
 			IDocumentPrefixParser? documentPrefixParser = null,
-			IDirectiveParser? directiveParser = null,
+			IDirectivesParser? directiveParser = null,
 			INodeParser? nodeParser = null,
 			IDocumentSuffixParser? documentSuffixParser = null
 		)
@@ -141,7 +141,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			return new DocumentParser(
 				documentPrefixParser ?? A.Dummy<IDocumentPrefixParser>(),
-				directiveParser ?? A.Dummy<IDirectiveParser>(),
+				directiveParser ?? A.Dummy<IDirectivesParser>(),
 				nodeParser ?? defaultNodeParser,
 				documentSuffixParser ?? A.Dummy<IDocumentSuffixParser>()
 			);

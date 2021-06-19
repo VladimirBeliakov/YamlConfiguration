@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
 {
-	internal interface IDirectiveParser
+	internal interface IDirectivesParser
 	{
 		ValueTask<DirectiveParseResult> Process(ICharacterStream charStream);
 	}

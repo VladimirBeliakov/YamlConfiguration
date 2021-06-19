@@ -8,11 +8,11 @@ namespace YamlConfiguration.Processor
 		private readonly IDocumentPrefixParser _documentPrefixParser;
 		private readonly IDocumentSuffixParser _documentSuffixParser;
 		private readonly INodeParser _nodeParser;
-		private readonly IDirectiveParser _directiveParser;
+		private readonly IDirectivesParser _directivesParser;
 
 		public DocumentParser(
 			IDocumentPrefixParser documentPrefixParser,
-			IDirectiveParser directiveParser,
+			IDirectivesParser directivesParser,
 			INodeParser nodeParser,
 			IDocumentSuffixParser documentSuffixParser
 		)
@@ -20,14 +20,14 @@ namespace YamlConfiguration.Processor
 			_documentPrefixParser = documentPrefixParser;
 			_documentSuffixParser = documentSuffixParser;
 			_nodeParser = nodeParser;
-			_directiveParser = directiveParser;
+			_directivesParser = directivesParser;
 		}
 
 		public async ValueTask<Document?> Process(ICharacterStream charStream)
 		{
 			await _documentPrefixParser.Process(charStream).ConfigureAwait(false);
 
-			var directiveParseResult = await _directiveParser.Process(charStream).ConfigureAwait(false);
+			var directiveParseResult = await _directivesParser.Process(charStream).ConfigureAwait(false);
 
 			var (directives, isDirectiveEndPresent) = directiveParseResult;
 

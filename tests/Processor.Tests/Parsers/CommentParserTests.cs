@@ -53,7 +53,7 @@ namespace YamlConfiguration.Processor.Tests
 				throw new NotImplementedException();
 			}
 
-			public ValueTask<IReadOnlyCollection<char>> Peek(int charCount)
+			public ValueTask<IReadOnlyList<char>> Peek(int charCount)
 			{
 				throw new NotImplementedException();
 			}

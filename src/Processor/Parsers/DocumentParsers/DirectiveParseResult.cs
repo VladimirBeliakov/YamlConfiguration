@@ -4,17 +4,17 @@ namespace YamlConfiguration.Processor
 {
 	internal class DirectiveParseResult
 	{
-		public DirectiveParseResult(IReadOnlyCollection<Directive> directives, bool isDirectiveEndPresent)
+		public DirectiveParseResult(IReadOnlyCollection<IDirective> directives, bool isDirectiveEndPresent = false)
 		{
 			Directives = directives;
 			IsDirectiveEndPresent = isDirectiveEndPresent;
 		}
 
-		public IReadOnlyCollection<Directive> Directives { get; }
+		public IReadOnlyCollection<IDirective> Directives { get; }
 		
 		public bool IsDirectiveEndPresent { get; }
 
-		public void Deconstruct(out IReadOnlyCollection<Directive> directives, out bool isDirectiveEndPresent)
+		public void Deconstruct(out IReadOnlyCollection<IDirective> directives, out bool isDirectiveEndPresent)
 		{
 			directives = Directives;
 			isDirectiveEndPresent = IsDirectiveEndPresent;

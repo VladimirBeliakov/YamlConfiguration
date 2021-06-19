@@ -7,7 +7,7 @@ namespace YamlConfiguration.Processor
 	{
 		ValueTask<char> Peek();
 
-		ValueTask<IReadOnlyCollection<char>> Peek(int charCount);
+		ValueTask<IReadOnlyList<char>> Peek(int charCount);
 
 		ValueTask<char?> Read();
 

@@ -2,7 +2,8 @@
 {
 	internal enum Directive : byte
 	{
-		Yaml = 0,
-		Tag = 1
+		Yaml = 1,
+		Tag = 2,
+		Reserved = 3,
 	}
 }

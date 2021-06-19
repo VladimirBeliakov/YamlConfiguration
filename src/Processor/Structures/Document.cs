@@ -7,7 +7,7 @@ namespace YamlConfiguration.Processor
 	{
 		public Document(
 			DocumentType type,
-			IReadOnlyCollection<Directive> directives,
+			IReadOnlyCollection<IDirective> directives,
 			IReadOnlyCollection<INode> nodes,
 			bool withSuffix
 		)
@@ -20,7 +20,7 @@ namespace YamlConfiguration.Processor
 
 		public DocumentType Type { get; }
 
-		public IReadOnlyCollection<Directive> Directives { get; }
+		public IReadOnlyCollection<IDirective> Directives { get; }
 
 		public IReadOnlyCollection<INode> Nodes { get; }
 
