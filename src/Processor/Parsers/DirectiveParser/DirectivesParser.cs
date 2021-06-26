@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
@@ -8,24 +6,14 @@ namespace YamlConfiguration.Processor
 	internal class DirectivesParser : IDirectivesParser
 	{
 		private readonly IReadOnlyCollection<IOneDirectiveParser> _directiveParsers;
-		private readonly IOneLineCommentParser _oneLineCommentParser;
 
-		public DirectivesParser(
-			IReadOnlyCollection<IOneDirectiveParser> directiveParsers,
-			IOneLineCommentParser oneLineCommentParser
-		)
+		public DirectivesParser(IReadOnlyCollection<IOneDirectiveParser> directiveParsers)
 		{
 			_directiveParsers = directiveParsers;
-			_oneLineCommentParser = oneLineCommentParser;
 		}
 
 		public async ValueTask<DirectiveParseResult> Process(ICharacterStream charStream)
 		{
-			var possibleDirectiveChar = await charStream.Peek().ConfigureAwait(false);
-
-			if (possibleDirectiveChar != '%')
-				return new DirectiveParseResult(Array.Empty<IDirective>());
-
 			var directives = new List<IDirective>();
 
 			bool anyNewDirectives;
@@ -43,8 +31,6 @@ namespace YamlConfiguration.Processor
 					anyNewDirectives = true;
 
 					directives.Add(directive);
-
-					while (await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false)) {}
 				}
 			} while (anyNewDirectives);
 
