@@ -121,10 +121,10 @@ namespace YamlConfiguration.Processor
 			}
 		}
 
-		public static class Directives
+		internal static class Directives
 		{
-			private const string _yamlDirectiveName = "YAML";
-			private const string _tagDirectiveName = "TAG";
+			public static RegexPattern YamlDirectiveName = (RegexPattern) "YAML";
+			public static RegexPattern TagDirectiveName = (RegexPattern) "TAG";
 
 			private static readonly string _reservedDirectiveName =
 				$"({Characters.NsChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}})";
@@ -145,16 +145,20 @@ namespace YamlConfiguration.Processor
 				$"{SeparateInLine + _parameter}" +
 				$"{Comment}";
 
-			public static readonly string Yaml =
-				$"^{Characters.Directive + _yamlDirectiveName}" +
-				$"{SeparateInLine}" +
-				$"([{Characters.DecimalDigits}]{{1,{Characters.CharGroupLength}}}" +
-				$"{Characters.VersionSeparator}" +
-				$"[{Characters.DecimalDigits}]{{1,{Characters.CharGroupLength}}})" +
-				$"{Comment}";
+			public static readonly RegexPattern Yaml =
+				Characters.Directive.WithAnchorAtBeginning() +
+				YamlDirectiveName +
+				SeparateInLine +
+				(
+					RegexPatternBuilder.BuildCharSet(Characters.DecimalDigits).WithLimitingRepetition(min: 1) +
+					// TODO: Replace \\ with a variable
+					(RegexPattern) "\\" + Characters.VersionSeparator +
+					RegexPatternBuilder.BuildCharSet(Characters.DecimalDigits).WithLimitingRepetition(min: 1)
+				).AsCapturingGroup() +
+				Comment;
 
 			public static readonly string Tag =
-				$"^{Characters.Directive + _tagDirectiveName}" +
+				$"^{Characters.Directive + TagDirectiveName}" +
 				$"{SeparateInLine}" +
 				$"({_tagHandle})" +
 				$"{SeparateInLine}" +

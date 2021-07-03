@@ -21,7 +21,9 @@ namespace YamlConfiguration.Processor
 			if (!await checkDirective(charStream).ConfigureAwait(false))
 				return null;
 
-			var directive = await ProcessSpecific(charStream).ConfigureAwait(false);
+			var rawDirective = await charStream.ReadLine().ConfigureAwait(false);
+
+			var directive = Parse(rawDirective);
 
 			if (directive is not null)
 				while (await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false)) {}
@@ -29,7 +31,7 @@ namespace YamlConfiguration.Processor
 			return directive;
 		}
 
-		protected abstract ValueTask<IDirective?> ProcessSpecific(ICharacterStream charStream);
+		protected abstract IDirective? Parse(string rawDirective);
 
 		protected abstract string DirectiveName { get; }
 
@@ -41,7 +43,7 @@ namespace YamlConfiguration.Processor
 
 			var possibleDirectiveChars = await charStream.Peek(directiveCharAndNameLength).ConfigureAwait(false);
 
-			if (possibleDirectiveChars.Count < directiveCharAndNameLength)
+			if (possibleDirectiveChars.Count != directiveCharAndNameLength)
 				return false;
 
 			for (var i = directiveCharLength; i < possibleDirectiveChars.Count; i++)

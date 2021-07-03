@@ -39,25 +39,25 @@ namespace YamlConfiguration.Processor
 
 		#region Indicator Characters
 
-		public static readonly RegexPattern SequenceEntry = (RegexPattern) "\u002D";	// -
-		public static readonly RegexPattern MappingKey = (RegexPattern) "\u003F";		// ?
-		public static readonly RegexPattern MappingValue = (RegexPattern) "\u003A";		// :
-		public static readonly RegexPattern CollectEntry = (RegexPattern) "\u002C";		// ,
-		public static readonly RegexPattern SequenceStart = (RegexPattern) "\u005B";	// [
-		public static readonly RegexPattern SequenceEnd = (RegexPattern) "\u005D";		// ]
-		public static readonly RegexPattern MappingStart = (RegexPattern) "\u007B";		// {
-		public static readonly RegexPattern MappingEnd = (RegexPattern) "\u007D";		// }
-		public static readonly RegexPattern Comment = (RegexPattern) "\u0023";			// #
-		public static readonly RegexPattern Anchor = (RegexPattern) "\u0026";			// &
-		public static readonly RegexPattern Alias = (RegexPattern) "\u002A";			// *
-		public static readonly RegexPattern Tag = (RegexPattern) "\u0021";				// !
-		public static readonly RegexPattern Literal = (RegexPattern) "\u007C";			// |
-		public static readonly RegexPattern Folded = (RegexPattern) "\u003E";			// >
-		public static readonly RegexPattern SingleQuote = (RegexPattern) "\u0027";		// '
-		public static readonly RegexPattern DoubleQuote = (RegexPattern) "\u0022";		// "
-		public static readonly RegexPattern Directive = (RegexPattern) "\u0025";		// %
-		public static readonly RegexPattern ReservedChar1 = (RegexPattern) "\u0040";	// @
-		public static readonly RegexPattern ReservedChar2 = (RegexPattern) "\u0060";	// `
+		public static readonly RegexPattern SequenceEntry = (RegexPattern) '\u002D';	// -
+		public static readonly RegexPattern MappingKey = (RegexPattern) '\u003F';		// ?
+		public static readonly RegexPattern MappingValue = (RegexPattern) '\u003A';		// :
+		public static readonly RegexPattern CollectEntry = (RegexPattern) '\u002C';		// ,
+		public static readonly RegexPattern SequenceStart = (RegexPattern) '\u005B';	// [
+		public static readonly RegexPattern SequenceEnd = (RegexPattern) '\u005D';		// ]
+		public static readonly RegexPattern MappingStart = (RegexPattern) '\u007B';		// {
+		public static readonly RegexPattern MappingEnd = (RegexPattern) '\u007D';		// }
+		public static readonly RegexPattern Comment = (RegexPattern) '\u0023';			// #
+		public static readonly RegexPattern Anchor = (RegexPattern) '\u0026';			// &
+		public static readonly RegexPattern Alias = (RegexPattern) '\u002A';			// *
+		public static readonly RegexPattern Tag = (RegexPattern) '\u0021';				// !
+		public static readonly RegexPattern Literal = (RegexPattern) '\u007C';			// |
+		public static readonly RegexPattern Folded = (RegexPattern) '\u003E';			// >
+		public static readonly RegexPattern SingleQuote = (RegexPattern) '\u0027';		// '
+		public static readonly RegexPattern DoubleQuote = (RegexPattern) '\u0022';		// "
+		public static readonly RegexPattern Directive = (RegexPattern) '\u0025';		// %
+		public static readonly RegexPattern ReservedChar1 = (RegexPattern) '\u0040';	// @
+		public static readonly RegexPattern ReservedChar2 = (RegexPattern) '\u0060';	// `
 
 		public static readonly string FlowIndicators =
 			$@"{CollectEntry}\{SequenceStart}\{SequenceEnd}{MappingStart}{MappingEnd}";
@@ -71,7 +71,7 @@ namespace YamlConfiguration.Processor
 
 		#region Escape Sequences
 
-		private static readonly RegexPattern _escape = (RegexPattern) "\\\\";
+		public static readonly RegexPattern Escape = (RegexPattern) "\\\\";
 		private static readonly RegexPattern _escapedNull = (RegexPattern) "0";
 		private static readonly RegexPattern _escapedBell = (RegexPattern) "a";
 		private static readonly RegexPattern _escapedBackspace = (RegexPattern) "b";
@@ -94,7 +94,7 @@ namespace YamlConfiguration.Processor
 		private static readonly RegexPattern _escaped32Bit = (RegexPattern) "U";
 
 		public static readonly RegexPattern EscapedChar =
-			(_escape +
+			(Escape +
 			RegexPatternBuilder.BuildCharSet(
 				_escapedNull,
 				_escapedBell,
@@ -120,7 +120,7 @@ namespace YamlConfiguration.Processor
 
 		#endregion
 
-		public const string VersionSeparator = ".";
+		public static RegexPattern VersionSeparator = (RegexPattern) '.';
 
 		public static readonly string ForbiddenCharsRegex =
 			RegexPatternBuilder.BuildCharSet(
@@ -157,7 +157,7 @@ namespace YamlConfiguration.Processor
 			MappingEnd
 		);
 
-		public const string DecimalDigits = "0-9";
+		public static RegexPattern DecimalDigits = (RegexPattern) "0-9";
 		internal static readonly RegexPattern SWhites = Space + Tab;
 		private const string _asciiLetters = "A-Za-z";
 		private static readonly string _hexDigits = $"{DecimalDigits}A-Fa-f";

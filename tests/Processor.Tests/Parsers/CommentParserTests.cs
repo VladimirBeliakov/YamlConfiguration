@@ -41,32 +41,5 @@ namespace YamlConfiguration.Processor.Tests
 
 			return charStream;
 		}
-
-		private class TestStreamWrapper : ICharacterStream
-		{
-			private readonly CharacterStream _charStream;
-
-			public TestStreamWrapper(CharacterStream charStream)
-			{
-				_charStream = charStream;
-			}
-
-			public ValueTask<char> Peek()
-			{
-				throw new NotImplementedException();
-			}
-
-			public ValueTask<IReadOnlyList<char>> Peek(int charCount)
-			{
-				throw new NotImplementedException();
-			}
-
-			public ValueTask<char?> Read() => _charStream.Read();
-
-			public ValueTask<string> ReadLine()
-			{
-				throw new NotImplementedException();
-			}
-		}
 	}
 }
