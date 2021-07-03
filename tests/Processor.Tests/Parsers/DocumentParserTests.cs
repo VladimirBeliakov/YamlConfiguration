@@ -1,7 +1,5 @@
 using System;
-using System.Text;
 using System.Threading.Tasks;
-using AutoFixture;
 using FakeItEasy;
 using NUnit.Framework;
 
@@ -11,14 +9,13 @@ namespace YamlConfiguration.Processor.Tests
 	public class DocumentParserTests
 	{
 		private static readonly ICharacterStream _charStream = A.Dummy<ICharacterStream>();
-		private static readonly Fixture _fixture = new Fixture();
 
 		[Test]
 		public void Process_WithDirectivesAndWithoutDirectiveEnd_ThrowsNoDirectiveEnd()
 		{
 			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(new[] { create<IDirective>() }, isDirectiveEndPresent: false)
+				new DirectiveParseResult(new[] { A.Dummy<IDirective>() }, isDirectiveEndPresent: false)
 			);
 
 			var documentParser = createDocumentParser(directiveParser: directiveParser);
@@ -62,7 +59,7 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => directiveParser.Process(A<ICharacterStream>._)).Returns(
-				new DirectiveParseResult(new[] { create<IDirective>() }, isDirectiveEndPresent: true)
+				new DirectiveParseResult(new[] { A.Dummy<IDirective>() }, isDirectiveEndPresent: true)
 			);
 
 			var document = await createDocumentParser(directiveParser: directiveParser).Process(_charStream);
@@ -110,7 +107,7 @@ namespace YamlConfiguration.Processor.Tests
 		public async Task Process_WithDirectivesAndWithNodes_ReturnsSameDirectivesAndNodes()
 		{
 			var nodes = new[] { A.Dummy<INode>() };
-			var directives = new[] { create<IDirective>() };
+			var directives = new[] { A.Dummy<IDirective>() };
 			var nodeParser = A.Fake<INodeParser>();
 			var directiveParser = A.Fake<IDirectivesParser>();
 			A.CallTo(() => nodeParser.Process(A<ICharacterStream>._)).Returns(nodes);
@@ -146,7 +143,5 @@ namespace YamlConfiguration.Processor.Tests
 				documentSuffixParser ?? A.Dummy<IDocumentSuffixParser>()
 			);
 		}
-
-		private static T create<T>() => _fixture.Create<T>();
 	}
 }

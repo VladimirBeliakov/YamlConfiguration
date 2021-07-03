@@ -34,7 +34,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task Process_ProcessSpecificReturnsNull_ReturnsNull()
+		public async Task Process_ParseReturnsNull_ReturnsNull()
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
@@ -46,7 +46,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task Process_ProcessSpecificReturnsDirective_ReturnsSameDirective()
+		public async Task Process_ParseReturnsDirective_ReturnsSameDirective()
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
@@ -59,7 +59,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task Process_ProcessSpecificReturnsNull_CommentParserNotCalled()
+		public async Task Process_ParseReturnsNull_CommentParserNotCalled()
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
@@ -72,7 +72,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task Process_ProcessSpecificReturnsDirective_CommentParserCalled()
+		public async Task Process_ParseReturnsDirective_CommentParserCalled()
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
@@ -118,8 +118,7 @@ namespace YamlConfiguration.Processor.Tests
 				DirectiveName = directiveName ?? "TestDirective";
 			}
 
-			protected override ValueTask<IDirective?> ProcessSpecific(ICharacterStream charStream) =>
-				ValueTask.FromResult(_directive);
+			protected override IDirective? Parse(string rawDirective) => _directive;
 
 			protected override string DirectiveName { get; }
 		}

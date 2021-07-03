@@ -9,7 +9,7 @@ namespace YamlConfiguration.Processor.Tests
 	{
 		public static IEnumerable<BlockFlow> GetBlockAndFlowTypes()
 		{
-			return Enum.GetValues(typeof(BlockFlow)).Cast<BlockFlow>().Except(GetKeys());
+			return Enum.GetValues(typeof(BlockFlow)).Cast<BlockFlow>().Except(getKeys());
 		}
 
 		public static IEnumerable<BlockFlow> GetBlockTypes()
@@ -23,7 +23,7 @@ namespace YamlConfiguration.Processor.Tests
 			yield return BlockFlow.FlowOut;
 		}
 
-		private static IEnumerable<BlockFlow> GetKeys()
+		private static IEnumerable<BlockFlow> getKeys()
 		{
 			yield return BlockFlow.BlockKey;
 			yield return BlockFlow.FlowKey;

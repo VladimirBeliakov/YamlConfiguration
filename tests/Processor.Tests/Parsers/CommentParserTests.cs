@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using FakeItEasy;
 using NUnit.Framework;
 
 namespace YamlConfiguration.Processor.Tests
@@ -11,33 +12,35 @@ namespace YamlConfiguration.Processor.Tests
 	public class CommentParserTests
 	{
 		[Test]
-		public async Task Process_StreamStartsWithDash_StreamAdvancesBehindComment()
+		public async Task Process_StreamStartsWithDash_ReturnsTrueAndCallsReadLine()
 		{
-			var stream = new MemoryStream(new[] { '#', 'a', '\n', 'b' }.Select(c => (byte) c).ToArray());
-			var charStream = getCharStream(stream);
+			var charStream = getCharStream('#');
 
-			await new OneLineCommentParser().TryProcess(charStream);
+			var result = await new OneLineCommentParser().TryProcess(charStream);
 
-			var actualCurrentStreamChar = await charStream.Peek();
-
-			Assert.That(actualCurrentStreamChar, Is.EqualTo('b'));
+			Assert.True(result);
+			A.CallTo(() => charStream.ReadLine()).MustHaveHappenedOnceExactly();
 		}
 
 		[Test]
-		public async Task Process_StreamDoesNotStartWithDash_StreamDoesNotAdvance()
+		public async Task Process_StreamDoesNotStartWithDash_ReturnsFalseAndDoesNotCalReadLine()
 		{
-			var stream = new MemoryStream(new[] { 'a', '#', '\n', 'b' }.Select(c => (byte) c).ToArray());
-			var charStream = getCharStream(stream);
+			var charStream = getCharStream('a');
 
-			await new OneLineCommentParser().TryProcess(charStream);
+			var result = await new OneLineCommentParser().TryProcess(charStream);
 
-			var actualCurrentStreamChar = await charStream.Peek();
-
-			Assert.That(actualCurrentStreamChar, Is.EqualTo('a'));
+			Assert.False(result);
+			A.CallTo(() => charStream.ReadLine()).MustNotHaveHappened();
 		}
 
-		private static ICharacterStream getCharStream(Stream stream) =>
-			new TestStreamWrapper(new CharacterStream(stream));
+		private static ICharacterStream getCharStream(char beginningChar)
+		{
+			var charStream = A.Fake<ICharacterStream>();
+
+			A.CallTo(() => charStream.Peek()).Returns(beginningChar);
+
+			return charStream;
+		}
 
 		private class TestStreamWrapper : ICharacterStream
 		{

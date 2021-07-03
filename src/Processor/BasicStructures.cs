@@ -86,9 +86,14 @@ namespace YamlConfiguration.Processor
 
 		#endregion
 
-		public static readonly string Comment =
-			(SeparateInLine +
-			 (Characters.Comment + RegexPatternBuilder.BuildNegatedCharSet(Break).WithLimitingRepetition()).AsOptional()
+		public static readonly RegexPattern Comment =
+			(
+				SeparateInLine +
+				(
+					Characters.Comment +
+					RegexPatternBuilder.BuildNegatedCharSet(Break)
+						.WithLimitingRepetition(max: Characters.CharGroupLength * Characters.CharGroupLength)
+				).AsOptional()
 			).AsOptional() + Break;
 
 		// TODO: Move the logic to a higher level.

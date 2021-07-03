@@ -18,8 +18,12 @@ namespace YamlConfiguration.Processor.Tests
 
 			var firstLineResult = multiLine.ProcessFirstLine(testCase.TestValue);
 
-			Assert.That(firstLineResult.LineType, Is.EqualTo(testCase.Result.LineType));
-			Assert.That(firstLineResult.ExtractedValue, Is.EqualTo(testCase.Result.ExtractedValue));
+			Assert.Multiple(() =>
+				{
+					Assert.That(firstLineResult.LineType, Is.EqualTo(testCase.Result.LineType));
+					Assert.That(firstLineResult.ExtractedValue, Is.EqualTo(testCase.Result.ExtractedValue));
+				}
+			);
 		}
 
 		[TestCaseSource(nameof(getNextLinePositiveTestCases))]
@@ -30,8 +34,12 @@ namespace YamlConfiguration.Processor.Tests
 
 			var nextLineResult = multiLine.ProcessNextLine(testCase.TestValue);
 
-			Assert.That(nextLineResult.LineType, Is.EqualTo(testCase.Result.LineType));
-			Assert.That(nextLineResult.ExtractedValue, Is.EqualTo(testCase.Result.ExtractedValue));
+			Assert.Multiple(() =>
+				{
+					Assert.That(nextLineResult.LineType, Is.EqualTo(testCase.Result.LineType));
+					Assert.That(nextLineResult.ExtractedValue, Is.EqualTo(testCase.Result.ExtractedValue));
+				}
+			);
 		}
 
 		[TestCaseSource(nameof(GetFirstLineNegativeTestCases), new Object[] { true })]

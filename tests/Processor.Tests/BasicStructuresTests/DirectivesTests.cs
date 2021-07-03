@@ -14,6 +14,7 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var match = _reservedDirectiveRegex.Match(testCase.TestValue);
 
+			Assert.True(match.Success);
 			Assert.Multiple(
 				() =>
 				{
@@ -40,8 +41,8 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var match = _yamlDirectiveRegex.Match(testCase.TestValue);
 
-			Assert.Multiple(
-				() =>
+			Assert.True(match.Success);
+			Assert.Multiple(() =>
 				{
 					Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 					Assert.That(match.Groups.Count, Is.EqualTo(2));
@@ -64,8 +65,8 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var match = _tagDirectiveRegex.Match(testCase.TestValue);
 
-			Assert.Multiple(
-				() =>
+			Assert.True(match.Success);
+			Assert.Multiple(() =>
 				{
 					Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 					Assert.That(match.Groups.Count, Is.EqualTo(3));
