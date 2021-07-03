@@ -1,14 +1,19 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
 
 namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
-	public abstract class DirectiveParserBaseTests
+	internal abstract class DirectiveParserBaseTests<TParser, TDirective>
+		where TParser : OneDirectiveParser
+		where TDirective : IDirective
 	{
-		internal static ICharacterStream CreateStream(string directiveName, string additionalChars)
+		protected abstract string DirectiveName { get; }
+
+		protected ICharacterStream CreateStream(string additionalChars)
 		{
 			var stream = A.Fake<ICharacterStream>();
 
@@ -16,14 +21,21 @@ namespace YamlConfiguration.Processor.Tests
 
 			A.CallTo(() => stream.Peek()).Returns(directiveChar);
 
-			var directiveCharAndName = new[] { directiveChar }.Concat(directiveName).ToArray();
+			var directiveCharAndName = new[] { directiveChar }.Concat(DirectiveName).ToArray();
 
 			A.CallTo(() => stream.Peek(directiveCharAndName.Length)).Returns(directiveCharAndName);
 
 			A.CallTo(() => stream.ReadLine())
-				.Returns($"{directiveChar}{directiveName} {additionalChars}{Environment.NewLine}");
+				.Returns($"{directiveChar}{DirectiveName} {additionalChars}{Environment.NewLine}");
 
 			return stream;
+		}
+
+		protected static async Task<TDirective?> Process(ICharacterStream charStream)
+		{
+			var parser = (TParser) Activator.CreateInstance(typeof(TParser), A.Dummy<IOneLineCommentParser>())!;
+
+			return (TDirective?) await parser.Process(charStream);
 		}
 	}
 }

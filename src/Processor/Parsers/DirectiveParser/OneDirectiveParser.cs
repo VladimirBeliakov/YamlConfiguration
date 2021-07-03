@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
@@ -34,6 +35,9 @@ namespace YamlConfiguration.Processor
 		protected abstract IDirective? Parse(string rawDirective);
 
 		protected abstract string DirectiveName { get; }
+
+		protected void LogFailure(string notParsedDirective) =>
+			Console.WriteLine($"Failed to parse {DirectiveName.ToLower()} directive '{notParsedDirective}'.");
 
 		private async ValueTask<bool> checkDirective(ICharacterStream charStream)
 		{

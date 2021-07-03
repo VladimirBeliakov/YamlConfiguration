@@ -20,7 +20,7 @@ namespace YamlConfiguration.Processor
 
 			if (!result.Success)
 			{
-				Console.WriteLine($"Failed to parse yaml directive '{rawDirective}'.");
+				LogFailure(rawDirective);
 				return null;
 			}
 
