@@ -6,21 +6,25 @@ namespace YamlConfiguration.Processor
 	public static class BasicStructures
 	{
 		// TODO: Define the break code by the file parsed.
-		public static readonly RegexPattern Break = (RegexPattern) '\n';
+		internal static readonly RegexPattern Break = (RegexPattern) '\n';
 
-		public static readonly RegexPattern Spaces = Characters.Space.WithLimitingRepetition(min: 1);
+		internal static readonly RegexPattern Spaces = Characters.Space.WithLimitingRepetition(min: 1);
 
 		private static readonly RegexPattern _indent = Characters.Space.WithLimitingRepetition();
 
 		private static readonly RegexPattern _anchoredIndent = _indent.WithAnchorAtBeginning();
 
 		internal static readonly RegexPattern SeparateInLine =
-			(RegexPattern) $"(?:^|[{Characters.Space}{Characters.Tab}]{{1,{Characters.CharGroupLength}}})";
+			RegexPatternBuilder.BuildAlternation(
+				RegexPattern.Empty.WithAnchorAtBeginning(),
+				RegexPatternBuilder.BuildCharSet(Characters.Space, Characters.Tab)
+					.WithLimitingRepetition(min: 1, asNonCapturingGroup: false)
+			);
 
-		private static readonly string _tagHandle =
-			$"{Characters.Tag}{Characters.WordChar}{{0,{Characters.CharGroupLength}}}{Characters.Tag}?";
+		private static readonly RegexPattern _tagHandle =
+			Characters.Tag + Characters.WordChar.WithLimitingRepetition() + Characters.Tag.AsOptional();
 
-		public static RegexPattern LinePrefix(BlockFlow c, bool useAnchoredIndent = true)
+		internal static RegexPattern LinePrefix(BlockFlow c, bool useAnchoredIndent = true)
 		{
 			var indent = useAnchoredIndent ? _anchoredIndent : _indent;
 
@@ -37,7 +41,7 @@ namespace YamlConfiguration.Processor
 			}
 		}
 
-		public static RegexPattern EmptyLine(BlockFlow c, bool useAnchoredIndent = true)
+		internal static RegexPattern EmptyLine(BlockFlow c, bool useAnchoredIndent = true)
 		{
 			return LinePrefix(c, useAnchoredIndent) + Break;
 		}
@@ -86,7 +90,7 @@ namespace YamlConfiguration.Processor
 
 		#endregion
 
-		public static readonly RegexPattern Comment =
+		internal static readonly RegexPattern Comment =
 			(
 				SeparateInLine +
 				(
@@ -126,24 +130,29 @@ namespace YamlConfiguration.Processor
 			public static RegexPattern YamlDirectiveName = (RegexPattern) "YAML";
 			public static RegexPattern TagDirectiveName = (RegexPattern) "TAG";
 
-			private static readonly string _reservedDirectiveName =
-				$"({Characters.NsChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}})";
+			private static readonly RegexPattern _reservedDirectiveName =
+				Characters.NsChar.AsNonCapturingGroup().WithLimitingRepetition(min: 1).AsCapturingGroup();
 
-			private static readonly string _parameter =
-				$"({Characters.NsChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}})";
+			private static readonly RegexPattern _parameter =
+				Characters.NsChar.AsNonCapturingGroup().WithLimitingRepetition(min: 1).AsCapturingGroup();
 
-			private static readonly string _localTagPrefix =
-				$"{Characters.Tag}{Characters.UriChar}{{0,{Characters.CharGroupLength}}}";
+			private static readonly RegexPattern _localTagPrefix =
+				Characters.Tag + Characters.UriChar.WithLimitingRepetition();
 
 			private static readonly string _globalTagPrefix =
-				$"{Characters.TagChar}{Characters.UriChar}{{0,{Characters.CharGroupLength}}}";
+				Characters.TagChar + Characters.UriChar.WithLimitingRepetition();
 
-			private static readonly string _tagPrefix = $"({_localTagPrefix}|{_globalTagPrefix})";
+			private static readonly RegexPattern _tagPrefix = RegexPatternBuilder
+				.BuildAlternation(_localTagPrefix, _globalTagPrefix).AsCapturingGroup();
 
-			public static readonly string Reserved =
-				$"^{Characters.Directive + _reservedDirectiveName}" +
-				$"{SeparateInLine + _parameter}" +
-				$"{Comment}";
+			public static readonly RegexPattern Reserved =
+				(
+					Characters.Directive +
+					_reservedDirectiveName +
+					SeparateInLine +
+					_parameter +
+					Comment
+				).WithAnchorAtBeginning();
 
 			public static readonly RegexPattern Yaml =
 				Characters.Directive.WithAnchorAtBeginning() +
@@ -151,19 +160,21 @@ namespace YamlConfiguration.Processor
 				SeparateInLine +
 				(
 					RegexPatternBuilder.BuildCharSet(Characters.DecimalDigits).WithLimitingRepetition(min: 1) +
-					// TODO: Replace \\ with a variable
-					(RegexPattern) "\\" + Characters.VersionSeparator +
+					Characters.Escape + Characters.VersionSeparator +
 					RegexPatternBuilder.BuildCharSet(Characters.DecimalDigits).WithLimitingRepetition(min: 1)
 				).AsCapturingGroup() +
 				Comment;
 
 			public static readonly string Tag =
-				$"^{Characters.Directive + TagDirectiveName}" +
-				$"{SeparateInLine}" +
-				$"({_tagHandle})" +
-				$"{SeparateInLine}" +
-				$"{_tagPrefix}" +
-				$"{Comment}";
+				(
+					Characters.Directive +
+					 TagDirectiveName +
+					 SeparateInLine +
+					 _tagHandle.AsCapturingGroup() +
+					 SeparateInLine +
+					 _tagPrefix +
+					 Comment
+				).WithAnchorAtBeginning();
 		}
 
 		public static class NodeTags

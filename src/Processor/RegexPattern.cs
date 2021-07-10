@@ -5,6 +5,8 @@ namespace YamlConfiguration.Processor
 {
 	public readonly struct RegexPattern : IEquatable<RegexPattern>
 	{
+		public static RegexPattern Empty = (RegexPattern) String.Empty;
+
 		private readonly string _regexValue;
 
 		public RegexPattern(string regexValue)

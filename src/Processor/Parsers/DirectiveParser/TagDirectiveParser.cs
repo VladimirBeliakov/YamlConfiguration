@@ -22,7 +22,7 @@ namespace YamlConfiguration.Processor
 
 			if (!result.Success)
 			{
-				LogFailure(rawDirective);
+				LogParseFailure(rawDirective);
 				return null;
 			}
 

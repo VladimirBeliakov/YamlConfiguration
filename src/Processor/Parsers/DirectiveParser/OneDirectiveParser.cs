@@ -19,7 +19,7 @@ namespace YamlConfiguration.Processor
 			if (possibleDirectiveChar != Characters.Directive)
 				return null;
 
-			if (!await checkDirective(charStream).ConfigureAwait(false))
+			if (DirectiveName.Length > 0 && !await checkDirective(charStream).ConfigureAwait(false))
 				return null;
 
 			var rawDirective = await charStream.ReadLine().ConfigureAwait(false);
@@ -36,7 +36,7 @@ namespace YamlConfiguration.Processor
 
 		protected abstract string DirectiveName { get; }
 
-		protected void LogFailure(string notParsedDirective) =>
+		protected void LogParseFailure(string notParsedDirective) =>
 			Console.WriteLine($"Failed to parse {DirectiveName.ToLower()} directive '{notParsedDirective}'.");
 
 		private async ValueTask<bool> checkDirective(ICharacterStream charStream)

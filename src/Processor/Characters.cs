@@ -2,7 +2,7 @@ using System;
 
 namespace YamlConfiguration.Processor
 {
-	public static class Characters
+	internal static class Characters
 	{
 		#region Unicode Characters Codes
 
@@ -22,7 +22,7 @@ namespace YamlConfiguration.Processor
 
 		#endregion
 
-		public static readonly RegexPattern Space = (RegexPattern) "\u0020";
+		public static readonly RegexPattern Space = (RegexPattern) '\u0020';
 		private static readonly string _basicLatinSubset = $"{Space}-\u007E";
 		private const string _del = "\u007F";
 		private const string _latinSupplementToHangulJamo = "\u00A0-\uD7FF";
@@ -71,7 +71,7 @@ namespace YamlConfiguration.Processor
 
 		#region Escape Sequences
 
-		public static readonly RegexPattern Escape = (RegexPattern) "\\\\";
+		public static readonly RegexPattern Escape = (RegexPattern) "\\";
 		private static readonly RegexPattern _escapedNull = (RegexPattern) "0";
 		private static readonly RegexPattern _escapedBell = (RegexPattern) "a";
 		private static readonly RegexPattern _escapedBackspace = (RegexPattern) "b";
@@ -94,7 +94,7 @@ namespace YamlConfiguration.Processor
 		private static readonly RegexPattern _escaped32Bit = (RegexPattern) "U";
 
 		public static readonly RegexPattern EscapedChar =
-			(Escape +
+			(Escape + Escape +
 			RegexPatternBuilder.BuildCharSet(
 				_escapedNull,
 				_escapedBell,
@@ -158,40 +158,40 @@ namespace YamlConfiguration.Processor
 		);
 
 		public static RegexPattern DecimalDigits = (RegexPattern) "0-9";
-		internal static readonly RegexPattern SWhites = Space + Tab;
+		public static readonly RegexPattern SWhites = Space + Tab;
 		private const string _asciiLetters = "A-Za-z";
 		private static readonly string _hexDigits = $"{DecimalDigits}A-Fa-f";
 
-		internal static readonly string WordChar =
+		public static readonly RegexPattern WordChar =
 			RegexPatternBuilder.BuildCharSet(
 				DecimalDigits,
 				_asciiLetters,
 				SequenceEntry
 			);
 
-		internal static readonly string UriChar =
+		internal static readonly RegexPattern UriChar =
 			RegexPatternBuilder.BuildAlternation(
 				"%" + RegexPatternBuilder.BuildCharSet(_hexDigits) + "{2}",
 				WordChar,
 				RegexPatternBuilder.BuildCharSet("#;\\/?:@&=+$,_.!~*'()\\[\\]”")
 			);
 
-		internal static readonly RegexPattern TagChar = RegexPatternBuilder.BuildExclusive(
+		public static readonly RegexPattern TagChar = RegexPatternBuilder.BuildExclusive(
 			exclusiveChars: Tag + FlowIndicators,
 			inclusiveChars: UriChar
 		);
 
-		internal static readonly RegexPattern NbChar = RegexPatternBuilder.BuildExclusive(
+		public static readonly RegexPattern NbChar = RegexPatternBuilder.BuildExclusive(
 			exclusiveChars: new String(new [] { _lf, _cr, ByteOrderMark }),
 			inclusiveChars: PrintableChar
 		);
 
-		internal static readonly RegexPattern NsChar = RegexPatternBuilder.BuildExclusive(
+		public static readonly RegexPattern NsChar = RegexPatternBuilder.BuildExclusive(
 			exclusiveChars: SWhites,
 			inclusiveChars: NbChar
 		);
 
-		internal static readonly RegexPattern AnchorChar = RegexPatternBuilder.BuildExclusive(
+		public static readonly RegexPattern AnchorChar = RegexPatternBuilder.BuildExclusive(
 			exclusiveChars: FlowIndicators,
 			inclusiveChars: NsChar
 		);
