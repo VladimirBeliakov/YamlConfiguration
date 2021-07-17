@@ -4,16 +4,16 @@ namespace YamlConfiguration.Processor
 {
 	internal class DocumentPrefixParser : IDocumentPrefixParser
 	{
-		private readonly IOneLineCommentParser _oneLineCommentParser;
+		private readonly IMultiLineCommentParser _multiLineCommentParser;
 
-		public DocumentPrefixParser(IOneLineCommentParser oneLineCommentParser)
+		public DocumentPrefixParser(IMultiLineCommentParser multiLineCommentParser)
 		{
-			_oneLineCommentParser = oneLineCommentParser;
+			_multiLineCommentParser = multiLineCommentParser;
 		}
 
 		public async ValueTask Process(ICharacterStream charStream)
 		{
-			while (await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false)) {}
+			await _multiLineCommentParser.Process(charStream).ConfigureAwait(false);
 		}
 	}
 }

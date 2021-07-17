@@ -63,12 +63,12 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
-			var commentParser = A.Fake<IOneLineCommentParser>();
+			var commentParser = A.Fake<IMultiLineCommentParser>();
 			var directiveParser = createDirectiveParser(directive: null, directiveName, commentParser);
 
 			await directiveParser.Process(stream);
 
-			A.CallTo(() => commentParser.TryProcess(stream)).MustNotHaveHappened();
+			A.CallTo(() => commentParser.Process(stream)).MustNotHaveHappened();
 		}
 
 		[Test]
@@ -76,12 +76,12 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
-			var commentParser = A.Fake<IOneLineCommentParser>();
+			var commentParser = A.Fake<IMultiLineCommentParser>();
 			var directiveParser = createDirectiveParser(A.Dummy<IDirective>(), directiveName, commentParser);
 
 			await directiveParser.Process(stream);
 
-			A.CallTo(() => commentParser.TryProcess(stream)).MustHaveHappened();
+			A.CallTo(() => commentParser.Process(stream)).MustHaveHappened();
 		}
 
 		private static ICharacterStream createStream(char directiveChar = '%', char[]? directiveName = null)
@@ -99,7 +99,7 @@ namespace YamlConfiguration.Processor.Tests
 		private static TestOneDirectiveParser createDirectiveParser(
 			IDirective? directive = null,
 			string? directiveName = null,
-			IOneLineCommentParser? commentParser = null
+			IMultiLineCommentParser? commentParser = null
 		) =>
 			new(directive, directiveName, commentParser);
 
@@ -110,9 +110,9 @@ namespace YamlConfiguration.Processor.Tests
 			public TestOneDirectiveParser(
 				IDirective? directive,
 				string? directiveName,
-				IOneLineCommentParser? commentParser = null
+				IMultiLineCommentParser? commentParser = null
 			)
-				: base(commentParser ?? A.Dummy<IOneLineCommentParser>())
+				: base(commentParser ?? A.Dummy<IMultiLineCommentParser>())
 			{
 				_directive = directive;
 				DirectiveName = directiveName ?? "TestDirective";

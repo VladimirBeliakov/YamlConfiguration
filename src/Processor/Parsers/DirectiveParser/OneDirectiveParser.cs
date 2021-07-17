@@ -5,11 +5,11 @@ namespace YamlConfiguration.Processor
 {
 	internal abstract class OneDirectiveParser : IOneDirectiveParser
 	{
-		private readonly IOneLineCommentParser _oneLineCommentParser;
+		private readonly IMultiLineCommentParser _multiLineCommentParser;
 
-		protected OneDirectiveParser(IOneLineCommentParser oneLineCommentParser)
+		protected OneDirectiveParser(IMultiLineCommentParser multiLineCommentParser)
 		{
-			_oneLineCommentParser = oneLineCommentParser;
+			_multiLineCommentParser = multiLineCommentParser;
 		}
 
 		public async ValueTask<IDirective?> Process(ICharacterStream charStream)
@@ -27,7 +27,7 @@ namespace YamlConfiguration.Processor
 			var directive = Parse(rawDirective);
 
 			if (directive is not null)
-				while (await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false)) {}
+				await _multiLineCommentParser.Process(charStream).ConfigureAwait(false);
 
 			return directive;
 		}
