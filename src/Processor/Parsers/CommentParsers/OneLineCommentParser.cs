@@ -5,10 +5,15 @@ namespace YamlConfiguration.Processor
 	internal class OneLineCommentParser : IOneLineCommentParser
 	{
 		private const int _commentCharLength = 1;
+		private const int _allowedCommentLength = _commentCharLength + Characters.CommentTextMaxLength;
 
 		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
 		{
 			var chars = await charStream.Peek(_commentCharLength + Characters.CharGroupMaxLength).ConfigureAwait(false);
+
+			// It's EOF
+			if (chars.Count == 0)
+				return false;
 
 			var whiteCharsSkipped = 0;
 
@@ -19,7 +24,7 @@ namespace YamlConfiguration.Processor
 				}
 				else
 				{
-					if (@char == Characters.Comment)
+					if (@char == Characters.Comment || @char == BasicStructures.Break)
 						break;
 
 					return false;
@@ -31,16 +36,23 @@ namespace YamlConfiguration.Processor
 					$"Allowed is {Characters.CharGroupMaxLength}."
 				);
 
+			// It's EOF
 			if (whiteCharsSkipped == chars.Count)
+			{
+				await charStream.ReadLine().ConfigureAwait(false);
+				return true;
+			}
+
+			var firstNotWhiteChar = chars[whiteCharsSkipped];
+
+			if (firstNotWhiteChar != Characters.Comment && firstNotWhiteChar != BasicStructures.Break)
 				return false;
 
 			var readLine = await charStream.ReadLine().ConfigureAwait(false);
 			var commentLength = readLine.Length - whiteCharsSkipped;
 
-			const int allowedCommentLength = _commentCharLength + Characters.CommentTextMaxLength;
-
-			if (commentLength > allowedCommentLength)
-				throw new InvalidYamlException($"Too long comment. Allowed length is {allowedCommentLength}.");
+			if (commentLength > _allowedCommentLength)
+				throw new InvalidYamlException($"Too long comment. Allowed length is {_allowedCommentLength}.");
 
 			return true;
 		}

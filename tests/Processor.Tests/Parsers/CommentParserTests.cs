@@ -25,10 +25,10 @@ namespace YamlConfiguration.Processor.Tests
 			A.CallTo(() => charStream.ReadLine()).MustHaveHappenedOnceExactly();
 		}
 
-		[TestCaseSource(nameof(getWhiteChars))]
-		public async Task Process_StreamStartsWithWhiteCharsOnly_ReturnsFalseAndDoesNotCallReadLine(string whiteChars)
+		[Test]
+		public async Task Process_StreamWithoutChars_ReturnsFalseAndDoesNotCallReadLine()
 		{
-			var charStream = getCharStream(whiteChars);
+			var charStream = getCharStream(String.Empty);
 
 			var result = await new OneLineCommentParser().TryProcess(charStream);
 
@@ -36,8 +36,30 @@ namespace YamlConfiguration.Processor.Tests
 			A.CallTo(() => charStream.ReadLine()).MustNotHaveHappened();
 		}
 
+		[TestCaseSource(nameof(getWhiteChars))]
+		public async Task Process_StreamStartsWithWhiteCharsOnly_ReturnsTrueAndCallsReadLine(string whiteChars)
+		{
+			var charStream = getCharStream(whiteChars);
+
+			var result = await new OneLineCommentParser().TryProcess(charStream);
+
+			Assert.True(result);
+			A.CallTo(() => charStream.ReadLine()).MustHaveHappened();
+		}
+
+		[TestCaseSource(nameof(getWhiteChars))]
+		public async Task Process_StreamStartsWithWhiteCharsAndBreak_ReturnsTrueAndCallsReadLine(string whiteChars)
+		{
+			var charStream = getCharStream(whiteChars + BasicStructures.Break);
+
+			var result = await new OneLineCommentParser().TryProcess(charStream);
+
+			Assert.True(result);
+			A.CallTo(() => charStream.ReadLine()).MustHaveHappened();
+		}
+
 		[Test]
-		public void Process_StreamStartsWithTooManyWhiteChars_ReturnsFalseAndDoesNotCallReadLine()
+		public void Process_StreamStartsWithTooManyWhiteChars_Throws()
 		{
 			var tooManyWhiteChars = CharStore.GetCharRange(" ") + " " + "#";
 			var charStream = getCharStream(tooManyWhiteChars);
@@ -54,10 +76,10 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.ThrowsAsync<InvalidYamlException>(() => new OneLineCommentParser().TryProcess(charStream).AsTask());
 		}
 
-		[Test]
-		public async Task Process_StreamWithoutDash_ReturnsFalseAndDoesNotCallReadLine()
+		[TestCaseSource(nameof(getWhiteChars))]
+		public async Task Process_StreamWithoutDash_ReturnsFalseAndDoesNotCallReadLine(string whiteChars)
 		{
-			var charStream = getCharStream("a");
+			var charStream = getCharStream($"{whiteChars}a");
 
 			var result = await new OneLineCommentParser().TryProcess(charStream);
 
@@ -67,9 +89,6 @@ namespace YamlConfiguration.Processor.Tests
 
 		private static ICharacterStream getCharStream(string chars)
 		{
-			if (chars.Length == 0)
-				throw new InvalidOperationException($"{nameof(chars)} must contain at least one char.");
-
 			var charStream = A.Fake<ICharacterStream>();
 
 			var requestedChars = 0;
