@@ -104,6 +104,9 @@ namespace YamlConfiguration.Processor.Tests
 			return result;
 		}
 
+		public static string Repeat(char @char, int times) =>
+			String.Join(String.Empty, Enumerable.Repeat(@char, times));
+
 		public static IEnumerable<string> GetTagHandles()
 		{
 			yield return "!";

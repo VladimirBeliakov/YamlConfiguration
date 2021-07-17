@@ -4,37 +4,42 @@ namespace YamlConfiguration.Processor
 {
 	internal class OneLineCommentParser : IOneLineCommentParser
 	{
+		private const int _commentCharLength = 1;
+
 		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
 		{
-			char? peekedChar;
-			var whiteCharCount = 0;
-			while (true)
-			{
-				peekedChar = await charStream.Peek().ConfigureAwait(false);
+			var chars = await charStream.Peek(_commentCharLength + Characters.CharGroupMaxLength).ConfigureAwait(false);
 
-				if (peekedChar != Characters.Space && peekedChar != Characters.Tab)
-					break;
+			var whiteCharsSkipped = 0;
 
-				if (whiteCharCount == Characters.CharGroupMaxLength)
-					throw new InvalidYamlException(
-						$"Too many white space characters in the comment line. " +
-						$"Allowed is {Characters.CharGroupMaxLength}."
-					);
+			foreach (var @char in chars)
+				if (@char == Characters.Tab || @char == Characters.Space)
+				{
+					whiteCharsSkipped++;
+				}
+				else
+				{
+					if (@char == Characters.Comment)
+						break;
 
-				await charStream.Read().ConfigureAwait(false);
+					return false;
+				}
 
-				whiteCharCount++;
-			}
+			if (whiteCharsSkipped > Characters.CharGroupMaxLength)
+				throw new InvalidYamlException(
+					$"Too many white space characters in the comment line. " +
+					$"Allowed is {Characters.CharGroupMaxLength}."
+				);
 
-			if (peekedChar != Characters.Comment)
+			if (whiteCharsSkipped == chars.Count)
 				return false;
 
-			var readCommentLine = await charStream.ReadLine().ConfigureAwait(false);
+			var readLine = await charStream.ReadLine().ConfigureAwait(false);
+			var commentLength = readLine.Length - whiteCharsSkipped;
 
-			const int commentCharLength = 1;
-			const int allowedCommentLength = commentCharLength + Characters.CommentTextMaxLength;
+			const int allowedCommentLength = _commentCharLength + Characters.CommentTextMaxLength;
 
-			if (readCommentLine.Length > allowedCommentLength)
+			if (commentLength > allowedCommentLength)
 				throw new InvalidYamlException($"Too long comment. Allowed length is {allowedCommentLength}.");
 
 			return true;

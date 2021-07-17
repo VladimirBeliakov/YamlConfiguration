@@ -11,10 +11,13 @@ namespace YamlConfiguration.Processor.Tests
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class CommentParserTests
 	{
-		[TestCaseSource(nameof(getCommentChars))]
-		public async Task Process_StreamStartsWithDashAndCommentChars_ReturnsTrueAndCallsReadLine(string commentChars)
+		[TestCaseSource(nameof(getWhiteAndCommentChars))]
+		public async Task Process_StreamStartsWithWhiteCharsAndDashAndCommentChars_ReturnsTrueAndCallsReadLine(
+			(string whiteChars, string commentChars) testCase
+		)
 		{
-			var charStream = getCharStream($"#{commentChars}");
+			var (whiteChars, commentChars) = testCase;
+			var charStream = getCharStream($"{whiteChars}#{commentChars}");
 
 			var result = await new OneLineCommentParser().TryProcess(charStream);
 
@@ -22,39 +25,37 @@ namespace YamlConfiguration.Processor.Tests
 			A.CallTo(() => charStream.ReadLine()).MustHaveHappenedOnceExactly();
 		}
 
-		[TestCaseSource(nameof(getWhiteSpaces))]
-		public async Task Process_StreamStartsWithWhiteSpaces_CallsReadsAsManyTimesAsWhiteSpaces(string whiteSpaces)
+		[TestCaseSource(nameof(getWhiteChars))]
+		public async Task Process_StreamStartsWithWhiteCharsOnly_ReturnsFalseAndDoesNotCallReadLine(string whiteChars)
 		{
-			var charStream = getCharStream(whiteSpaces);
+			var charStream = getCharStream(whiteChars);
 
-			await new OneLineCommentParser().TryProcess(charStream);
+			var result = await new OneLineCommentParser().TryProcess(charStream);
 
-			A.CallTo(() => charStream.Read()).MustHaveHappened(numberOfTimes: whiteSpaces.Length, Times.Exactly);
+			Assert.False(result);
+			A.CallTo(() => charStream.ReadLine()).MustNotHaveHappened();
 		}
 
 		[Test]
-		public void Process_StreamStartsWithTooManyWhiteSpaces_Throws()
+		public void Process_StreamStartsWithTooManyWhiteChars_ReturnsFalseAndDoesNotCallReadLine()
 		{
-			var tooManyWhiteSpaces = CharStore.GetCharRange(" ") + " ";
-			var charStream = getCharStream(tooManyWhiteSpaces);
+			var tooManyWhiteChars = CharStore.GetCharRange(" ") + " " + "#";
+			var charStream = getCharStream(tooManyWhiteChars);
 
 			Assert.ThrowsAsync<InvalidYamlException>(() => new OneLineCommentParser().TryProcess(charStream).AsTask());
 		}
 
 		[Test]
-		public async Task Process_StreamStartsWithDashAndTooManyChars_Throws()
+		public void Process_StreamStartsWithDashAndTooManyChars_Throws()
 		{
-			var tooManyCommentChars = CharStore.GetCharRange("a") + "a";
+			var tooManyCommentChars = CharStore.Repeat('a', Characters.CommentTextMaxLength + 1);
 			var charStream = getCharStream($"#{tooManyCommentChars}");
 
-			var result = await new OneLineCommentParser().TryProcess(charStream);
-
-			Assert.True(result);
-			A.CallTo(() => charStream.ReadLine()).MustHaveHappenedOnceExactly();
+			Assert.ThrowsAsync<InvalidYamlException>(() => new OneLineCommentParser().TryProcess(charStream).AsTask());
 		}
 
 		[Test]
-		public async Task Process_StreamDoesNotStartWithDash_ReturnsFalseAndDoesNotCalReadLine()
+		public async Task Process_StreamWithoutDash_ReturnsFalseAndDoesNotCallReadLine()
 		{
 			var charStream = getCharStream("a");
 
@@ -71,23 +72,26 @@ namespace YamlConfiguration.Processor.Tests
 
 			var charStream = A.Fake<ICharacterStream>();
 
-			var thenConfiguration = A.CallTo(() => charStream.Peek()).Returns(chars.First()).Once();
+			var requestedChars = 0;
+			A.CallTo(() => charStream.Peek(A<int>._))
+				.Invokes(o => requestedChars = (int) o.Arguments[0]!)
+				.ReturnsLazily(() => chars.ToCharArray().Take(requestedChars).ToArray());
 
-			foreach (var @char in chars.Skip(1))
-				thenConfiguration = thenConfiguration.Then.Returns(@char).Once();
-
-			thenConfiguration.Then.Returns(null);
+			A.CallTo(() => charStream.ReadLine()).Returns(chars);
 
 			return charStream;
 		}
 
-		private static IEnumerable<string> getCommentChars()
+		private static IEnumerable<(string whiteChars, string commentChars)> getWhiteAndCommentChars()
 		{
-			yield return String.Empty;
-			yield return CharStore.GetCharRange("a");
+			yield return (whiteChars: String.Empty, commentChars: String.Empty);
+			yield return (
+				whiteChars: CharStore.GetCharRange(" "),
+				commentChars: CharStore.Repeat('a', Characters.CommentTextMaxLength)
+			);
 		}
 
-		private static IEnumerable<string> getWhiteSpaces()
+		private static IEnumerable<string> getWhiteChars()
 		{
 			yield return " ";
 			yield return "\t";
