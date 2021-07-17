@@ -196,6 +196,7 @@ namespace YamlConfiguration.Processor
 			inclusiveChars: NsChar
 		);
 
-		public const int CharGroupLength = 1000;
+		public const int CharGroupMaxLength = 1000;
+		public const int CommentTextMaxLength = CharGroupMaxLength * CharGroupMaxLength;
 	}
 }

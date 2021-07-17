@@ -34,9 +34,9 @@ namespace YamlConfiguration.Processor.Tests
 			var chars = CharStore.Chars;
 
 			var nbDoubleOneLines =
-				CharStore.NbNsDoubleCharsWithoutEscapedAndSurrogates.Value.GroupBy(Characters.CharGroupLength)
-					.Concat(CharStore.SurrogatePairs.Value.GroupBy(Characters.CharGroupLength))
-					.Concat(CharStore.EscapedChars.GroupBy(Characters.CharGroupLength))
+				CharStore.NbNsDoubleCharsWithoutEscapedAndSurrogates.Value.GroupBy(Characters.CharGroupMaxLength)
+					.Concat(CharStore.SurrogatePairs.Value.GroupBy(Characters.CharGroupMaxLength))
+					.Concat(CharStore.EscapedChars.GroupBy(Characters.CharGroupMaxLength))
 					.Append(string.Empty);
 
 			foreach (var nbDoubleOneLine in nbDoubleOneLines)

@@ -32,7 +32,7 @@ namespace YamlConfiguration.Processor
 		public static RegexPattern WithLimitingRepetition(
 			this RegexPattern pattern,
 			int min = 0,
-			int max = Characters.CharGroupLength,
+			int max = Characters.CharGroupMaxLength,
 			bool asNonCapturingGroup = true
 		) => new(
 				$"{(asNonCapturingGroup ? pattern.AsNonCapturingGroup().ToString() : pattern)}" +

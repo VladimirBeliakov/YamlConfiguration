@@ -93,10 +93,10 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var result = String.Join(
 				String.Empty,
-				Enumerable.Repeat(chars, Characters.CharGroupLength / chars.Length)
+				Enumerable.Repeat(chars, Characters.CharGroupMaxLength / chars.Length)
 			);
 
-			var missingCharsCount = Characters.CharGroupLength - result.Length;
+			var missingCharsCount = Characters.CharGroupMaxLength - result.Length;
 
 			if (missingCharsCount > 0)
 				result += new String(result.Take(missingCharsCount).ToArray());
@@ -109,7 +109,7 @@ namespace YamlConfiguration.Processor.Tests
 			yield return "!";
 			yield return "!!";
 
-			foreach (var wordChar in WordChars.GroupBy(Characters.CharGroupLength))
+			foreach (var wordChar in WordChars.GroupBy(Characters.CharGroupMaxLength))
 			{
 				yield return $"!{wordChar}";
 				yield return $"!{wordChar}!";
@@ -125,8 +125,8 @@ namespace YamlConfiguration.Processor.Tests
 
 		public static IEnumerable<string> GetUriCharGroups()
 		{
-			var hexNumberGroups = GetHexNumbers().GroupBy(Characters.CharGroupLength);
-			var uriCharGroupsWithoutHexNumbers = GetUriCharsWithoutHexNumbers().GroupBy(Characters.CharGroupLength);
+			var hexNumberGroups = GetHexNumbers().GroupBy(Characters.CharGroupMaxLength);
+			var uriCharGroupsWithoutHexNumbers = GetUriCharsWithoutHexNumbers().GroupBy(Characters.CharGroupMaxLength);
 
 			return hexNumberGroups.Concat(uriCharGroupsWithoutHexNumbers);
 		}
@@ -193,9 +193,9 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var oneCharGroups = _printableCharsWithoutSurrogates.Value
 				.Except(excludedChars)
-				.GroupBy(Characters.CharGroupLength);
+				.GroupBy(Characters.CharGroupMaxLength);
 
-			var surrogatePairGroups = SurrogatePairs.Value.Except(excludedChars).GroupBy(Characters.CharGroupLength);
+			var surrogatePairGroups = SurrogatePairs.Value.Except(excludedChars).GroupBy(Characters.CharGroupMaxLength);
 
 			return oneCharGroups.Concat(surrogatePairGroups);
 		}

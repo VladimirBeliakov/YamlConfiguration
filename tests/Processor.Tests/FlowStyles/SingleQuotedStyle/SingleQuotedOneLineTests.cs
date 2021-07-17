@@ -35,8 +35,8 @@ namespace YamlConfiguration.Processor.Tests
 
 			var nbSingleOneLines =
 				CharStore.NbNsSingleCharsWithoutSurrogates.Value
-					.GroupBy(Characters.CharGroupLength)
-					.Concat(CharStore.SurrogatePairs.Value.GroupBy(Characters.CharGroupLength))
+					.GroupBy(Characters.CharGroupMaxLength)
+					.Concat(CharStore.SurrogatePairs.Value.GroupBy(Characters.CharGroupMaxLength))
 					.Append(CharStore.GetCharRange("''"))
 					.Append(string.Empty);
 

@@ -20,8 +20,8 @@ namespace YamlConfiguration.Processor.TypeDefinitions
 		}
 
 		private static readonly Regex _yamlMappingRegex = new Regex(
-			$"^([\\w]{{1,{Characters.CharGroupLength}}}):{BasicStructures.Spaces}" +
-			$"(.{{1,{Characters.CharGroupLength}}}?)" +
+			$"^([\\w]{{1,{Characters.CharGroupMaxLength}}}):{BasicStructures.Spaces}" +
+			$"(.{{1,{Characters.CharGroupMaxLength}}}?)" +
 			$"(?:{BasicStructures.Comment})?$",
 			RegexOptions.Compiled
 		);

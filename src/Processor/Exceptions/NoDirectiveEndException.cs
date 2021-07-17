@@ -4,6 +4,6 @@ namespace YamlConfiguration.Processor
 {
 	public class NoDirectiveEndException : Exception
 	{
-		public NoDirectiveEndException(string message) {}
+		public NoDirectiveEndException(string message) : base(message) {}
 	}
 }

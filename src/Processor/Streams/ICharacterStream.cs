@@ -5,7 +5,7 @@ namespace YamlConfiguration.Processor
 {
 	internal interface ICharacterStream
 	{
-		ValueTask<char> Peek();
+		ValueTask<char?> Peek();
 
 		ValueTask<IReadOnlyList<char>> Peek(int charCount);
 

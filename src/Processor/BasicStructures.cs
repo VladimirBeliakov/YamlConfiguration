@@ -66,7 +66,7 @@ namespace YamlConfiguration.Processor
 			throw new NotSupportedException();
 			return Break +
 				linePrefix +
-				$"(?=.{{0,{Characters.CharGroupLength}}}[^ \t{Break}]{{1,{Characters.CharGroupLength}}}.{{0,{Characters.CharGroupLength}}})";
+				$"(?=.{{0,{Characters.CharGroupMaxLength}}}[^ \t{Break}]{{1,{Characters.CharGroupMaxLength}}}.{{0,{Characters.CharGroupMaxLength}}})";
 		}
 
 		public static string FlowFoldedTrimmedLine()
@@ -90,13 +90,14 @@ namespace YamlConfiguration.Processor
 
 		#endregion
 
+		// TODO: Replace with OneLineCommentParser
 		internal static readonly RegexPattern Comment =
 			(
 				SeparateInLine +
 				(
 					Characters.Comment +
 					RegexPatternBuilder.BuildNegatedCharSet(Break)
-						.WithLimitingRepetition(max: Characters.CharGroupLength * Characters.CharGroupLength)
+						.WithLimitingRepetition(max: Characters.CommentTextMaxLength)
 				).AsOptional()
 			).AsOptional() + Break;
 
@@ -181,17 +182,17 @@ namespace YamlConfiguration.Processor
 		{
 			// Even though '!<!>' satisfies the regex, it's not a valid verbatim tag since verbatim tags are not
 			// subject to tag resolution.
-			private static readonly string _verbatimTag = $"!<{Characters.UriChar}{{1,{Characters.CharGroupLength}}}>";
+			private static readonly string _verbatimTag = $"!<{Characters.UriChar}{{1,{Characters.CharGroupMaxLength}}}>";
 
 			private static readonly string _shorthandTag =
-				$"{_tagHandle}{Characters.TagChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}}";
+				$"{_tagHandle}{Characters.TagChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupMaxLength}}}";
 
 			private static readonly string _nonSpecificTag = $"{Characters.Tag}";
 
 			private static readonly string _tagProperty = $"({_verbatimTag}|{_shorthandTag}|{_nonSpecificTag})";
 
 			internal static readonly string AnchorName =
-				$"{Characters.AnchorChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupLength}}}";
+				$"{Characters.AnchorChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupMaxLength}}}";
 
 			private static readonly string _anchorProperty = $"{Characters.Anchor}({AnchorName})";
 

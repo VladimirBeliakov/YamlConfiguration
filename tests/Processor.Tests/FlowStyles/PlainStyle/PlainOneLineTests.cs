@@ -79,7 +79,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			var nsPlainChars = nsPlainSafeChars.Except(new[] { mappingValue, comment }).ToList();
 
-			const int groupItemCount = Characters.CharGroupLength;
+			const int groupItemCount = Characters.CharGroupMaxLength;
 			const int whiteCharGroupCount = groupItemCount / 2;
 
 			var anyNsPlainFirst = nsPlainChars.First(canBeNsPlainFirst);
@@ -192,12 +192,12 @@ namespace YamlConfiguration.Processor.Tests
 			yield return nsPlainFirst + nsPlainInLine;
 
 			// Too many ns plain chars
-			var tooManyNsPlainChars = Helpers.RepeatAndJoin(nsPlainChar, Characters.CharGroupLength + 1);
+			var tooManyNsPlainChars = Helpers.RepeatAndJoin(nsPlainChar, Characters.CharGroupMaxLength + 1);
 			yield return nsPlainFirst + tooManyNsPlainChars;
 
 			// Too long ns plain in line
 			var tooLongNsPlainInLine =
-				Helpers.RepeatAndJoin(whiteChar + nsPlainChar, Characters.CharGroupLength) + whiteChar;
+				Helpers.RepeatAndJoin(whiteChar + nsPlainChar, Characters.CharGroupMaxLength) + whiteChar;
 			yield return nsPlainFirst + tooLongNsPlainInLine;
 
 			// Ns plain in line with a white space but without ns plain char

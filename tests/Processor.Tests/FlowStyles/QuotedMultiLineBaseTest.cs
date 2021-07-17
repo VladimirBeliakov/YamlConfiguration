@@ -155,7 +155,7 @@ namespace YamlConfiguration.Processor.Tests
 			bool isFirstLine
 		)
 		{
-			const int groupItemCount = Characters.CharGroupLength;
+			const int groupItemCount = Characters.CharGroupMaxLength;
 			const int whiteCharGroupCount = groupItemCount / 2;
 			const string tab = "\t";
 			const string space = " ";
@@ -247,7 +247,7 @@ namespace YamlConfiguration.Processor.Tests
 			var tooManyNonSpaceChars = "a" + CharStore.GetCharRange("a ") + CharStore.GetCharRange("a ") + "a";
 			var tooManyNonSpaceCharGroups = "a" + string.Join(
 				string.Empty,
-				Enumerable.Repeat(CharStore.SpacesAndTabs + "a", Characters.CharGroupLength)
+				Enumerable.Repeat(CharStore.SpacesAndTabs + "a", Characters.CharGroupMaxLength)
 			) + "a";
 
 			foreach (var lineEnding in new[] { @break, isDoubleQuote ? "\"" : "\'" })

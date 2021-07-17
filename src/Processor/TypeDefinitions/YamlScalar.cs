@@ -19,13 +19,13 @@ namespace YamlConfiguration.Processor.TypeDefinitions
 
 		private static readonly Regex _yamlScalarRegex =
 			new Regex(
-				$"^\\- ([\\w]{{1,{Characters.CharGroupLength}}})(?:{BasicStructures.Comment})?$",
+				$"^\\- ([\\w]{{1,{Characters.CharGroupMaxLength}}})(?:{BasicStructures.Comment})?$",
 				RegexOptions.Compiled
 			);
 		
 		private static readonly Regex _yamlCollectionScalarRegex = 
 			new Regex(
-				$"^{BasicStructures.Spaces}\\- ([\\w]{{1,{Characters.CharGroupLength}}})" +
+				$"^{BasicStructures.Spaces}\\- ([\\w]{{1,{Characters.CharGroupMaxLength}}})" +
 				$"(?:{BasicStructures.Comment})?$",
 				RegexOptions.Compiled
 			);

@@ -56,7 +56,7 @@ namespace YamlConfiguration.Processor.Tests
 		private static IEnumerable<TestCaseData> getTrimmedLineBlockFlowWithCorrespondingRegex()
 		{
 			var newLine = Environment.NewLine;
-			var charGroupLength = Characters.CharGroupLength;
+			var charGroupLength = Characters.CharGroupMaxLength;
 
 			foreach (var value in EnumCache.GetBlockAndFlowTypes())
 			{
