@@ -11,6 +11,8 @@ namespace YamlConfiguration.Processor
 
 		ValueTask<char?> Read();
 
+		IAsyncEnumerable<char> Read(int charCount);
+
 		ValueTask<string> ReadLine();
 	}
 }
