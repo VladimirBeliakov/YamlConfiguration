@@ -191,10 +191,10 @@ namespace YamlConfiguration.Processor
 
 			private static readonly string _tagProperty = $"({_verbatimTag}|{_shorthandTag}|{_nonSpecificTag})";
 
-			internal static readonly string AnchorName =
-				$"{Characters.AnchorChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupMaxLength}}}";
+			internal static readonly RegexPattern AnchorName =
+				Characters.AnchorChar.WithLimitingRepetition(min: 1, asNonCapturingGroup: false).AsCapturingGroup();
 
-			private static readonly string _anchorProperty = $"{Characters.Anchor}({AnchorName})";
+			private static readonly string _anchorProperty = Characters.Anchor + AnchorName;
 
 			public static readonly string TagAnchorProperties =
 				$"^{SeparateInLine}{_tagProperty}(?:{SeparateInLine}{_anchorProperty})?{SeparateInLine}";
