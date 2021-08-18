@@ -14,8 +14,8 @@ namespace YamlConfiguration.Processor
 
 		public static RegexPattern BuildAlternation(params string[] items) => new($"(?:{join(items, separator: "|")})");
 
-		public static string BuildLookAhead(string beforeChars, RegexPattern lookAheadExpression) =>
-			$"{beforeChars}(?={lookAheadExpression.ToString()})";
+		public static RegexPattern BuildLookAhead(RegexPattern beforeChars, RegexPattern lookAheadExpression) =>
+			new($"{beforeChars.ToString()}(?={lookAheadExpression.ToString()})");
 
 		public static string BuildLookBehind(RegexPattern lookBehindExpression, string afterChars) =>
 			$"(?<={lookBehindExpression.ToString()}){afterChars}";

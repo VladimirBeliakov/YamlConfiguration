@@ -182,25 +182,44 @@ namespace YamlConfiguration.Processor
 		{
 			// Even though '!<!>' satisfies the regex, it's not a valid verbatim tag since verbatim tags are not
 			// subject to tag resolution.
-			private static readonly string _verbatimTag = $"!<{Characters.UriChar}{{1,{Characters.CharGroupMaxLength}}}>";
+			internal static readonly RegexPattern VerbatimTag =
+				appendLookAhead(new RegexPattern(
+						$"!<{Characters.UriChar.WithLimitingRepetition(min: 1, asNonCapturingGroup: false).ToString()}>"
+					)
+					.AsCapturingGroup()
+					.WithAnchorAtBeginning()
+				);
 
-			private static readonly string _shorthandTag =
-				$"{_tagHandle}{Characters.TagChar.AsNonCapturingGroup()}{{1,{Characters.CharGroupMaxLength}}}";
+			internal static readonly RegexPattern ShorthandTag =
+				appendLookAhead(
+					(_tagHandle + Characters.TagChar.WithLimitingRepetition(min: 1))
+						.AsCapturingGroup()
+						.WithAnchorAtBeginning()
+				);
 
-			private static readonly string _nonSpecificTag = $"{Characters.Tag}";
+			private static readonly RegexPattern _nonSpecificTag = Characters.Tag;
 
-			private static readonly string _tagProperty = $"({_verbatimTag}|{_shorthandTag}|{_nonSpecificTag})";
+			public static readonly RegexPattern TagProperty =
+				RegexPatternBuilder.BuildAlternation(VerbatimTag, ShorthandTag, _nonSpecificTag)
+					.AsCapturingGroup()
+					.WithAnchorAtBeginning();
 
 			internal static readonly RegexPattern AnchorName =
 				Characters.AnchorChar.WithLimitingRepetition(min: 1, asNonCapturingGroup: false).AsCapturingGroup();
 
-			private static readonly string _anchorProperty = Characters.Anchor + AnchorName;
+			private static readonly RegexPattern _anchorProperty = Characters.Anchor + AnchorName;
 
 			public static readonly string TagAnchorProperties =
-				$"^{SeparateInLine}{_tagProperty}(?:{SeparateInLine}{_anchorProperty})?{SeparateInLine}";
+				$"^{SeparateInLine}{TagProperty}(?:{SeparateInLine}{_anchorProperty})?{SeparateInLine}";
 
 			public static readonly string AnchorTagProperties =
-				$"^{SeparateInLine}{_anchorProperty}(?:{SeparateInLine}{_tagProperty})?{SeparateInLine}";
+				$"^{SeparateInLine}{_anchorProperty}(?:{SeparateInLine}{TagProperty})?{SeparateInLine}";
+
+			private static RegexPattern appendLookAhead(RegexPattern pattern) =>
+				RegexPatternBuilder.BuildLookAhead(
+					beforeChars: pattern,
+					lookAheadExpression: RegexPatternBuilder.BuildCharSet(Characters.SWhites + Break)
+				);
 		}
 	}
 }

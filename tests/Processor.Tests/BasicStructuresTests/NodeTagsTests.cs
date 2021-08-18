@@ -7,7 +7,8 @@ using NUnit.Framework;
 
 namespace YamlConfiguration.Processor.Tests
 {
-	[TestFixture, Parallelizable(ParallelScope.All)]
+	// TODO: Decide if the test is necessary
+	[TestFixture, Parallelizable(ParallelScope.All), Explicit]
 	public class NodeTagsTests
 	{
 		[TestCaseSource(nameof(getTagAnchorPositiveTestCases))]

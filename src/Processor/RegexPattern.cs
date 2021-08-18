@@ -26,12 +26,12 @@ namespace YamlConfiguration.Processor
 			throw new InvalidCastException($"Can't cast the multi char pattern '{pattern}' to one char.");
 		}
 
-		public static explicit operator RegexPattern(string rawValue) => new RegexPattern(rawValue);
+		public static explicit operator RegexPattern(string rawValue) => new(rawValue);
 
-		public static explicit operator RegexPattern(char rawValue) => new RegexPattern(rawValue.ToString());
+		public static explicit operator RegexPattern(char rawValue) => new(rawValue.ToString());
 
 		public static RegexPattern operator +(RegexPattern pattern1, RegexPattern pattern2) =>
-			new RegexPattern($"{pattern1._regexValue}{pattern2._regexValue}");
+			new($"{pattern1._regexValue}{pattern2._regexValue}");
 
 		public bool Equals(RegexPattern other)
 		{
