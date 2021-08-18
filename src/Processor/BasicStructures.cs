@@ -182,7 +182,7 @@ namespace YamlConfiguration.Processor
 		{
 			// Even though '!<!>' satisfies the regex, it's not a valid verbatim tag since verbatim tags are not
 			// subject to tag resolution.
-			internal static readonly RegexPattern VerbatimTag =
+			public static readonly RegexPattern VerbatimTag =
 				appendLookAhead(new RegexPattern(
 						$"!<{Characters.UriChar.WithLimitingRepetition(min: 1, asNonCapturingGroup: false).ToString()}>"
 					)
@@ -190,30 +190,19 @@ namespace YamlConfiguration.Processor
 					.WithAnchorAtBeginning()
 				);
 
-			internal static readonly RegexPattern ShorthandTag =
+			public static readonly RegexPattern ShorthandTag =
 				appendLookAhead(
 					(_tagHandle + Characters.TagChar.WithLimitingRepetition(min: 1))
 						.AsCapturingGroup()
 						.WithAnchorAtBeginning()
 				);
 
-			private static readonly RegexPattern _nonSpecificTag = Characters.Tag;
+			public static readonly RegexPattern NonSpecificTag = Characters.Tag;
 
-			public static readonly RegexPattern TagProperty =
-				RegexPatternBuilder.BuildAlternation(VerbatimTag, ShorthandTag, _nonSpecificTag)
-					.AsCapturingGroup()
-					.WithAnchorAtBeginning();
-
-			internal static readonly RegexPattern AnchorName =
+			public static readonly RegexPattern AnchorName =
 				Characters.AnchorChar.WithLimitingRepetition(min: 1, asNonCapturingGroup: false).AsCapturingGroup();
 
-			private static readonly RegexPattern _anchorProperty = Characters.Anchor + AnchorName;
-
-			public static readonly string TagAnchorProperties =
-				$"^{SeparateInLine}{TagProperty}(?:{SeparateInLine}{_anchorProperty})?{SeparateInLine}";
-
-			public static readonly string AnchorTagProperties =
-				$"^{SeparateInLine}{_anchorProperty}(?:{SeparateInLine}{TagProperty})?{SeparateInLine}";
+			public static readonly RegexPattern AnchorProperty = appendLookAhead(Characters.Anchor + AnchorName);
 
 			private static RegexPattern appendLookAhead(RegexPattern pattern) =>
 				RegexPatternBuilder.BuildLookAhead(

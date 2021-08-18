@@ -15,11 +15,11 @@ namespace YamlConfiguration.Processor.Tests
 
 			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 
-			var hasShorthandTagGroupCaptured = match.Groups.Count == 2;
-			Assert.True(hasShorthandTagGroupCaptured, $"Found {match.Groups.Count} groups.");
+			var hasShorthandTagGroupBeenCaptured = match.Groups.Count == 2;
+			Assert.True(hasShorthandTagGroupBeenCaptured, $"Found {match.Groups.Count} groups.");
 
 			var capturedShorthandTagCount = match.Groups[1].Captures.Count;
-			Assert.That(capturedShorthandTagCount, Is.EqualTo(1), $"Found {match.Groups[1].Captures.Count} captures.");
+			Assert.That(capturedShorthandTagCount, Is.EqualTo(1), $"Found {capturedShorthandTagCount} captures.");
 
 			var capturedShorthandTag = match.Groups[1].Captures[0].Value;
 			Assert.That(capturedShorthandTag, Is.EqualTo(testCase.Captures?.FirstOrDefault()));

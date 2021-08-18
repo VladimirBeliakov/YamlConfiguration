@@ -17,11 +17,11 @@ namespace YamlConfiguration.Processor.Tests
 
 			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 
-			var hasVerbatimTagGroupCaptured = match.Groups.Count == 2;
-			Assert.True(hasVerbatimTagGroupCaptured, $"Found {match.Groups.Count} groups.");
+			var hasVerbatimTagGroupBeenCaptured = match.Groups.Count == 2;
+			Assert.True(hasVerbatimTagGroupBeenCaptured, $"Found {match.Groups.Count} groups.");
 
 			var capturedVerbatimTagCount = match.Groups[1].Captures.Count;
-			Assert.That(capturedVerbatimTagCount, Is.EqualTo(1), $"Found {match.Groups[1].Captures.Count} captures.");
+			Assert.That(capturedVerbatimTagCount, Is.EqualTo(1), $"Found {capturedVerbatimTagCount} captures.");
 
 			var capturedVerbatimTag = match.Groups[1].Captures[0].Value;
 			Assert.That(capturedVerbatimTag, Is.EqualTo(testCase.Captures?.FirstOrDefault()));
