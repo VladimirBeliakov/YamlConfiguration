@@ -10,7 +10,7 @@ namespace YamlConfiguration.Processor
 		private readonly YamlCharacterStream _stream;
 		private StreamReader? _innerStreamReader;
 
-		private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+		private readonly CancellationTokenSource _cts = new();
 		private readonly char[] _buffer = new char[4096];
 
 		private int _currentCharPosition;

@@ -13,7 +13,7 @@ namespace YamlConfiguration.Processor
 		private const int _preambleMaxSize = 4;
 
 		private readonly Stream _stream;
-		private readonly Queue<byte> _buffer = new Queue<byte>(_preambleMaxSize);
+		private readonly Queue<byte> _buffer = new(_preambleMaxSize);
 		private Encoding? _encoding;
 
 		public YamlCharacterStream(Stream stream)

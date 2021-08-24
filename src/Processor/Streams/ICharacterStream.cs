@@ -9,6 +9,8 @@ namespace YamlConfiguration.Processor
 
 		ValueTask<IReadOnlyList<char>> Peek(int charCount);
 
+		ValueTask<string> PeekLine();
+
 		ValueTask<char?> Read();
 
 		IAsyncEnumerable<char> Read(int charCount);

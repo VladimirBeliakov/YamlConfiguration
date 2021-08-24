@@ -12,7 +12,7 @@ namespace YamlConfiguration.Processor.Tests
 	{
 		[TestCase(1, new[] { 'a' })]
 		[TestCase(2, new[] { 'a', 'b' })]
-		public async Task Peek_PickChars_ReturnsCorrectChar(int charCount, char[] expectedChars)
+		public async Task Peek_SomeCharsInStream_ReturnsCorrectChar(int charCount, char[] expectedChars)
 		{
 			var charArray = new[] { 'a', 'b', 'c' };
 			var stream = createStreamReaderFrom(charArray);
@@ -25,7 +25,7 @@ namespace YamlConfiguration.Processor.Tests
 
 		[TestCase(1, new[] { 'a' })]
 		[TestCase(2, new[] { 'a', 'b' })]
-		public async Task Read_ReadChars_ReturnsCorrectChars(int charCount, char[] expectedChars)
+		public async Task Read_SomeCharsInStream_ReturnsCorrectChars(int charCount, char[] expectedChars)
 		{
 			var charArray = new[] { 'a', 'b', 'c' };
 			var stream = createStreamReaderFrom(charArray);
@@ -143,6 +143,84 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.ThrowsAsync<InvalidOperationException>(() => bufferedStreamReader.Peek(0).AsTask());
 		}
 
+		[TestCase(new[] { 'a', '\n', 'b' })]
+		[TestCase(new[] { 'a', 'b', '\n', 'c' })]
+		public async Task PeekLine_SomeCharsInStream_PeeksCorrectChars(char[] charArray)
+		{
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+
+			var actualChars = (await bufferedStreamReader.PeekLine()).ToCharArray();
+
+			var expectedChars = charArray.TakeWhile(c => c is not '\n');
+			CollectionAssert.AreEqual(expectedChars, actualChars);
+		}
+
+		[Test]
+		public async Task PeekLine_PeekOneCharBeforePeekingLine_ReturnsCorrectChars()
+		{
+			var charArray = new[] { 'a', '\n', 'b' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+			await bufferedStreamReader.Peek(1);
+
+			var actualChars = (await bufferedStreamReader.PeekLine()).ToCharArray();
+
+			var expectedChars = charArray.TakeWhile(c => c is not '\n');
+			CollectionAssert.AreEqual(expectedChars, actualChars);
+		}
+
+		[Test]
+		public async Task PeekLine_PeekCharsWithBreakBeforePeekingLine_ReturnsCorrectChars()
+		{
+			var charArray = new[] { 'a', '\n', 'b' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+			await bufferedStreamReader.Peek(2);
+
+			var actualChars = (await bufferedStreamReader.PeekLine()).ToCharArray();
+
+			var expectedChars = charArray.TakeWhile(c => c is not '\n');
+			CollectionAssert.AreEqual(expectedChars, actualChars);
+		}
+
+		[Test]
+		public async Task PeekLine_StreamWithoutBreak_ReturnsAllCharsFromStream()
+		{
+			var charArray = new[] { 'a', 'b' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+
+			var actualChars = (await bufferedStreamReader.PeekLine()).ToCharArray();
+
+			CollectionAssert.AreEqual(charArray, actualChars);
+		}
+
+		[Test]
+		public async Task PeekLine_EmptyStream_ReturnsEmptyLine()
+		{
+			var charArray = Array.Empty<char>();
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+
+			var actualString = (await bufferedStreamReader.PeekLine());
+
+			CollectionAssert.AreEqual(String.Empty, actualString);
+		}
+
+		[Test]
+		public async Task PeekLine_PeekLineBeforePeekingChars_DoesNotAdvanceStream()
+		{
+			var charArray = new[] { 'a', 'b', '\n', 'c' };
+			var stream = createStreamReaderFrom(charArray);
+			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+			await bufferedStreamReader.PeekLine();
+
+			var actualChars = await bufferedStreamReader.Peek(charArray.Length);
+
+			CollectionAssert.AreEqual(charArray, actualChars);
+		}
+
 		[Test]
 		public async Task ReadLine_PeekOneCharBeforeBreak_PeekDoesNotAdvanceStream()
 		{
@@ -208,7 +286,7 @@ namespace YamlConfiguration.Processor.Tests
 
 		private static CharacterStreamReader createStreamReaderFrom(IEnumerable<char> chars)
 		{
-			return new CharacterStreamReader(
+			return new(
 				new YamlCharacterStream(new MemoryStream(chars.Select(_ => (byte) _).ToArray()))
 			);
 		}
