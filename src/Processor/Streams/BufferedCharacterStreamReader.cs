@@ -10,10 +10,10 @@ namespace YamlConfiguration.Processor
 	{
 		private const int _queueMaxSize = 1024;
 
-		private readonly CharacterStreamReader _streamReader;
+		private readonly EnsureBreakAtEofCharacterStreamReader _streamReader;
 		private readonly Queue<char> _buffer = new(_queueMaxSize);
 
-		public BufferedCharacterStreamReader(CharacterStreamReader streamReader)
+		public BufferedCharacterStreamReader(EnsureBreakAtEofCharacterStreamReader streamReader)
 		{
 			_streamReader = streamReader;
 		}
