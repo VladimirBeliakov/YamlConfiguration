@@ -145,16 +145,16 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.ThrowsAsync<InvalidOperationException>(() => bufferedStreamReader.Peek(0).AsTask());
 		}
 
-		[TestCase(new[] { 'a', '\n', 'b' })]
-		[TestCase(new[] { 'a', 'b', '\n', 'c' })]
-		public async Task PeekLine_SomeCharsInStream_PeeksCorrectChars(char[] charArray)
+		[Test]
+		public async Task PeekLine_SomeCharsInStream_PeeksCorrectChars()
 		{
+			var charArray = new[] { 'a', 'b', '\n', 'c' };
 			var stream = createStreamReaderFrom(charArray);
 			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
 
 			var actualChars = (await bufferedStreamReader.PeekLine()).ToCharArray();
 
-			var expectedChars = charArray.TakeWhile(c => c is not '\n');
+			var expectedChars = new[] { 'a', 'b', '\n' };
 			CollectionAssert.AreEqual(expectedChars, actualChars);
 		}
 
@@ -168,7 +168,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			var actualChars = (await bufferedStreamReader.PeekLine()).ToCharArray();
 
-			var expectedChars = charArray.TakeWhile(c => c is not '\n');
+			var expectedChars = new[] { 'a', '\n' };
 			CollectionAssert.AreEqual(expectedChars, actualChars);
 		}
 
@@ -182,32 +182,8 @@ namespace YamlConfiguration.Processor.Tests
 
 			var actualChars = (await bufferedStreamReader.PeekLine()).ToCharArray();
 
-			var expectedChars = charArray.TakeWhile(c => c is not '\n');
+			var expectedChars = new[] { 'a', '\n' };
 			CollectionAssert.AreEqual(expectedChars, actualChars);
-		}
-
-		[Test]
-		public async Task PeekLine_StreamWithoutBreak_ReturnsAllCharsFromStream()
-		{
-			var charArray = new[] { 'a', 'b' };
-			var stream = createStreamReaderFrom(charArray);
-			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
-
-			var actualChars = (await bufferedStreamReader.PeekLine()).ToCharArray();
-
-			CollectionAssert.AreEqual(charArray, actualChars);
-		}
-
-		[Test]
-		public async Task PeekLine_EmptyStream_ReturnsEmptyLine()
-		{
-			var charArray = Array.Empty<char>();
-			var stream = createStreamReaderFrom(charArray);
-			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
-
-			var actualString = (await bufferedStreamReader.PeekLine());
-
-			CollectionAssert.AreEqual(String.Empty, actualString);
 		}
 
 		[Test]

@@ -8,7 +8,7 @@ namespace YamlConfiguration.Processor
 {
 	internal class BufferedCharacterStreamReader : IDisposable
 	{
-		private const int _queueMaxSize = 1024;
+		private const int _queueMaxSize = 1024 * 1024;
 
 		private readonly EnsureBreakAtEofCharacterStreamReader _streamReader;
 		private readonly Queue<char> _buffer = new(_queueMaxSize);
@@ -50,10 +50,12 @@ namespace YamlConfiguration.Processor
 			var sb = new StringBuilder(_queueMaxSize);
 
 			foreach(var @char in _buffer)
-				if (@char != @break)
-					sb.Append(@char);
-				else
+			{
+				sb.Append(@char);
+
+				if (@char == @break)
 					return sb.ToString();
+			}
 
 			while (true)
 			{
@@ -67,10 +69,10 @@ namespace YamlConfiguration.Processor
 
 				_buffer.Enqueue(charRead.Value);
 
+				sb.Append(charRead.Value);
+
 				if (charRead == @break)
 					break;
-
-				sb.Append(charRead.Value);
 			}
 
 			return sb.ToString();
