@@ -14,7 +14,7 @@ namespace YamlConfiguration.Processor
 		private readonly char[] _buffer = new char[4096];
 
 		private int _currentCharPosition;
-		private int _bufferLength;
+		private int _bufferAvailableCharCount;
 		private bool _isDisposed;
 
 		public CharacterStreamReader(YamlCharacterStream stream)
@@ -26,21 +26,18 @@ namespace YamlConfiguration.Processor
 
 		public async ValueTask<char?> Read()
 		{
-			await ensureStreamReaderInitialized().ConfigureAwait(false);
-
 			if (_isDisposed)
-				return null;
+				throw new ObjectDisposedException(GetType().Name);
+
+			await ensureStreamReaderInitialized().ConfigureAwait(false);
 
 			if (tryGetCurrentCharFromBuffer(out var currentChar))
 				return currentChar;
 
 			await fillBuffer().ConfigureAwait(false);
 
-			if (_bufferLength == 0)
-			{
-				dispose();
+			if (_bufferAvailableCharCount == 0)
 				return null;
-			}
 
 			return getBufferCurrentCharAndAdvance();
 		}
@@ -58,19 +55,19 @@ namespace YamlConfiguration.Processor
 
 		private async ValueTask fillBuffer()
 		{
+			if (_bufferAvailableCharCount > 0)
+				throw new InvalidOperationException("Can't fill the buffer when it still has characters available.");
+
 			var charsRead = await _innerStreamReader!.ReadAsync(_buffer, _cts.Token).ConfigureAwait(false);
 
-			if (charsRead == 0)
-				dispose();
-
-			_bufferLength = charsRead;
+			_bufferAvailableCharCount = charsRead;
 		}
 
 		private char getCurrentChar() => _buffer[_currentCharPosition];
 
 		private bool tryGetCurrentCharFromBuffer(out char currentChar)
 		{
-			if (_bufferLength > 0)
+			if (_bufferAvailableCharCount > 0)
 			{
 				currentChar = getBufferCurrentCharAndAdvance();
 
@@ -86,11 +83,11 @@ namespace YamlConfiguration.Processor
 		{
 			var currentChar = getCurrentChar();
 
-			var bufferLastCharPosition = _bufferLength - 1;
+			var bufferLastCharPosition = _bufferAvailableCharCount - 1;
 			if (_currentCharPosition == bufferLastCharPosition)
 			{
 				_currentCharPosition = 0;
-				_bufferLength = 0;
+				_bufferAvailableCharCount = 0;
 			}
 			else
 			{
