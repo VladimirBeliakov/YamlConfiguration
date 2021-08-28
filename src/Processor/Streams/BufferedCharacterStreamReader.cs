@@ -105,14 +105,27 @@ namespace YamlConfiguration.Processor
 			var sb = new StringBuilder();
 
 			while (_buffer.Count > 0)
-				if (_buffer.Peek() != @break)
-					sb.Append(_buffer.Dequeue());
-				else
-					return sb.ToString();
+			{
+				var @char = _buffer.Dequeue();
 
-			char? charRead;
-			while ((charRead = await _streamReader.Read().ConfigureAwait(false)) != @break && charRead is not null)
+				sb.Append(@char);
+
+				if (@char == @break)
+					return sb.ToString();
+			}
+
+			while (true)
+			{
+				var charRead = await _streamReader.Read().ConfigureAwait(false);
+
+				if (charRead is null)
+					break;
+
 				sb.Append(charRead.Value);
+
+				if (charRead == @break)
+					break;
+			}
 
 			return sb.ToString();
 		}

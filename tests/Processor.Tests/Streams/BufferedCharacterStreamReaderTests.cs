@@ -106,11 +106,11 @@ namespace YamlConfiguration.Processor.Tests
 		[Test]
 		public async Task Peek_PeekMoreCharsThanStreamHas_ReturnsOnlyAvailableChars()
 		{
-			var charArray = new[] { 'a' };
+			var charArray = new[] { 'a', '\n' };
 			var stream = createStreamReaderFrom(charArray);
 			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
 
-			var peekedChars = await bufferedStreamReader.Peek(2);
+			var peekedChars = await bufferedStreamReader.Peek(3);
 
 			CollectionAssert.AreEqual(charArray, peekedChars);
 		}
@@ -118,16 +118,18 @@ namespace YamlConfiguration.Processor.Tests
 		[Test]
 		public async Task Read_ReadMoreCharsThanStreamHas_ReturnsOnlyAvailableChars()
 		{
-			var charArray = new[] { 'a' };
+			var charArray = new[] { 'a', '\n' };
 			var stream = createStreamReaderFrom(charArray);
 			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
 
-			var readChar = await bufferedStreamReader.Read();
+			var readChar1 = await bufferedStreamReader.Read();
+			var readChar2 = await bufferedStreamReader.Read();
 			var nullChar = await bufferedStreamReader.Read();
 
 			Assert.Multiple(() =>
 				{
-					Assert.That(readChar, Is.EqualTo('a'));
+					Assert.That(readChar1, Is.EqualTo('a'));
+					Assert.That(readChar2, Is.EqualTo('\n'));
 					Assert.Null(nullChar);
 				}
 			);
@@ -216,13 +218,13 @@ namespace YamlConfiguration.Processor.Tests
 			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
 			await bufferedStreamReader.PeekLine();
 
-			var actualChars = await bufferedStreamReader.Peek(charArray.Length);
+			var actualChar = (await bufferedStreamReader.Peek(1)).Single();
 
-			CollectionAssert.AreEqual(charArray, actualChars);
+			Assert.That('a', Is.EqualTo(actualChar));
 		}
 
 		[Test]
-		public async Task ReadLine_PeekOneCharBeforeBreak_PeekDoesNotAdvanceStream()
+		public async Task ReadLine_PeekOneCharBeforeReadingLine_ReturnsCorrectChars()
 		{
 			var charArray = new[] { 'a', 'b', 'c', '\n', 'd' };
 			var stream = createStreamReaderFrom(charArray);
@@ -231,11 +233,11 @@ namespace YamlConfiguration.Processor.Tests
 
 			var actualLine = await bufferedStreamReader.ReadLine();
 
-			Assert.That(actualLine, Is.EqualTo("abc"));
+			Assert.That(actualLine, Is.EqualTo("abc\n"));
 		}
 
 		[Test]
-		public async Task ReadLine_PeekAllCharsInLine_PeekDoesNotAdvanceStream()
+		public async Task ReadLine_PeekAllCharsInStreamBeforeReadingLine_ReturnsCorrectChars()
 		{
 			var charArray = new[] { 'a', 'b', 'c', '\n', 'd' };
 			var stream = createStreamReaderFrom(charArray);
@@ -244,20 +246,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			var actualLine = await bufferedStreamReader.ReadLine();
 
-			Assert.That(actualLine, Is.EqualTo("abc"));
-		}
-
-		[Test]
-		public async Task ReadLine_PeekAllCharsInLineAndNoBreakInStream_PeekDoesNotAdvanceStream()
-		{
-			var charArray = new[] { 'a', 'b', 'c' };
-			var stream = createStreamReaderFrom(charArray);
-			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
-			await bufferedStreamReader.Peek(charArray.Length);
-
-			var actualLine = await bufferedStreamReader.ReadLine();
-
-			Assert.That(actualLine, Is.EqualTo("abc"));
+			Assert.That(actualLine, Is.EqualTo("abc\n"));
 		}
 
 		[Test]
@@ -269,25 +258,28 @@ namespace YamlConfiguration.Processor.Tests
 
 			var actualLine = await bufferedStreamReader.ReadLine();
 
-			Assert.That(actualLine, Is.EqualTo("abc"));
+			Assert.That(actualLine, Is.EqualTo("abc\n"));
 		}
 
 		[Test]
-		public async Task ReadLine_LineWithoutBreakAndNoPeeking_ReturnsAllCharsInStream()
+		public async Task ReadLine_ReadLineBeforePeekingOneChar_AdvancesStream()
 		{
-			var charArray = new[] { 'a', 'b', 'c', 'd' };
+			var charArray = new[] { 'a', 'b', 'c', '\n', 'd' };
 			var stream = createStreamReaderFrom(charArray);
 			using var bufferedStreamReader = new BufferedCharacterStreamReader(stream);
+			await bufferedStreamReader.ReadLine();
 
-			var actualLine = await bufferedStreamReader.ReadLine();
+			var actualChar = (await bufferedStreamReader.Peek(1)).Single();
 
-			Assert.That(actualLine, Is.EqualTo("abcd"));
+			Assert.That(actualChar, Is.EqualTo('d'));
 		}
 
-		private static CharacterStreamReader createStreamReaderFrom(IEnumerable<char> chars)
+		private static EnsureBreakAtEofCharacterStreamReader createStreamReaderFrom(IEnumerable<char> chars)
 		{
 			return new(
-				new YamlCharacterStream(new MemoryStream(chars.Select(_ => (byte) _).ToArray()))
+				new CharacterStreamReader(
+					new YamlCharacterStream(new MemoryStream(chars.Select(_ => (byte) _).ToArray()))
+				)
 			);
 		}
 	}
