@@ -197,7 +197,7 @@ namespace YamlConfiguration.Processor
 						.WithAnchorAtBeginning()
 				);
 
-			public static readonly RegexPattern NonSpecificTag = Characters.Tag;
+			public static readonly RegexPattern NonSpecificTag = appendLookAhead(Characters.Tag.AsCapturingGroup());
 
 			public static readonly RegexPattern AnchorName =
 				Characters.AnchorChar.WithLimitingRepetition(min: 1, asNonCapturingGroup: false).AsCapturingGroup();
