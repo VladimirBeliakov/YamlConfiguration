@@ -51,7 +51,7 @@ namespace YamlConfiguration.Processor.Tests.NodeParsers
 		[Test]
 		public async Task Process_StreamWithShorthandTagButNoWhiteSpaceOrBreakCharAfterwards_ReturnsNull()
 		{
-			var charArray = new[] { '!', 'a', '!'  };
+			var charArray = new[] { '!', 'a', '!', 'b'  };
 			var stream = createStream(charArray);
 
 			var result = await createParser().Process(stream);
@@ -100,6 +100,18 @@ namespace YamlConfiguration.Processor.Tests.NodeParsers
 					Assert.That(result?.Value, Is.EqualTo("!"));
 				}
 			);
+		}
+
+		[TestCase(new[] { '!' })]
+		[TestCase(new[] { '!', 'a', '!', 'b' })]
+		[TestCase(new[] { '!', '<', 'a', '>' })]
+		public async Task Process_StreamWithValidTag_AdvancesStream(char[] tagChars)
+		{
+			var stream = createStream(tagChars.Append(' ').ToArray());
+
+			await createParser().Process(stream);
+
+			A.CallTo(() => stream.Read(tagChars.Length)).MustHaveHappenedOnceExactly();
 		}
 
 		private static ICharacterStream createStream(char[] chars)

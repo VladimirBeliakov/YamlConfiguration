@@ -6,6 +6,6 @@ namespace YamlConfiguration.Processor
 	internal static class Extensions
 	{
 		public static async ValueTask AdvanceBy(this ICharacterStream charStream, int charCount) =>
-			await charStream.Read(charCount).ToListAsync();
+			await charStream.Read(charCount).ToListAsync().ConfigureAwait(false);
 	}
 }
