@@ -88,19 +88,6 @@ namespace YamlConfiguration.Processor
 			return charRead;
 		}
 
-		public async IAsyncEnumerable<char> Read(int charCount)
-		{
-			for (var i = 0; i < charCount; i++)
-			{
-				var charRead = await Read().ConfigureAwait(false);
-
-				if (charRead is null)
-					yield break;
-
-				yield return charRead.Value;
-			}
-		}
-
 		public async ValueTask<string> ReadLine()
 		{
 			var @break = BasicStructures.Break;

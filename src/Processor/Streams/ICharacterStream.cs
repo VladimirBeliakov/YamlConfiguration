@@ -16,5 +16,7 @@ namespace YamlConfiguration.Processor
 		IAsyncEnumerable<char> Read(int charCount);
 
 		ValueTask<string> ReadLine();
+
+		bool IsAtStartOfLine { get; }
 	}
 }
