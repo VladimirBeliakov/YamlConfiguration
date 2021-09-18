@@ -13,7 +13,7 @@ namespace YamlConfiguration.Processor
 
 		public async ValueTask Process(ICharacterStream charStream)
 		{
-			await _multiLineCommentParser.Process(charStream).ConfigureAwait(false);
+			await _multiLineCommentParser.TryProcess(charStream).ConfigureAwait(false);
 		}
 	}
 }

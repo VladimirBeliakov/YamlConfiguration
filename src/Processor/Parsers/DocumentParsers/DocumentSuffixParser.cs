@@ -6,21 +6,16 @@ namespace YamlConfiguration.Processor
 	internal class DocumentSuffixParser : IDocumentSuffixParser
 	{
 		private const char _dot = '.';
-		private readonly IOneLineCommentParser _oneLineCommentParser;
 		private readonly IMultiLineCommentParser _multiLineCommentParser;
 
-		public DocumentSuffixParser(
-			IOneLineCommentParser oneLineCommentParser,
-			IMultiLineCommentParser multiLineCommentParser
-		)
+		public DocumentSuffixParser(IMultiLineCommentParser multiLineCommentParser)
 		{
-			_oneLineCommentParser = oneLineCommentParser;
 			_multiLineCommentParser = multiLineCommentParser;
 		}
 
 		public async ValueTask<bool> Process(ICharacterStream charStream)
 		{
-			var possibleDocumentEndChars = await charStream.Peek(4);
+			var possibleDocumentEndChars = await charStream.Peek(3);
 
 			if (possibleDocumentEndChars.Count < 3)
 				return false;
@@ -32,37 +27,13 @@ namespace YamlConfiguration.Processor
 			)
 				return false;
 
-			// It's EOF
-			if (possibleDocumentEndChars.Count is 3)
-			{
-				await charStream.ReadLine().ConfigureAwait(false);
-				return true;
-			}
-
-			if (
-				possibleDocumentEndChars[3] != Characters.Space &&
-				possibleDocumentEndChars[3] != Characters.Tab &&
-				possibleDocumentEndChars[3] != BasicStructures.Break
-			)
-				return false;
-
 			// We need to advance the stream by four chars so then we can process any comments.
-			await charStream.Read(4).ToListAsync().ConfigureAwait(false);
+			await charStream.AdvanceBy(3).ConfigureAwait(false);
 
-			if (possibleDocumentEndChars[3] != BasicStructures.Break)
-			{
-				var isComment = await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false);
+			var isComment = await _multiLineCommentParser.TryProcess(charStream).ConfigureAwait(false);
 
-				if (!isComment)
-				{
-					var invalidString = await charStream.ReadLine().ConfigureAwait(false);
-					throw new InvalidYamlException(
-						$"Only a comment may follow a document end. Actual string - '{invalidString}'."
-					);
-				}
-			}
-
-			await _multiLineCommentParser.Process(charStream).ConfigureAwait(false);
+			if (!isComment)
+				throw new InvalidYamlException("Only a comment may follow a document end.");
 
 			return true;
 		}

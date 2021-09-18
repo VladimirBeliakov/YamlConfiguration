@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -17,6 +18,7 @@ namespace YamlConfiguration.Processor.Tests
 			var result = await directiveParser.Process(stream);
 
 			Assert.Null(result);
+			stream.AssertNotAdvanced();
 		}
 
 		[TestCase(new[] { 'a', 'b' })]
@@ -31,10 +33,11 @@ namespace YamlConfiguration.Processor.Tests
 			var result = await directiveParser.Process(stream);
 
 			Assert.Null(result);
+			stream.AssertNotAdvanced();
 		}
 
 		[Test]
-		public async Task Process_ParseReturnsNull_ReturnsNull()
+		public async Task Process_DirectiveNotParsed_ReturnsNull()
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
@@ -43,10 +46,11 @@ namespace YamlConfiguration.Processor.Tests
 			var result = await directiveParser.Process(stream);
 
 			Assert.Null(result);
+			A.CallTo(() => stream.ReadLine()).MustHaveHappenedOnceExactly();
 		}
 
 		[Test]
-		public async Task Process_ParseReturnsDirective_ReturnsSameDirective()
+		public async Task Process_DirectiveParsed_ReturnsSameDirective()
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
@@ -56,32 +60,46 @@ namespace YamlConfiguration.Processor.Tests
 			var actualDirective = await directiveParser.Process(stream);
 
 			Assert.That(actualDirective, Is.EqualTo(directive));
+			A.CallTo(() => stream.ReadLine()).MustHaveHappenedOnceExactly();
 		}
 
 		[Test]
-		public async Task Process_ParseReturnsNull_CommentParserNotCalled()
+		public async Task Process_DirectiveNotParsed_MultiLineCommentParserNotCalled()
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
-			var commentParser = A.Fake<IMultiLineCommentParser>();
-			var directiveParser = createDirectiveParser(directive: null, directiveName, commentParser);
+			var multiLineCommentParser = A.Fake<IMultiLineCommentParser>();
+			var directiveParser = createDirectiveParser(directive: null, directiveName, multiLineCommentParser);
 
 			await directiveParser.Process(stream);
 
-			A.CallTo(() => commentParser.Process(stream)).MustNotHaveHappened();
+			A.CallTo(() => multiLineCommentParser.TryProcess(stream)).MustNotHaveHappened();
 		}
 
 		[Test]
-		public async Task Process_ParseReturnsDirective_CommentParserCalled()
+		public async Task Process_DirectiveParsed_MultiLineCommentParserCalled()
 		{
 			const string directiveName = "abc";
 			var stream = createStream(directiveName: directiveName.ToCharArray());
-			var commentParser = A.Fake<IMultiLineCommentParser>();
-			var directiveParser = createDirectiveParser(A.Dummy<IDirective>(), directiveName, commentParser);
+			var multiLineCommentParser = A.Fake<IMultiLineCommentParser>();
+			A.CallTo(() => multiLineCommentParser.TryProcess(stream)).Returns(true);
+			var directiveParser = createDirectiveParser(A.Dummy<IDirective>(), directiveName, multiLineCommentParser);
 
 			await directiveParser.Process(stream);
 
-			A.CallTo(() => commentParser.Process(stream)).MustHaveHappened();
+			A.CallTo(() => multiLineCommentParser.TryProcess(stream)).MustHaveHappened();
+		}
+
+		[Test]
+		public void Process_MultiLineCommentParserReturnsFalse_Throws()
+		{
+			var stream = createStream();
+			var multiLineCommentParser = A.Fake<IMultiLineCommentParser>();
+			A.CallTo(() => multiLineCommentParser.TryProcess(stream)).Returns(false);
+
+			var directiveParser =
+				createDirectiveParser(A.Dummy<IDirective>(), multiLineCommentParser: multiLineCommentParser);
+			Assert.ThrowsAsync<InvalidYamlException>(() => directiveParser.Process(stream).AsTask());
 		}
 
 		private static ICharacterStream createStream(char directiveChar = '%', char[]? directiveName = null)
@@ -99,9 +117,14 @@ namespace YamlConfiguration.Processor.Tests
 		private static TestOneDirectiveParser createDirectiveParser(
 			IDirective? directive = null,
 			string? directiveName = null,
-			IMultiLineCommentParser? commentParser = null
-		) =>
-			new(directive, directiveName, commentParser);
+			IMultiLineCommentParser? multiLineCommentParser = null
+		)
+		{
+			var defaultMultiLineCommentParser = A.Fake<IMultiLineCommentParser>();
+			A.CallTo(() => defaultMultiLineCommentParser.TryProcess(A<ICharacterStream>._)).Returns(true);
+
+			return new(directive, directiveName, multiLineCommentParser ?? defaultMultiLineCommentParser);
+		}
 
 		private class TestOneDirectiveParser : OneDirectiveParser
 		{
@@ -110,12 +133,12 @@ namespace YamlConfiguration.Processor.Tests
 			public TestOneDirectiveParser(
 				IDirective? directive,
 				string? directiveName,
-				IMultiLineCommentParser? commentParser = null
+				IMultiLineCommentParser commentParser
 			)
-				: base(commentParser ?? A.Dummy<IMultiLineCommentParser>())
+				: base(commentParser)
 			{
 				_directive = directive;
-				DirectiveName = directiveName ?? "TestDirective";
+				DirectiveName = directiveName ?? String.Empty;
 			}
 
 			protected override IDirective? Parse(string rawDirective) => _directive;

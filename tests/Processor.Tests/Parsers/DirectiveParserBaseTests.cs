@@ -33,7 +33,10 @@ namespace YamlConfiguration.Processor.Tests
 
 		protected static async Task<TDirective?> Process(ICharacterStream charStream)
 		{
-			var parser = (TParser) Activator.CreateInstance(typeof(TParser), A.Dummy<IMultiLineCommentParser>())!;
+			var multiLineCommentParser = A.Fake<IMultiLineCommentParser>();
+			A.CallTo(() => multiLineCommentParser.TryProcess(A<ICharacterStream>._)).Returns(true);
+
+			var parser = (TParser) Activator.CreateInstance(typeof(TParser), multiLineCommentParser)!;
 
 			return (TDirective?) await parser.Process(charStream);
 		}

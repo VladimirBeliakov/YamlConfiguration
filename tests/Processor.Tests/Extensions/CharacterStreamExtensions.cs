@@ -7,6 +7,7 @@ namespace YamlConfiguration.Processor.Tests
 		public static void AssertNotAdvanced(this ICharacterStream stream)
 		{
 			A.CallTo(() => stream.Read()).MustNotHaveHappened();
+			A.CallTo(() => stream.ReadLine()).MustNotHaveHappened();
 			A.CallTo(() => stream.Read(A<int>._)).MustNotHaveHappened();
 		}
 	}

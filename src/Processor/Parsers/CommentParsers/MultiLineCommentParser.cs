@@ -12,9 +12,16 @@ namespace YamlConfiguration.Processor
 			_oneLineCommentParser = oneLineCommentParser;
 		}
 
-		public async ValueTask Process(ICharacterStream charStream)
+		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
 		{
+			var isComment = await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false);
+
+			if (!isComment)
+				return false;
+
 			while (await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false)) {}
+
+			return true;
 		}
 	}
 }

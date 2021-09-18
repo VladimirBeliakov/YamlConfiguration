@@ -27,7 +27,12 @@ namespace YamlConfiguration.Processor
 			var directive = Parse(rawDirective);
 
 			if (directive is not null)
-				await _multiLineCommentParser.Process(charStream).ConfigureAwait(false);
+			{
+				var isComment = await _multiLineCommentParser.TryProcess(charStream).ConfigureAwait(false);
+
+				if (!isComment)
+					throw new InvalidYamlException("Only a comment may follow a directive.");
+			}
 
 			return directive;
 		}
