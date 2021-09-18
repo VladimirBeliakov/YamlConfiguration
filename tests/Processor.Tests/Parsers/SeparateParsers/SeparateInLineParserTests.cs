@@ -64,6 +64,7 @@ namespace YamlConfiguration.Processor.Tests
 			yield return new TestCaseData(new[] { ' ', '\t', 'a' }, 2);
 			yield return new TestCaseData(new[] { '\t', ' ', 'a' }, 2);
 			yield return new TestCaseData(CharStore.GetCharRange(" ").Append('a').ToArray(), 1000);
+			yield return new TestCaseData(CharStore.GetCharRange("\t").Append('a').ToArray(), 1000);
 		}
 
 		private static SeparateInLineParser createParser() => new();

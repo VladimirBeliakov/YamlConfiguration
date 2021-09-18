@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
-using YamlConfiguration.Processor.Extensions;
 
 namespace YamlConfiguration.Processor.SeparateParsers
 {
-	internal class SeparateInLineParser
+	internal class SeparateInLineParser : ISeparateInLineParser
 	{
 		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
 		{

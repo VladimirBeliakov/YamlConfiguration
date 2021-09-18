@@ -1,4 +1,4 @@
-namespace YamlConfiguration.Processor.Extensions
+namespace YamlConfiguration.Processor
 {
 	internal static class CharExtensions
 	{
