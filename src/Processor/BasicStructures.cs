@@ -90,7 +90,7 @@ namespace YamlConfiguration.Processor
 
 		#endregion
 
-		// TODO: Replace with OneLineCommentParser
+		// TODO: Replace with CommentParser
 		internal static readonly RegexPattern Comment =
 			(
 				SeparateInLine +

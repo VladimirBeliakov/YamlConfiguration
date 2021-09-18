@@ -74,15 +74,7 @@ namespace YamlConfiguration.Processor.Tests
 			return charStream;
 		}
 
-		private static DocumentSuffixParser createParser(IMultiLineCommentParser? multiLineCommentParser = null)
-		{
-			var defaultOneLineCommentParser = A.Fake<IOneLineCommentParser>();
-
-			A.CallTo(() => defaultOneLineCommentParser.TryProcess(A<ICharacterStream>._)).Returns(true);
-
-			return new DocumentSuffixParser(
-				multiLineCommentParser ?? A.Dummy<IMultiLineCommentParser>()
-			);
-		}
+		private static DocumentSuffixParser createParser(IMultiLineCommentParser? multiLineCommentParser = null) =>
+			new(multiLineCommentParser ?? A.Dummy<IMultiLineCommentParser>());
 	}
 }

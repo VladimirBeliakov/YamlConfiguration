@@ -5,21 +5,21 @@ namespace YamlConfiguration.Processor
 {
 	internal class MultiLineCommentParser : IMultiLineCommentParser
 	{
-		private readonly IOneLineCommentParser _oneLineCommentParser;
+		private readonly ICommentParser _commentParser;
 
-		public MultiLineCommentParser(IOneLineCommentParser oneLineCommentParser)
+		public MultiLineCommentParser(ICommentParser commentParser)
 		{
-			_oneLineCommentParser = oneLineCommentParser;
+			_commentParser = commentParser;
 		}
 
 		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
 		{
-			var isComment = await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false);
+			var isComment = await _commentParser.TryProcess(charStream).ConfigureAwait(false);
 
 			if (!isComment)
 				return false;
 
-			while (await _oneLineCommentParser.TryProcess(charStream).ConfigureAwait(false)) {}
+			while (await _commentParser.TryProcess(charStream).ConfigureAwait(false)) {}
 
 			return true;
 		}
