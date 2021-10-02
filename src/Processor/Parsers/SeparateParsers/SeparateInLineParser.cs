@@ -9,11 +9,11 @@ namespace YamlConfiguration.Processor
 			var peekedChar = await charStream.Peek().ConfigureAwait(false);
 
 			if (peekedChar?.IsWhiteSpace() is false)
-				return new ParsedSeparateInLineResult(IsSeparateInLine: charStream.IsAtStartOfLine, WhiteSpaceCount: 0);
+				return new ParsedSeparateInLineResult(isSeparateInLine: charStream.IsAtStartOfLine, whiteSpaceCount: 0);
 
 			var peekedChars = await charStream.Peek(Characters.CharGroupMaxLength + 1).ConfigureAwait(false);
 
-			var whiteSpaceCount = 0;
+			uint whiteSpaceCount = 0;
 			foreach (var @char in peekedChars)
 				if (@char.IsWhiteSpace())
 					whiteSpaceCount++;
@@ -25,7 +25,7 @@ namespace YamlConfiguration.Processor
 					$"Too many white space characters in the line. Allowed {Characters.CharGroupMaxLength} only."
 				);
 
-			return new ParsedSeparateInLineResult(IsSeparateInLine: true, WhiteSpaceCount: whiteSpaceCount);
+			return new ParsedSeparateInLineResult(isSeparateInLine: true, whiteSpaceCount: whiteSpaceCount);
 		}
 	}
 }
