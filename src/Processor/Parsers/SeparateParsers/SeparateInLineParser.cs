@@ -1,15 +1,15 @@
 using System.Threading.Tasks;
 
-namespace YamlConfiguration.Processor.SeparateParsers
+namespace YamlConfiguration.Processor
 {
 	internal class SeparateInLineParser : ISeparateInLineParser
 	{
-		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
+		public async ValueTask<ParsedSeparateInLineResult> Peek(ICharacterStream charStream)
 		{
 			var peekedChar = await charStream.Peek().ConfigureAwait(false);
 
 			if (peekedChar?.IsWhiteSpace() is false)
-				return charStream.IsAtStartOfLine;
+				return new ParsedSeparateInLineResult(IsSeparateInLine: charStream.IsAtStartOfLine, WhiteSpaceCount: 0);
 
 			var peekedChars = await charStream.Peek(Characters.CharGroupMaxLength + 1).ConfigureAwait(false);
 
@@ -25,9 +25,7 @@ namespace YamlConfiguration.Processor.SeparateParsers
 					$"Too many white space characters in the line. Allowed {Characters.CharGroupMaxLength} only."
 				);
 
-			await charStream.AdvanceBy(whiteSpaceCount).ConfigureAwait(false);
-
-			return true;
+			return new ParsedSeparateInLineResult(IsSeparateInLine: true, WhiteSpaceCount: whiteSpaceCount);
 		}
 	}
 }

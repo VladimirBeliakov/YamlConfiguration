@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
-using YamlConfiguration.Processor.SeparateParsers;
 
 namespace YamlConfiguration.Processor.Tests
 {
@@ -11,37 +10,47 @@ namespace YamlConfiguration.Processor.Tests
 	public class SeparateInLineParserTests
 	{
 		[Test]
-		public async Task TryProcess_StreamStartsWithNoWhiteSpace_ReturnsWhetherStreamAtStartOfLine(
+		public async Task Peek_StreamStartsWithNoWhiteSpace_ReturnsWhetherStreamAtStartOfLineAndZeroWhiteSpaces(
 			[Values] bool isAtStartOfLine
 		)
 		{
 			var stream = createStreamFrom(new[] { 'a' }, isAtStartOfLine);
 
-			var result = await createParser().TryProcess(stream);
+			var (isSeparateInLine, whiteSpaceCount) = await createParser().Peek(stream);
 
-			Assert.That(result, Is.EqualTo(isAtStartOfLine));
+			Assert.Multiple(() =>
+				{
+					Assert.That(isSeparateInLine, Is.EqualTo(isAtStartOfLine));
+					Assert.That(whiteSpaceCount, Is.Zero);
+				}
+			);
 			stream.AssertNotAdvanced();
 		}
 
 		[TestCaseSource(nameof(getCharsWithWhiteSpaceCharCount))]
-		public async Task TryProcess_StreamStartsWithWhiteSpace_ReturnsTrueAndAdvancesStreamByWhiteSpaceCharCount(
-			char[] testCase, int whiteSpaceCount
+		public async Task Peek_StreamStartsWithWhiteSpace_ReturnsTrueAndCorrectWhiteSpaceCount(
+			char[] testCase, int expectedWhiteSpaceCount
 		)
 		{
 			var stream = createStreamFrom(testCase);
 
-			var result = await createParser().TryProcess(stream);
+			var (isSeparateInLine, whiteSpaceCount) = await createParser().Peek(stream);
 
-			Assert.True(result);
-			A.CallTo(() => stream.Read(whiteSpaceCount)).MustHaveHappenedOnceExactly();
+			Assert.Multiple(() =>
+				{
+					Assert.True(isSeparateInLine);
+					Assert.That(whiteSpaceCount, Is.EqualTo(expectedWhiteSpaceCount));
+				}
+			);
+			stream.AssertNotAdvanced();
 		}
 
 		[Test]
-		public void TryProcess_StreamStartsWithTooManyWhiteSpace_Throws()
+		public void Peek_StreamStartsWithTooManyWhiteSpace_Throws()
 		{
 			var stream = createStreamFrom(CharStore.GetCharRange(" ").Append(' ').ToArray());
 
-			Assert.ThrowsAsync<InvalidYamlException>(() => createParser().TryProcess(stream).AsTask());
+			Assert.ThrowsAsync<InvalidYamlException>(() => createParser().Peek(stream).AsTask());
 			stream.AssertNotAdvanced();
 		}
 

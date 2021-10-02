@@ -27,7 +27,7 @@ namespace YamlConfiguration.Processor
 			)
 				return false;
 
-			// We need to advance the stream by four chars so then we can process any comments.
+			// We need to advance the stream by three chars so then we can process any comments.
 			await charStream.AdvanceBy(3).ConfigureAwait(false);
 
 			var isComment = await _multiLineCommentParser.TryProcess(charStream).ConfigureAwait(false);

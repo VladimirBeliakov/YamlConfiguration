@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
-using YamlConfiguration.Processor.SeparateParsers;
 
 namespace YamlConfiguration.Processor.Tests
 {
@@ -20,7 +19,7 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.ThrowsAsync<InvalidYamlException>(
 				() => createParser(separateInLineParser).TryProcess(stream, invalidIndentLength).AsTask()
 			);
-			A.CallTo(() => separateInLineParser.TryProcess(stream)).MustNotHaveHappened();
+			A.CallTo(() => separateInLineParser.Peek(stream)).MustNotHaveHappened();
 			stream.AssertNotAdvanced();
 		}
 
@@ -36,7 +35,7 @@ namespace YamlConfiguration.Processor.Tests
 			var result = await createParser(separateInLineParser).TryProcess(stream, indentLength);
 
 			Assert.False(result);
-			A.CallTo(() => separateInLineParser.TryProcess(stream)).MustNotHaveHappened();
+			A.CallTo(() => separateInLineParser.Peek(stream)).MustNotHaveHappened();
 			stream.AssertNotAdvanced();
 		}
 
@@ -52,7 +51,7 @@ namespace YamlConfiguration.Processor.Tests
 			var result = await createParser(separateInLineParser).TryProcess(stream, indentLength);
 
 			Assert.True(result);
-			A.CallTo(() => separateInLineParser.TryProcess(stream)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => separateInLineParser.Peek(stream)).MustHaveHappenedOnceExactly();
 			A.CallTo(() => stream.Read(indentLength)).MustHaveHappenedOnceExactly();
 		}
 

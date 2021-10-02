@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace YamlConfiguration.Processor.SeparateParsers
+namespace YamlConfiguration.Processor
 {
 	internal class FlowLinePrefixParser
 	{
@@ -21,13 +21,13 @@ namespace YamlConfiguration.Processor.SeparateParsers
 
 			var peekedChars = await charStream.Peek(indentLength).ConfigureAwait(false);
 
-			if (peekedChars.Any(c => c != Characters.Space) || peekedChars.Count != indentLength)
+			if (peekedChars.Count != indentLength || peekedChars.Any(c => c != Characters.Space))
 				return false;
 
 			await charStream.AdvanceBy(indentLength).ConfigureAwait(false);
 
 			// Not checking the result because a separate in line may not exist.
-			await _separateInLineParser.TryProcess(charStream).ConfigureAwait(false);
+			await _separateInLineParser.Peek(charStream).ConfigureAwait(false);
 
 			return true;
 		}

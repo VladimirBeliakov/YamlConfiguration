@@ -1,9 +1,11 @@
 using System.Threading.Tasks;
 
-namespace YamlConfiguration.Processor.SeparateParsers
+namespace YamlConfiguration.Processor
 {
+	internal record ParsedSeparateInLineResult(bool IsSeparateInLine, int WhiteSpaceCount);
+
 	internal interface ISeparateInLineParser
 	{
-		ValueTask<bool> TryProcess(ICharacterStream charStream);
+		ValueTask<ParsedSeparateInLineResult> Peek(ICharacterStream charStream);
 	}
 }
