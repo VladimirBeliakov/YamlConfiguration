@@ -109,7 +109,7 @@ namespace YamlConfiguration.Processor.Tests
 			A.CallTo(() => stream.Peek()).Returns(directiveChar);
 
 			if (directiveName is not null)
-				A.CallTo(() => stream.Peek(A<int>._)).Returns(new[] { directiveChar }.Concat(directiveName).ToList());
+				A.CallTo(() => stream.Peek(A<uint>._)).Returns(new[] { directiveChar }.Concat(directiveName).ToList());
 
 			return stream;
 		}

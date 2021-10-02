@@ -25,7 +25,7 @@ namespace YamlConfiguration.Processor
 
 				const int anchorCharLength = 1;
 
-				await charStream.AdvanceBy(anchorCharLength + anchorName.Length).ConfigureAwait(false);
+				await charStream.AdvanceBy(anchorCharLength + (uint) anchorName.Length).ConfigureAwait(false);
 
 				return new AnchorProperty { AnchorName = anchorName };
 			}

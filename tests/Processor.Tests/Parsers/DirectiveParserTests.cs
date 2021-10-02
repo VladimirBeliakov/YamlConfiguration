@@ -125,7 +125,7 @@ namespace YamlConfiguration.Processor.Tests
 			var stream = A.Fake<ICharacterStream>();
 
 			if (directiveEnd is not null)
-				A.CallTo(() => stream.Peek(A<int>._)).Returns(directiveEnd);
+				A.CallTo(() => stream.Peek(A<uint>._)).Returns(directiveEnd);
 
 			return stream;
 		}

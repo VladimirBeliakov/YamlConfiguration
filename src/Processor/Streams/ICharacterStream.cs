@@ -7,13 +7,13 @@ namespace YamlConfiguration.Processor
 	{
 		ValueTask<char?> Peek();
 
-		ValueTask<IReadOnlyList<char>> Peek(int charCount);
+		ValueTask<IReadOnlyList<char>> Peek(uint charCount);
 
 		ValueTask<string> PeekLine();
 
 		ValueTask<char?> Read();
 
-		IAsyncEnumerable<char> Read(int charCount);
+		IAsyncEnumerable<char> Read(uint charCount);
 
 		ValueTask<string> ReadLine();
 

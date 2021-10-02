@@ -12,7 +12,7 @@ namespace YamlConfiguration.Processor
 			_separateInLineParser = separateInLineParser;
 		}
 
-		public async ValueTask<bool> TryProcess(ICharacterStream charStream, int indentLength)
+		public async ValueTask<bool> TryProcess(ICharacterStream charStream, uint indentLength)
 		{
 			if (indentLength > Characters.CharGroupMaxLength)
 				throw new InvalidYamlException(
@@ -26,8 +26,10 @@ namespace YamlConfiguration.Processor
 
 			await charStream.AdvanceBy(indentLength).ConfigureAwait(false);
 
-			// Not checking the result because a separate in line may not exist.
-			await _separateInLineParser.Peek(charStream).ConfigureAwait(false);
+			var (_, whiteSpaceCount) = await _separateInLineParser.Peek(charStream).ConfigureAwait(false);
+
+			if (whiteSpaceCount > 0)
+				await charStream.AdvanceBy(whiteSpaceCount).ConfigureAwait(false);
 
 			return true;
 		}

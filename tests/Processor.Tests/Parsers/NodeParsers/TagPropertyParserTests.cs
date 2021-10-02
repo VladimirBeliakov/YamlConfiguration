@@ -111,7 +111,7 @@ namespace YamlConfiguration.Processor.Tests.NodeParsers
 
 			await createParser().Process(stream);
 
-			A.CallTo(() => stream.Read(tagChars.Length)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => stream.Read((uint) tagChars.Length)).MustHaveHappenedOnceExactly();
 		}
 
 		private static ICharacterStream createStreamFrom(char[] chars)

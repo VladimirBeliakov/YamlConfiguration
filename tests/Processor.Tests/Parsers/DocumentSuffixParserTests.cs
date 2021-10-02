@@ -69,7 +69,7 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var charStream = A.Fake<ICharacterStream>();
 
-			A.CallTo(() => charStream.Peek(A<int>._)).Returns(chars.ToCharArray());
+			A.CallTo(() => charStream.Peek(A<uint>._)).Returns(chars.ToCharArray());
 
 			return charStream;
 		}

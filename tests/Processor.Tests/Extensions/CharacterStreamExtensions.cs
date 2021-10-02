@@ -8,7 +8,7 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			A.CallTo(() => stream.Read()).MustNotHaveHappened();
 			A.CallTo(() => stream.ReadLine()).MustNotHaveHappened();
-			A.CallTo(() => stream.Read(A<int>._)).MustNotHaveHappened();
+			A.CallTo(() => stream.Read(A<uint>._)).MustNotHaveHappened();
 		}
 	}
 }

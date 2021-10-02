@@ -2,7 +2,7 @@ using System;
 
 namespace YamlConfiguration.Processor
 {
-	internal record ParsedSeparateInLineResult
+	internal class ParsedSeparateInLineResult
 	{
 		public ParsedSeparateInLineResult(bool isSeparateInLine, uint whiteSpaceCount)
 		{

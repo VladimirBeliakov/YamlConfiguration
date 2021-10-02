@@ -48,7 +48,7 @@ namespace YamlConfiguration.Processor
 		{
 			const int directiveCharLength = 1;
 
-			var directiveCharAndNameLength = directiveCharLength + DirectiveName.Length;
+			var directiveCharAndNameLength = directiveCharLength + (uint) DirectiveName.Length;
 
 			var possibleDirectiveChars = await charStream.Peek(directiveCharAndNameLength).ConfigureAwait(false);
 

@@ -26,7 +26,7 @@ namespace YamlConfiguration.Processor.Tests
 		[TestCaseSource(nameof(getCharsWithIndentDifferentFromIndentLength))]
 		public async Task TryProcess_StreamStartsWithLessNumberOfIndentCharsThanIndentLength_ReturnsFalse(
 			char[] chars,
-			int indentLength
+			uint indentLength
 		)
 		{
 			var stream = createStreamFrom(chars, indentLength);
@@ -42,7 +42,7 @@ namespace YamlConfiguration.Processor.Tests
 		[TestCaseSource(nameof(getCharsWithIndentSameAsIndentLength))]
 		public async Task TryProcess_StreamStartsWithSameNumberOfIndentCharsAsIndentLength_ReturnTrue(
 			char[] chars,
-			int indentLength
+			uint indentLength
 		)
 		{
 			var stream = createStreamFrom(chars, indentLength);
@@ -55,11 +55,54 @@ namespace YamlConfiguration.Processor.Tests
 			A.CallTo(() => stream.Read(indentLength)).MustHaveHappenedOnceExactly();
 		}
 
-		private static ICharacterStream createStreamFrom(char[] chars, int indentLength)
+		[Test]
+		public async Task TryProcess_ZeroIndent_DoesNotAdvanceStream()
+		{
+			const int indentLength = 0;
+			var stream = createStreamFrom(new[] { 'a' }, indentLength);
+			var separateInLineParser = A.Fake<ISeparateInLineParser>();
+
+			await createParser(separateInLineParser).TryProcess(stream, indentLength);
+
+			A.CallTo(() => stream.Read(A<uint>._)).MustNotHaveHappened();
+		}
+
+		[Test]
+		public async Task TryProcess_SeparateInLineParserReturnsZeroWhiteSpaceCount_DoesNotAdvanceStream()
+		{
+			const int indentLength = 0;
+			var stream = createStreamFrom(new[] { 'a' }, indentLength);
+			var separateInLineParser = A.Fake<ISeparateInLineParser>();
+			A.CallTo(() => separateInLineParser.Peek(stream)).Returns(
+				new ParsedSeparateInLineResult(isSeparateInLine: false, whiteSpaceCount: 0)
+			);
+
+			await createParser(separateInLineParser).TryProcess(stream, indentLength);
+
+			A.CallTo(() => stream.Read(A<uint>._)).MustNotHaveHappened();
+		}
+
+		[Test]
+		public async Task TryProcess_SeparateInLineParserReturnsNotZeroWhiteSpaceCount_AdvancesStream()
+		{
+			const int indentLength = 0;
+			const int whiteSpaceCount = 1;
+			var stream = createStreamFrom(new[] { 'a' }, indentLength);
+			var separateInLineParser = A.Fake<ISeparateInLineParser>();
+			A.CallTo(() => separateInLineParser.Peek(stream)).Returns(
+				new ParsedSeparateInLineResult(isSeparateInLine: true, whiteSpaceCount)
+			);
+
+			await createParser(separateInLineParser).TryProcess(stream, indentLength);
+
+			A.CallTo(() => stream.Read(whiteSpaceCount)).MustHaveHappenedOnceExactly();
+		}
+
+		private static ICharacterStream createStreamFrom(char[] chars, uint indentLength)
 		{
 			var stream = A.Fake<ICharacterStream>();
 
-			A.CallTo(() => stream.Peek(indentLength)).Returns(chars.Take(indentLength).ToList());
+			A.CallTo(() => stream.Peek(indentLength)).Returns(chars.Take((int) indentLength).ToList());
 
 			return stream;
 		}
@@ -71,17 +114,16 @@ namespace YamlConfiguration.Processor.Tests
 
 		private static IEnumerable<TestCaseData> getCharsWithIndentDifferentFromIndentLength()
 		{
-			yield return new TestCaseData(new[] { 'a' }, 1);
-			yield return new TestCaseData(new[] { ' ', 'a' }, 2);
-			yield return new TestCaseData(new[] { ' ' }, 1000);
+			yield return new TestCaseData(new[] { 'a' }, 1u);
+			yield return new TestCaseData(new[] { ' ', 'a' }, 2u);
+			yield return new TestCaseData(new[] { ' ' }, 1000u);
 		}
 
 		private static IEnumerable<TestCaseData> getCharsWithIndentSameAsIndentLength()
 		{
-			yield return new TestCaseData(new[] { 'a' }, 0);
-			yield return new TestCaseData(new[] { ' ' }, 0);
-			yield return new TestCaseData(new[] { ' ', 'a' }, 1);
-			yield return new TestCaseData(CharStore.GetCharRange(" ").Append('a').ToArray(), 1000);
+			yield return new TestCaseData(new[] { ' ', ' ' }, 1u);
+			yield return new TestCaseData(new[] { ' ', 'a' }, 1u);
+			yield return new TestCaseData(CharStore.GetCharRange(" ").Append('a').ToArray(), 1000u);
 		}
 	}
 }

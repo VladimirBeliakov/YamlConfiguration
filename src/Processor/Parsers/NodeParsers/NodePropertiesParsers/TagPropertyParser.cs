@@ -46,7 +46,7 @@ namespace YamlConfiguration.Processor
 			{
 				var tag = match.Groups[1].Captures[0].Value;
 
-				await charStream.AdvanceBy(tag.Length).ConfigureAwait(false);
+				await charStream.AdvanceBy((uint) tag.Length).ConfigureAwait(false);
 
 				return new TagProperty { Type = type, Value = tag };
 			}

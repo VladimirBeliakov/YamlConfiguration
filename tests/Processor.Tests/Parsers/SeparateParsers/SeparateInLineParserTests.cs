@@ -60,7 +60,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			A.CallTo(() => stream.Peek()).Returns(chars[0]);
 
-			A.CallTo(() => stream.Peek(A<int>._)).Returns(chars);
+			A.CallTo(() => stream.Peek(A<uint>._)).Returns(chars);
 
 			A.CallTo(() => stream.IsAtStartOfLine).Returns(isAtStartOfLine);
 

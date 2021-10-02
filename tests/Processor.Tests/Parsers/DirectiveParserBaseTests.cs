@@ -23,7 +23,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			var directiveCharAndName = new[] { directiveChar }.Concat(DirectiveName).ToArray();
 
-			A.CallTo(() => stream.Peek(directiveCharAndName.Length)).Returns(directiveCharAndName);
+			A.CallTo(() => stream.Peek((uint) directiveCharAndName.Length)).Returns(directiveCharAndName);
 
 			A.CallTo(() => stream.ReadLine())
 				.Returns($"{directiveChar}{DirectiveName} {additionalChars}{Environment.NewLine}");
