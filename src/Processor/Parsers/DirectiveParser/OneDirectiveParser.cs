@@ -5,11 +5,11 @@ namespace YamlConfiguration.Processor
 {
 	internal abstract class OneDirectiveParser : IOneDirectiveParser
 	{
-		private readonly IMultiLineCommentParser _multiLineCommentParser;
+		private readonly ICommentParser _commentParser;
 
-		protected OneDirectiveParser(IMultiLineCommentParser multiLineCommentParser)
+		protected OneDirectiveParser(ICommentParser commentParser)
 		{
-			_multiLineCommentParser = multiLineCommentParser;
+			_commentParser = commentParser;
 		}
 
 		public async ValueTask<IDirective?> Process(ICharacterStream charStream)
@@ -27,12 +27,7 @@ namespace YamlConfiguration.Processor
 			var directive = Parse(rawDirective);
 
 			if (directive is not null)
-			{
-				var isComment = await _multiLineCommentParser.TryProcess(charStream).ConfigureAwait(false);
-
-				if (!isComment)
-					throw new InvalidYamlException("Only a comment may follow a directive.");
-			}
+				await _commentParser.ProcessMultilineComments(charStream).ConfigureAwait(false);
 
 			return directive;
 		}

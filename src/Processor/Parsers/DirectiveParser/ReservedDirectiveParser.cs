@@ -10,7 +10,7 @@ namespace YamlConfiguration.Processor
 			RegexOptions.Compiled
 		);
 
-		public ReservedDirectiveParser(IMultiLineCommentParser multiLineCommentParser) : base(multiLineCommentParser) {}
+		public ReservedDirectiveParser(ICommentParser commentParser) : base(commentParser) {}
 
 		protected override string DirectiveName => String.Empty;
 

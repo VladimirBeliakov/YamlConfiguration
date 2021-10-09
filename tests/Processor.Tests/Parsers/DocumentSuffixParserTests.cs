@@ -42,27 +42,28 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public void Process_MultiCommentParserReturnsFalse_Throws()
+		public void Process_CommentParserReturnsFalse_Throws()
 		{
 			var stream = getCharStream("...");
-			var multiLineCommentParser = A.Fake<IMultiLineCommentParser>();
-			A.CallTo(() => multiLineCommentParser.TryProcess(stream)).Returns(false);
+			var commentParser = A.Fake<ICommentParser>();
+			A.CallTo(() => commentParser.TryProcess(stream, false)).Returns(false);
 
-			var parser = createParser(multiLineCommentParser);
+			var parser = createParser(commentParser);
 			Assert.ThrowsAsync<InvalidYamlException>(() => parser.Process(stream).AsTask());
 		}
 
 		[Test]
-		public async Task Process_MultiLineCommentParserReturnsTrue_ReturnsTrue()
+		public async Task Process_CommentParserReturnsTrue_ReturnsTrue()
 		{
 			var stream = getCharStream("...");
-			var multiLineCommentParser = A.Fake<IMultiLineCommentParser>();
-			A.CallTo(() => multiLineCommentParser.TryProcess(stream)).Returns(true);
+			var commentParser = A.Fake<ICommentParser>();
+			A.CallTo(() => commentParser.TryProcess(stream, false)).Returns(true);
 
-			var result = await createParser(multiLineCommentParser).Process(stream);
+			var result = await createParser(commentParser).Process(stream);
 
 			Assert.True(result);
-			A.CallTo(() => stream.Read(3)).MustHaveHappened();
+			A.CallTo(() => stream.Read(3)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => commentParser.TryProcess(stream, true)).MustHaveHappened();
 		}
 
 		private static ICharacterStream getCharStream(string chars)
@@ -74,7 +75,7 @@ namespace YamlConfiguration.Processor.Tests
 			return charStream;
 		}
 
-		private static DocumentSuffixParser createParser(IMultiLineCommentParser? multiLineCommentParser = null) =>
-			new(multiLineCommentParser ?? A.Dummy<IMultiLineCommentParser>());
+		private static DocumentSuffixParser createParser(ICommentParser? commentParser = null) =>
+			new(commentParser ?? A.Dummy<ICommentParser>());
 	}
 }

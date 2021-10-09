@@ -6,11 +6,11 @@ namespace YamlConfiguration.Processor
 	internal class DocumentSuffixParser : IDocumentSuffixParser
 	{
 		private const char _dot = '.';
-		private readonly IMultiLineCommentParser _multiLineCommentParser;
+		private readonly ICommentParser _commentParser;
 
-		public DocumentSuffixParser(IMultiLineCommentParser multiLineCommentParser)
+		public DocumentSuffixParser(ICommentParser commentParser)
 		{
-			_multiLineCommentParser = multiLineCommentParser;
+			_commentParser = commentParser;
 		}
 
 		public async ValueTask<bool> Process(ICharacterStream charStream)
@@ -30,10 +30,12 @@ namespace YamlConfiguration.Processor
 			// We need to advance the stream by three chars so then we can process any comments.
 			await charStream.AdvanceBy(3).ConfigureAwait(false);
 
-			var isComment = await _multiLineCommentParser.TryProcess(charStream).ConfigureAwait(false);
+			var isComment = await _commentParser.TryProcess(charStream).ConfigureAwait(false);
 
 			if (!isComment)
 				throw new InvalidYamlException("Only a comment may follow a document end.");
+
+			await _commentParser.ProcessMultilineComments(charStream).ConfigureAwait(false);
 
 			return true;
 		}

@@ -4,6 +4,6 @@ namespace YamlConfiguration.Processor
 {
 	internal interface ICommentParser
 	{
-		ValueTask<bool> TryProcess(ICharacterStream charStream);
+		ValueTask<bool> TryProcess(ICharacterStream charStream, bool isLineComment = false);
 	}
 }

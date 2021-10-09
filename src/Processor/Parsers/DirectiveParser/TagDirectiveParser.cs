@@ -10,7 +10,7 @@ namespace YamlConfiguration.Processor
 			RegexOptions.Compiled
 		);
 
-		public TagDirectiveParser(IMultiLineCommentParser multiLineCommentParser) : base(multiLineCommentParser)
+		public TagDirectiveParser(ICommentParser commentParser) : base(commentParser)
 		{
 		}
 
