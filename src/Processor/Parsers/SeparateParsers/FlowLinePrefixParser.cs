@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
 {
-	internal class FlowLinePrefixParser
+	internal class FlowLinePrefixParser : IFlowLinePrefixParser
 	{
 		private readonly ISeparateInLineParser _separateInLineParser;
 
