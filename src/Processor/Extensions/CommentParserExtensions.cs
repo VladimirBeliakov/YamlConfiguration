@@ -4,7 +4,7 @@ namespace YamlConfiguration.Processor
 {
 	internal static class CommentParserExtensions
 	{
-		public static async ValueTask ProcessMultilineComments(
+		public static async ValueTask ProcessLineComments(
 			this ICommentParser commentParser,
 			ICharacterStream charStream
 		)

@@ -11,6 +11,6 @@ namespace YamlConfiguration.Processor
 			_commentParser = commentParser;
 		}
 
-		public ValueTask Process(ICharacterStream charStream) => _commentParser.ProcessMultilineComments(charStream);
+		public ValueTask Process(ICharacterStream charStream) => _commentParser.ProcessLineComments(charStream);
 	}
 }

@@ -35,7 +35,7 @@ namespace YamlConfiguration.Processor
 			if (!isComment)
 				throw new InvalidYamlException("Only a comment may follow a document end.");
 
-			await _commentParser.ProcessMultilineComments(charStream).ConfigureAwait(false);
+			await _commentParser.ProcessLineComments(charStream).ConfigureAwait(false);
 
 			return true;
 		}

@@ -27,7 +27,7 @@ namespace YamlConfiguration.Processor
 			var directive = Parse(rawDirective);
 
 			if (directive is not null)
-				await _commentParser.ProcessMultilineComments(charStream).ConfigureAwait(false);
+				await _commentParser.ProcessLineComments(charStream).ConfigureAwait(false);
 
 			return directive;
 		}
