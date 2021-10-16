@@ -32,13 +32,13 @@ namespace YamlConfiguration.Processor.FlowStyles
 			return new ProcessedLineResult(LineType.Invalid);
 		}
 
-		private ProcessedLineResult(LineType lineType, string extractedValue = null)
+		private ProcessedLineResult(LineType lineType, string? extractedValue = null)
 		{
 			LineType = lineType;
 			ExtractedValue = extractedValue;
 		}
 
 		public LineType LineType { get; }
-		public string ExtractedValue { get; }
+		public string? ExtractedValue { get; }
 	}
 }

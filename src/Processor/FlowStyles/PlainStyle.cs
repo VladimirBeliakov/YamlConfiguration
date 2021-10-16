@@ -65,27 +65,22 @@ namespace YamlConfiguration.Processor.FlowStyles
 				.WithLimitingRepetition();
 
 		private static RegexPattern getNsPlainOneLine(Context context) =>
-			(getNsPlainFirst(context) + getNbNsPlainInLine(context)).WithAnchorAtBeginning().WithAnchorAtEnd();
+			(getNsPlainFirst(context) + getNbNsPlainInLine(context)).WithAnchorAtBeginning();
 
-		private static readonly Regex _blockKeyOneLineRegex = new Regex(getNsPlainOneLine(Context.BlockKey));
-		private static readonly Regex _flowKeyOneLineRegex = new Regex(getNsPlainOneLine(Context.FlowKey));
-
-		// case BlockFlow.BlockKey
-		// case BlockFlow.FlowKey
-		public static bool IsOneLine(string value, Context context)
+		public static RegexPattern GetPatternFor(Context context)
 		{
-			var regex = context switch
+			switch (context)
 			{
-				Context.BlockKey => _blockKeyOneLineRegex,
-				Context.FlowKey => _flowKeyOneLineRegex,
-				_ => throw new ArgumentOutOfRangeException(
-					nameof(context),
-					context,
-					$"Only {Context.BlockKey} and {Context.FlowKey} can be processed."
-				)
-			};
-
-			return regex.Match(value).Success;
+				case Context.BlockKey:
+				case Context.FlowKey:
+					return getNsPlainOneLine(context);
+				default:
+					throw new ArgumentOutOfRangeException(
+						nameof(context),
+						context,
+						$"Only {Context.BlockKey} and {Context.FlowKey} are supported."
+					);
+			}
 		}
 	}
 }

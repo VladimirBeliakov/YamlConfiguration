@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using YamlConfiguration.Processor.FlowStyles;
 using YamlConfiguration.Processor.TypeDefinitions;
@@ -12,38 +13,34 @@ namespace YamlConfiguration.Processor.Tests
 	public class PlainOneLineTests
 	{
 		[TestCaseSource(nameof(getPositiveTestCases), new object[] { Context.BlockKey })]
-		public void ValidOnePlainLineInBlockKey_ReturnsTrueAndExtractedValue(string testValue)
+		public void ValidOnePlainLineInBlockKey_Matches(RegexTestCase testCase)
 		{
-			var isSuccess = PlainStyle.IsOneLine(testValue, Context.BlockKey);
+			var match = _blockKeyOneLineRegex.Match(testCase.TestValue);
 
-			Assert.True(isSuccess);
+			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
 		[TestCaseSource(nameof(getPositiveTestCases), new object[] { Context.FlowKey })]
-		public void ValidOnePlainLineInFlowKey_ReturnsTrueAndExtractedValue(string testValue)
+		public void ValidOnePlainLineInFlowKey_Matches(RegexTestCase testCase)
 		{
-			var isSuccess = PlainStyle.IsOneLine(testValue, Context.FlowKey);
+			var match = _flowKeyOneLineRegex.Match(testCase.TestValue);
 
-			Assert.True(isSuccess);
+			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
-		[TestCaseSource(nameof(getNegativeTextCases), new object[] { Context.BlockKey })]
-		public void InvalidOnePlainLineInBlockKey_ReturnsFalse(string testCase)
+		[TestCaseSource(nameof(getNegativeTextCases))]
+		public void InvalidOnePlainLineInBlockKey_DoesNotMatch(string testCase)
 		{
-			var result = PlainStyle.IsOneLine(testCase, Context.BlockKey);
-
-			Assert.False(result);
+			Assert.False(_blockKeyOneLineRegex.IsMatch(testCase));
 		}
 
-		[TestCaseSource(nameof(getNegativeTextCases), new object[] { Context.FlowKey })]
-		public void InvalidOnePlainLineInFlowKey_ReturnsFalse(string testCase)
+		[TestCaseSource(nameof(getNegativeTextCases))]
+		public void InvalidOnePlainLineInFlowKey_DoesNotMatch(string testCase)
 		{
-			var result = PlainStyle.IsOneLine(testCase, Context.FlowKey);
-
-			Assert.False(result);
+			Assert.False(_flowKeyOneLineRegex.IsMatch(testCase));
 		}
 
-		private static IEnumerable<string> getPositiveTestCases(Context context)
+		private static IEnumerable<RegexTestCase> getPositiveTestCases(Context context)
 		{
 			var excludedChars = context switch
 			{
@@ -60,10 +57,14 @@ namespace YamlConfiguration.Processor.Tests
 				CharStore.GetNsCharsWithoutSurrogates().Except(excludedChars).ToList();
 
 			var nsPlainSafeSurrogates = CharStore.SurrogatePairs.Value;
+			var whiteChars = CharStore.SpacesAndTabs;
 
 			foreach (var nsPlainSafeChars in new[] { nsPlainSafeCharsWithoutSurrogates, nsPlainSafeSurrogates })
-				foreach (var nbNsPlainInLine in createNbNsPlainInLineFrom(nsPlainSafeChars))
-					yield return nbNsPlainInLine;
+			foreach (var nbNsPlainInLine in createNbNsPlainInLineFrom(nsPlainSafeChars))
+				yield return new RegexTestCase(
+					testValue: nbNsPlainInLine + whiteChars + ":",
+					wholeMatch: nbNsPlainInLine
+				);
 		}
 
 		private static IEnumerable<string> createNbNsPlainInLineFrom(IReadOnlyCollection<string> nsPlainSafeChars)
@@ -153,29 +154,13 @@ namespace YamlConfiguration.Processor.Tests
 			yield return mappingValue + mappingValue + anyNsPlainSafe;
 		}
 
-		private static IEnumerable<string> getNegativeTextCases(Context context)
+		private static IEnumerable<string> getNegativeTextCases()
 		{
-			const string nsChar = "a";
 			const string whiteChar = " ";
-			const string invalidNsChar = whiteChar;
-			const string nsPlainFirst = nsChar;
-			const string nsPlainChar = nsChar;
-			const string comment = "#";
 			const string mappingKey = "?";
 			const string mappingValue = ":";
 			const string sequenceEntry = "-";
 			const string nsPlainSafe = "a";
-
-			IReadOnlyCollection<string> invalidNsPlainSafes = context switch
-			{
-				Context.BlockKey => new[] { " " },
-				Context.FlowKey => CharStore.FlowIndicators.ToList(),
-				_ => throw new ArgumentOutOfRangeException(
-					nameof(context),
-					context,
-					$"Only {Context.BlockKey} and {Context.FlowKey} can be processed."
-				)
-			};
 
 			// Invalid ns plain first
 			var conditionalNsPlainFirsts = new[] { mappingKey, mappingValue, sequenceEntry };
@@ -185,33 +170,12 @@ namespace YamlConfiguration.Processor.Tests
 
 			foreach (var invalidNsPlainFirst in conditionalNsPlainFirsts)
 				yield return invalidNsPlainFirst + whiteChar + nsPlainSafe;
-
-			// Too many white chars
-			var tooManyWhiteChars = CharStore.SpacesAndTabs + " ";
-			var nsPlainInLine = tooManyWhiteChars + nsPlainChar;
-			yield return nsPlainFirst + nsPlainInLine;
-
-			// Too many ns plain chars
-			var tooManyNsPlainChars = Helpers.RepeatAndJoin(nsPlainChar, Characters.CharGroupMaxLength + 1);
-			yield return nsPlainFirst + tooManyNsPlainChars;
-
-			// Too long ns plain in line
-			var tooLongNsPlainInLine =
-				Helpers.RepeatAndJoin(whiteChar + nsPlainChar, Characters.CharGroupMaxLength) + whiteChar;
-			yield return nsPlainFirst + tooLongNsPlainInLine;
-
-			// Ns plain in line with a white space but without ns plain char
-			const string invalidNsPlainInLine = whiteChar;
-			yield return nsPlainFirst + invalidNsPlainInLine;
-
-			// Invalid ns plain char
-			yield return nsPlainFirst + invalidNsChar + comment;
-
-			foreach (var invalidNsPlainSafe in invalidNsPlainSafes)
-			{
-				yield return nsPlainFirst + invalidNsPlainSafe;
-				yield return nsPlainFirst + mappingValue + invalidNsPlainSafe;
-			}
 		}
+
+		private static readonly Regex _blockKeyOneLineRegex =
+			new(PlainStyle.GetPatternFor(Context.BlockKey), RegexOptions.Compiled);
+
+		private static readonly Regex _flowKeyOneLineRegex =
+			new(PlainStyle.GetPatternFor(Context.FlowKey), RegexOptions.Compiled);
 	}
 }
