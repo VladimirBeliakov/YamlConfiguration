@@ -1,6 +1,6 @@
 namespace YamlConfiguration.Processor.TypeDefinitions
 {
-	public enum BlockFlow : byte
+	public enum Context : byte
 	{
 		BlockIn = 1,
 		BlockOut = 2,

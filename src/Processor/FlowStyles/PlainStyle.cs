@@ -13,22 +13,22 @@ namespace YamlConfiguration.Processor.FlowStyles
 			inclusiveChars: Characters.NsChar
 		);
 
-		private static RegexPattern getNsPlainSafe(BlockFlow blockFlow)
+		private static RegexPattern getNsPlainSafe(Context context)
 		{
-			switch (blockFlow)
+			switch (context)
 			{
-				case BlockFlow.FlowOut:
-				case BlockFlow.BlockKey:
+				case Context.FlowOut:
+				case Context.BlockKey:
 					return _nsPlainSafeOut;
-				case BlockFlow.FlowIn:
-				case BlockFlow.FlowKey:
+				case Context.FlowIn:
+				case Context.FlowKey:
 					return _nsPlainSafeIn;
 				default:
-					throw new ArgumentOutOfRangeException(nameof(blockFlow), blockFlow, null);
+					throw new ArgumentOutOfRangeException(nameof(context), context, null);
 			}
 		}
 
-		private static RegexPattern getNsPlainFirst(BlockFlow blockFlow) =>
+		private static RegexPattern getNsPlainFirst(Context context) =>
 			RegexPatternBuilder.BuildAlternation(
 				RegexPatternBuilder.BuildExclusive(
 					exclusiveChars: Characters.CIndicators,
@@ -40,15 +40,15 @@ namespace YamlConfiguration.Processor.FlowStyles
 						Characters.MappingValue,
 						Characters.SequenceEntry
 					),
-					lookAheadExpression: getNsPlainSafe(blockFlow)
+					lookAheadExpression: getNsPlainSafe(context)
 				)
 			);
 
-		private static RegexPattern getNsPlainChar(BlockFlow blockFlow) =>
+		private static RegexPattern getNsPlainChar(Context context) =>
 			RegexPatternBuilder.BuildAlternation(
 				RegexPatternBuilder.BuildExclusive(
 					exclusiveChars: Characters.MappingValue + Characters.Comment,
-					inclusiveChars: getNsPlainSafe(blockFlow)
+					inclusiveChars: getNsPlainSafe(context)
 				),
 				RegexPatternBuilder.BuildLookBehind(
 					lookBehindExpression: Characters.NsChar,
@@ -56,32 +56,32 @@ namespace YamlConfiguration.Processor.FlowStyles
 				),
 				RegexPatternBuilder.BuildLookAhead(
 					beforeChars: Characters.MappingValue,
-					lookAheadExpression: getNsPlainSafe(blockFlow)
+					lookAheadExpression: getNsPlainSafe(context)
 				)
 			);
 
-		private static RegexPattern getNbNsPlainInLine(BlockFlow blockFlow) =>
-			(RegexPatternBuilder.BuildCharSet(Characters.SWhites).WithLimitingRepetition() + getNsPlainChar(blockFlow))
+		private static RegexPattern getNbNsPlainInLine(Context context) =>
+			(RegexPatternBuilder.BuildCharSet(Characters.SWhites).WithLimitingRepetition() + getNsPlainChar(context))
 				.WithLimitingRepetition();
 
-		private static RegexPattern getNsPlainOneLine(BlockFlow blockFlow) =>
-			(getNsPlainFirst(blockFlow) + getNbNsPlainInLine(blockFlow)).WithAnchorAtBeginning().WithAnchorAtEnd();
+		private static RegexPattern getNsPlainOneLine(Context context) =>
+			(getNsPlainFirst(context) + getNbNsPlainInLine(context)).WithAnchorAtBeginning().WithAnchorAtEnd();
 
-		private static readonly Regex _blockKeyOneLineRegex = new Regex(getNsPlainOneLine(BlockFlow.BlockKey));
-		private static readonly Regex _flowKeyOneLineRegex = new Regex(getNsPlainOneLine(BlockFlow.FlowKey));
+		private static readonly Regex _blockKeyOneLineRegex = new Regex(getNsPlainOneLine(Context.BlockKey));
+		private static readonly Regex _flowKeyOneLineRegex = new Regex(getNsPlainOneLine(Context.FlowKey));
 
 		// case BlockFlow.BlockKey
 		// case BlockFlow.FlowKey
-		public static bool IsOneLine(string value, BlockFlow blockFlow)
+		public static bool IsOneLine(string value, Context context)
 		{
-			var regex = blockFlow switch
+			var regex = context switch
 			{
-				BlockFlow.BlockKey => _blockKeyOneLineRegex,
-				BlockFlow.FlowKey => _flowKeyOneLineRegex,
+				Context.BlockKey => _blockKeyOneLineRegex,
+				Context.FlowKey => _flowKeyOneLineRegex,
 				_ => throw new ArgumentOutOfRangeException(
-					nameof(blockFlow),
-					blockFlow,
-					$"Only {BlockFlow.BlockKey} and {BlockFlow.FlowKey} can be processed."
+					nameof(context),
+					context,
+					$"Only {Context.BlockKey} and {Context.FlowKey} can be processed."
 				)
 			};
 

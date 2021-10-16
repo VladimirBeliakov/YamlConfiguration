@@ -7,26 +7,26 @@ namespace YamlConfiguration.Processor.Tests
 {
 	internal static class EnumCache
 	{
-		public static IEnumerable<BlockFlow> GetBlockAndFlowTypes()
+		public static IEnumerable<Context> GetBlockAndFlowTypes()
 		{
-			return Enum.GetValues(typeof(BlockFlow)).Cast<BlockFlow>().Except(getKeys());
+			return Enum.GetValues(typeof(Context)).Cast<Context>().Except(getKeys());
 		}
 
-		public static IEnumerable<BlockFlow> GetBlockTypes()
+		public static IEnumerable<Context> GetBlockTypes()
 		{
 			return GetBlockAndFlowTypes().Except(GetFlowTypes());
 		}
 
-		public static IEnumerable<BlockFlow> GetFlowTypes()
+		public static IEnumerable<Context> GetFlowTypes()
 		{
-			yield return BlockFlow.FlowIn;
-			yield return BlockFlow.FlowOut;
+			yield return Context.FlowIn;
+			yield return Context.FlowOut;
 		}
 
-		private static IEnumerable<BlockFlow> getKeys()
+		private static IEnumerable<Context> getKeys()
 		{
-			yield return BlockFlow.BlockKey;
-			yield return BlockFlow.FlowKey;
+			yield return Context.BlockKey;
+			yield return Context.FlowKey;
 		}
 	}
 }

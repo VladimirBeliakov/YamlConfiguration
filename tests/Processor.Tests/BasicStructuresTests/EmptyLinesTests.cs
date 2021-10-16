@@ -11,7 +11,7 @@ namespace YamlConfiguration.Processor.Tests
 	public class EmptyLinesTests
 	{
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
-		public void EmptyLine_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, RegexPattern expectedRegex)
+		public void EmptyLine_ReturnsCorrespondingRegexForBlockFlow(Context value, RegexPattern expectedRegex)
 		{
 			var actualRegex = BasicStructures.EmptyLine(value);
 
@@ -40,7 +40,7 @@ namespace YamlConfiguration.Processor.Tests
 
 		[Test]
 		public void EmptyLine_NoSpacesAtBeginning_DoesNotMatch(
-			[ValueSource(nameof(getBlocksAndFlows))] BlockFlow type,
+			[ValueSource(nameof(getBlocksAndFlows))] Context type,
 			[ValueSource(nameof(getNonMatchableCases))] string testValue
 		)
 		{
@@ -58,12 +58,12 @@ namespace YamlConfiguration.Processor.Tests
 			{
 				switch (value)
 				{
-					case BlockFlow.BlockOut:
-					case BlockFlow.BlockIn:
+					case Context.BlockOut:
+					case Context.BlockIn:
 						yield return new TestCaseData(value, (RegexPattern) ("^(?: ){0,1000}" + newLine));
 						break;
-					case BlockFlow.FlowOut:
-					case BlockFlow.FlowIn:
+					case Context.FlowOut:
+					case Context.FlowIn:
 						yield return new TestCaseData(
 							value,
 							(RegexPattern) ("^(?: ){0,1000}(?:(?:^|[ \t]{1,1000}))?" + newLine)
@@ -75,7 +75,7 @@ namespace YamlConfiguration.Processor.Tests
 			}
 		}
 
-		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(BlockFlow type)
+		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(Context type)
 		{
 			var spaces = CharStore.Spaces;
 			var newLine = Environment.NewLine;
@@ -124,12 +124,12 @@ namespace YamlConfiguration.Processor.Tests
 			yield return $"ABC\t{@break}\t";
 		}
 
-		private static IEnumerable<BlockFlow> getBlocksAndFlows()
+		private static IEnumerable<Context> getBlocksAndFlows()
 		{
 			return EnumCache.GetBlockAndFlowTypes();
 		}
 
-		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _emptyLineBlockFlowRegexByType =
+		private static readonly IReadOnlyDictionary<Context, Regex> _emptyLineBlockFlowRegexByType =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
 				i => new Regex(BasicStructures.EmptyLine(i), RegexOptions.Compiled)

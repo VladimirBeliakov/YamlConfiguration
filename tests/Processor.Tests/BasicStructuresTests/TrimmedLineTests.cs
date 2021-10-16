@@ -13,7 +13,7 @@ namespace YamlConfiguration.Processor.Tests
 	public class TrimmedLineTests
 	{
 		[TestCaseSource(nameof(getTrimmedLineBlockFlowWithCorrespondingRegex))]
-		public void ReturnsCorrespondingRegexForBlockOrFlowType(BlockFlow value, string expectedRegex)
+		public void ReturnsCorrespondingRegexForBlockOrFlowType(Context value, string expectedRegex)
 		{
 			var actualRegex = BasicStructures.TrimmedLine(value);
 
@@ -42,7 +42,7 @@ namespace YamlConfiguration.Processor.Tests
 
 		[Test]
 		public void NoEmptyLines_DoesNotMatch(
-			[ValueSource(nameof(getBlocksAndFlows))] BlockFlow type,
+			[ValueSource(nameof(getBlocksAndFlows))] Context type,
 			[ValueSource(nameof(getTrimmedLineNonMatchableCases))] string testValue
 		)
 		{
@@ -62,16 +62,16 @@ namespace YamlConfiguration.Processor.Tests
 			{
 				switch (value)
 				{
-					case BlockFlow.BlockOut:
-					case BlockFlow.BlockIn:
+					case Context.BlockOut:
+					case Context.BlockIn:
 						yield return new TestCaseData(
 							value,
 							newLine +
 							$"(?: {{0,{charGroupLength}}}" + newLine + ")+"
 						);
 						break;
-					case BlockFlow.FlowOut:
-					case BlockFlow.FlowIn:
+					case Context.FlowOut:
+					case Context.FlowIn:
 						yield return new TestCaseData(
 							value,
 							newLine +
@@ -84,7 +84,7 @@ namespace YamlConfiguration.Processor.Tests
 			}
 		}
 
-		private static IEnumerable<BlockFlowTestCase> getTrimmedLineCommonTestCases(BlockFlow type)
+		private static IEnumerable<BlockFlowTestCase> getTrimmedLineCommonTestCases(Context type)
 		{
 			var spaces = CharStore.Spaces;
 			var @break = Environment.NewLine;
@@ -186,12 +186,12 @@ namespace YamlConfiguration.Processor.Tests
 			yield return $"ABC\t{@break}\tABC";
 		}
 
-		private static IEnumerable<BlockFlow> getBlocksAndFlows()
+		private static IEnumerable<Context> getBlocksAndFlows()
 		{
 			return EnumCache.GetBlockAndFlowTypes();
 		}
 
-		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _trimmedLineRegex =
+		private static readonly IReadOnlyDictionary<Context, Regex> _trimmedLineRegex =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
 				i => new Regex(BasicStructures.TrimmedLine(i), RegexOptions.Compiled)

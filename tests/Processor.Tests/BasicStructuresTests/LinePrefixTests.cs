@@ -11,7 +11,7 @@ namespace YamlConfiguration.Processor.Tests
 	public class LinePrefixTests
 	{
 		[TestCaseSource(nameof(getBlockFlowWithCorrespondingRegex))]
-		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(BlockFlow value, RegexPattern expectedRegex)
+		public void LinePrefix_ReturnsCorrespondingRegexForBlockFlow(Context value, RegexPattern expectedRegex)
 		{
 			var actualRegex = BasicStructures.LinePrefix(value);
 
@@ -46,12 +46,12 @@ namespace YamlConfiguration.Processor.Tests
 			{
 				switch (value)
 				{
-					case BlockFlow.BlockOut:
-					case BlockFlow.BlockIn:
+					case Context.BlockOut:
+					case Context.BlockIn:
 						yield return new TestCaseData(value, (RegexPattern) "^(?: ){0,1000}");
 						break;
-					case BlockFlow.FlowOut:
-					case BlockFlow.FlowIn:
+					case Context.FlowOut:
+					case Context.FlowIn:
 						yield return new TestCaseData(value, (RegexPattern) "^(?: ){0,1000}(?:(?:^|[ \t]{1,1000}))?");
 						break;
 					default:
@@ -60,7 +60,7 @@ namespace YamlConfiguration.Processor.Tests
 			}
 		}
 
-		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(BlockFlow type)
+		private static IEnumerable<BlockFlowTestCase> getCommonTestCases(Context type)
 		{
 			var spaces = CharStore.Spaces;
 
@@ -99,7 +99,7 @@ namespace YamlConfiguration.Processor.Tests
 			}
 		}
 
-		private static readonly IReadOnlyDictionary<BlockFlow, Regex> _linePrefixBlockFlowRegexByType =
+		private static readonly IReadOnlyDictionary<Context, Regex> _linePrefixBlockFlowRegexByType =
 			EnumCache.GetBlockAndFlowTypes().ToDictionary(
 				i => i,
 				i => new Regex(BasicStructures.LinePrefix(i), RegexOptions.Compiled)

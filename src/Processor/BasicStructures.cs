@@ -24,31 +24,31 @@ namespace YamlConfiguration.Processor
 		private static readonly RegexPattern _tagHandle =
 			Characters.Tag + Characters.WordChar.WithLimitingRepetition() + Characters.Tag.AsOptional();
 
-		internal static RegexPattern LinePrefix(BlockFlow c, bool useAnchoredIndent = true)
+		internal static RegexPattern LinePrefix(Context c, bool useAnchoredIndent = true)
 		{
 			var indent = useAnchoredIndent ? _anchoredIndent : _indent;
 
 			switch (c)
 			{
-				case BlockFlow.BlockIn:
-				case BlockFlow.BlockOut:
+				case Context.BlockIn:
+				case Context.BlockOut:
 					return indent;
-				case BlockFlow.FlowIn:
-				case BlockFlow.FlowOut:
+				case Context.FlowIn:
+				case Context.FlowOut:
 					return indent + SeparateInLine.AsOptional();
 				default:
-					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(BlockFlow)} item {c}.");
+					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(Context)} item {c}.");
 			}
 		}
 
-		internal static RegexPattern EmptyLine(BlockFlow c, bool useAnchoredIndent = true)
+		internal static RegexPattern EmptyLine(Context c, bool useAnchoredIndent = true)
 		{
 			return LinePrefix(c, useAnchoredIndent) + Break;
 		}
 
 		#region Folded Line Regexes
 
-		public static string TrimmedLine(BlockFlow c)
+		public static string TrimmedLine(Context c)
 		{
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
 			// their logic will be moved to upper levels.
@@ -75,8 +75,8 @@ namespace YamlConfiguration.Processor
 			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
 			return $"{SeparateInLine}?" +
-			TrimmedLine(BlockFlow.FlowIn) +
-			LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false);
+			TrimmedLine(Context.FlowIn) +
+			LinePrefix(Context.FlowIn, useAnchoredIndent: false);
 		}
 
 		public static string FlowFoldedLineWithBreakAsSpace()
@@ -85,7 +85,7 @@ namespace YamlConfiguration.Processor
 			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
 			return $"{SeparateInLine}?" +
-			BreakAsSpace(linePrefix: LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false));
+			BreakAsSpace(linePrefix: LinePrefix(Context.FlowIn, useAnchoredIndent: false));
 		}
 
 		#endregion
@@ -102,20 +102,20 @@ namespace YamlConfiguration.Processor
 			).AsOptional() + Break;
 
 		// TODO: Move the logic to a higher level.
-		public static string SeparateLines(BlockFlow c)
+		public static string SeparateLines(Context c)
 		{
 			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
 			// their logic will be moved to upper levels.
 			throw new NotSupportedException();
 			switch (c)
 			{
-				case BlockFlow.BlockIn:
-				case BlockFlow.BlockOut:
-				case BlockFlow.FlowIn:
-				case BlockFlow.FlowOut:
+				case Context.BlockIn:
+				case Context.BlockOut:
+				case Context.FlowIn:
+				case Context.FlowOut:
 					return $"(?:{Comment}" +
 						   $"(?:{Comment})*" +
-						   $"{LinePrefix(BlockFlow.FlowIn, useAnchoredIndent: false)}" +
+						   $"{LinePrefix(Context.FlowIn, useAnchoredIndent: false)}" +
 						   "|" +
 						   $"{SeparateInLine})";
 //				case BlockFlow.BlockKey:

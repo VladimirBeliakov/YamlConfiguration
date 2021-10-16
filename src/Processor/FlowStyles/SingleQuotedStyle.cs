@@ -59,10 +59,10 @@ namespace YamlConfiguration.Processor.FlowStyles
 			private static readonly RegexPattern _nbNsSingleFirstLine =
 				Characters.SingleQuote.WithAnchorAtBeginning() + _nbNsSingleInLine.AsCapturingGroup();
 
-			private static readonly RegexPattern _emptyLineWithoutBreak = BasicStructures.LinePrefix(BlockFlow.FlowIn);
+			private static readonly RegexPattern _emptyLineWithoutBreak = BasicStructures.LinePrefix(Context.FlowIn);
 
 			private static readonly RegexPattern _nonEmptyLine =
-				BasicStructures.LinePrefix(BlockFlow.FlowIn) + (_nsSingleChar + _nbNsSingleInLine).AsCapturingGroup();
+				BasicStructures.LinePrefix(Context.FlowIn) + (_nsSingleChar + _nbNsSingleInLine).AsCapturingGroup();
 
 			private static readonly Regex _firstLineBreakRegex = new Regex(
 				_nbNsSingleFirstLine + _foldedLineSequenceBeginning,

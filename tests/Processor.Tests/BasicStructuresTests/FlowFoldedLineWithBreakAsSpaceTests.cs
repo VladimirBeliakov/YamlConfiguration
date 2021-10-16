@@ -60,7 +60,7 @@ namespace YamlConfiguration.Processor.Tests
 					})
 					{
 						yield return new BlockFlowTestCase(
-							BlockFlow.FlowIn,
+							Context.FlowIn,
 							testValue: separateInLine +
 									   breakAsSpace +
 									   "ABC" + @break,
@@ -69,7 +69,7 @@ namespace YamlConfiguration.Processor.Tests
 										  linePrefix
 						);
 						yield return new BlockFlowTestCase(
-							BlockFlow.FlowIn,
+							Context.FlowIn,
 							testValue: "ABC" + separateInLine +
 									   breakAsSpace +
 									   "ABC" + @break,

@@ -63,9 +63,9 @@ namespace YamlConfiguration.Processor.FlowStyles
 			private static readonly RegexPattern _nbDoubleFirstLine =
 					(Characters.DoubleQuote + _nbNsDoubleInLine.AsCapturingGroup()).WithAnchorAtBeginning();
 
-			private static readonly RegexPattern _emptyLineWithoutBreak = BasicStructures.LinePrefix(BlockFlow.FlowIn);
+			private static readonly RegexPattern _emptyLineWithoutBreak = BasicStructures.LinePrefix(Context.FlowIn);
 
-			private static readonly RegexPattern _nonEmptyLine = BasicStructures.LinePrefix(BlockFlow.FlowIn) +
+			private static readonly RegexPattern _nonEmptyLine = BasicStructures.LinePrefix(Context.FlowIn) +
 														   (_nonSpaceDoubleChar + _nbNsDoubleInLine).AsCapturingGroup();
 
 			private static readonly Regex _firstLineWithoutEscapedBreakRegex = new Regex(

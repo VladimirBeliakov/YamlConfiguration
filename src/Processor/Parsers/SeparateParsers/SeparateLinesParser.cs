@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
 {
-	internal class SeparateLinesParser
+	internal class SeparateLinesParser : ISeparateLinesParser
 	{
 		private readonly IMultilineCommentParser _multilineCommentParser;
 		private readonly IFlowLinePrefixParser _flowLinePrefixParser;
@@ -31,16 +31,7 @@ namespace YamlConfiguration.Processor
 				return false;
 			}
 
-			var (isSeparateInLine, whiteSpaceCount) =
-				await _separateInLineParser.Peek(charStream).ConfigureAwait(false);
-
-			if (isSeparateInLine)
-			{
-				await charStream.AdvanceBy(whiteSpaceCount).ConfigureAwait(false);
-				return true;
-			}
-
-			return false;
+			return await _separateInLineParser.TryProcess(charStream).ConfigureAwait(false);
 		}
 	}
 }

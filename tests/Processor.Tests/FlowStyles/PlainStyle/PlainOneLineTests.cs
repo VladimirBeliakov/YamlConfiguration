@@ -11,48 +11,48 @@ namespace YamlConfiguration.Processor.Tests
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class PlainOneLineTests
 	{
-		[TestCaseSource(nameof(getPositiveTestCases), new object[] { BlockFlow.BlockKey })]
+		[TestCaseSource(nameof(getPositiveTestCases), new object[] { Context.BlockKey })]
 		public void ValidOnePlainLineInBlockKey_ReturnsTrueAndExtractedValue(string testValue)
 		{
-			var isSuccess = PlainStyle.IsOneLine(testValue, BlockFlow.BlockKey);
+			var isSuccess = PlainStyle.IsOneLine(testValue, Context.BlockKey);
 
 			Assert.True(isSuccess);
 		}
 
-		[TestCaseSource(nameof(getPositiveTestCases), new object[] { BlockFlow.FlowKey })]
+		[TestCaseSource(nameof(getPositiveTestCases), new object[] { Context.FlowKey })]
 		public void ValidOnePlainLineInFlowKey_ReturnsTrueAndExtractedValue(string testValue)
 		{
-			var isSuccess = PlainStyle.IsOneLine(testValue, BlockFlow.FlowKey);
+			var isSuccess = PlainStyle.IsOneLine(testValue, Context.FlowKey);
 
 			Assert.True(isSuccess);
 		}
 
-		[TestCaseSource(nameof(getNegativeTextCases), new object[] { BlockFlow.BlockKey })]
+		[TestCaseSource(nameof(getNegativeTextCases), new object[] { Context.BlockKey })]
 		public void InvalidOnePlainLineInBlockKey_ReturnsFalse(string testCase)
 		{
-			var result = PlainStyle.IsOneLine(testCase, BlockFlow.BlockKey);
+			var result = PlainStyle.IsOneLine(testCase, Context.BlockKey);
 
 			Assert.False(result);
 		}
 
-		[TestCaseSource(nameof(getNegativeTextCases), new object[] { BlockFlow.FlowKey })]
+		[TestCaseSource(nameof(getNegativeTextCases), new object[] { Context.FlowKey })]
 		public void InvalidOnePlainLineInFlowKey_ReturnsFalse(string testCase)
 		{
-			var result = PlainStyle.IsOneLine(testCase, BlockFlow.FlowKey);
+			var result = PlainStyle.IsOneLine(testCase, Context.FlowKey);
 
 			Assert.False(result);
 		}
 
-		private static IEnumerable<string> getPositiveTestCases(BlockFlow blockFlow)
+		private static IEnumerable<string> getPositiveTestCases(Context context)
 		{
-			var excludedChars = blockFlow switch
+			var excludedChars = context switch
 			{
-				BlockFlow.BlockKey => Enumerable.Empty<string>(),
-				BlockFlow.FlowKey => CharStore.FlowIndicators,
+				Context.BlockKey => Enumerable.Empty<string>(),
+				Context.FlowKey => CharStore.FlowIndicators,
 				_ => throw new ArgumentOutOfRangeException(
-					nameof(blockFlow),
-					blockFlow,
-					$"Only {BlockFlow.BlockKey} and {BlockFlow.FlowKey} can be processed."
+					nameof(context),
+					context,
+					$"Only {Context.BlockKey} and {Context.FlowKey} can be processed."
 				)
 			};
 
@@ -153,7 +153,7 @@ namespace YamlConfiguration.Processor.Tests
 			yield return mappingValue + mappingValue + anyNsPlainSafe;
 		}
 
-		private static IEnumerable<string> getNegativeTextCases(BlockFlow blockFlow)
+		private static IEnumerable<string> getNegativeTextCases(Context context)
 		{
 			const string nsChar = "a";
 			const string whiteChar = " ";
@@ -166,14 +166,14 @@ namespace YamlConfiguration.Processor.Tests
 			const string sequenceEntry = "-";
 			const string nsPlainSafe = "a";
 
-			IReadOnlyCollection<string> invalidNsPlainSafes = blockFlow switch
+			IReadOnlyCollection<string> invalidNsPlainSafes = context switch
 			{
-				BlockFlow.BlockKey => new[] { " " },
-				BlockFlow.FlowKey => CharStore.FlowIndicators.ToList(),
+				Context.BlockKey => new[] { " " },
+				Context.FlowKey => CharStore.FlowIndicators.ToList(),
 				_ => throw new ArgumentOutOfRangeException(
-					nameof(blockFlow),
-					blockFlow,
-					$"Only {BlockFlow.BlockKey} and {BlockFlow.FlowKey} can be processed."
+					nameof(context),
+					context,
+					$"Only {Context.BlockKey} and {Context.FlowKey} can be processed."
 				)
 			};
 
