@@ -4,7 +4,7 @@ using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor.FlowStyles
 {
-	public class PlainStyle
+	public class Plain
 	{
 		private static readonly RegexPattern _nsPlainSafeOut = Characters.NsChar;
 

@@ -10,7 +10,7 @@ using YamlConfiguration.Processor.TypeDefinitions;
 namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
-	public class PlainOneLineTests
+	public class PlainTests
 	{
 		[TestCaseSource(nameof(getPositiveTestCases), new object[] { Context.BlockKey })]
 		public void ValidOnePlainLineInBlockKey_Matches(RegexTestCase testCase)
@@ -173,9 +173,9 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		private static readonly Regex _blockKeyOneLineRegex =
-			new(PlainStyle.GetPatternFor(Context.BlockKey), RegexOptions.Compiled);
+			new(Plain.GetPatternFor(Context.BlockKey), RegexOptions.Compiled);
 
 		private static readonly Regex _flowKeyOneLineRegex =
-			new(PlainStyle.GetPatternFor(Context.FlowKey), RegexOptions.Compiled);
+			new(Plain.GetPatternFor(Context.FlowKey), RegexOptions.Compiled);
 	}
 }
