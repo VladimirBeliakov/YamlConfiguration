@@ -50,6 +50,17 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
+		public async Task TryProcess_OnlyBreakInStream_ReturnsTrue()
+		{
+			var stream = createStreamFrom("\n");
+
+			var result = await createParser().TryProcess(stream);
+
+			Assert.True(result);
+			A.CallTo(() => stream.ReadLine()).MustHaveHappenedOnceExactly();
+		}
+
+		[Test]
 		public async Task TryProcess_AllCharsInStreamAreWhiteSpacesAndBreakInTheEnd_ReturnsTrue()
 		{
 			var stream = createStreamFrom(" \t \t\n");
