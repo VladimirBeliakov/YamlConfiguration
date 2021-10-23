@@ -49,7 +49,7 @@ namespace YamlConfiguration.Processor
 
 			var sb = new StringBuilder(_queueMaxSize);
 
-			foreach(var @char in _buffer)
+			foreach (var @char in _buffer)
 			{
 				sb.Append(@char);
 

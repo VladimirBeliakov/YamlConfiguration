@@ -14,7 +14,10 @@ internal class EmptyLineParser : IEmptyLineParser
 		if (readLine[0] == Characters.Tab)
 			throw new InvalidYamlException("An empty line can't begin with a tab.");
 
-		foreach (var @char in readLine)
+		if (readLine[^1] != BasicStructures.Break)
+			return false;
+
+		foreach (var @char in readLine[..^1])
 			if (!@char.IsWhiteSpace())
 				return false;
 

@@ -39,9 +39,20 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[Test]
-		public async Task TryProcess_AllCharsInStreamAreWhiteSpaces_ReturnsTrue()
+		public async Task TryProcess_NoBreakInTheEnd_ReturnsFalse()
 		{
 			var stream = createStreamFrom(" \t \t");
+
+			var result = await createParser().TryProcess(stream);
+
+			Assert.False(result);
+			stream.AssertNotAdvanced();
+		}
+
+		[Test]
+		public async Task TryProcess_AllCharsInStreamAreWhiteSpacesAndBreakInTheEnd_ReturnsTrue()
+		{
+			var stream = createStreamFrom(" \t \t\n");
 
 			var result = await createParser().TryProcess(stream);
 
