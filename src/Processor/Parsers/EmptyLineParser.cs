@@ -1,28 +1,30 @@
 using System;
 using System.Threading.Tasks;
-using YamlConfiguration.Processor;
 
-internal class EmptyLineParser : IEmptyLineParser
+namespace YamlConfiguration.Processor
 {
-	public async ValueTask<bool> TryProcess(ICharacterStream charStream)
+	internal class EmptyLineParser : IEmptyLineParser
 	{
-		var readLine = await charStream.PeekLine().ConfigureAwait(false);
+		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
+		{
+			var readLine = await charStream.PeekLine().ConfigureAwait(false);
 
-		if (String.IsNullOrEmpty(readLine))
-			return false;
-
-		if (readLine[0] == Characters.Tab)
-			throw new InvalidYamlException("An empty line can't begin with a tab.");
-
-		if (readLine[^1] != BasicStructures.Break)
-			return false;
-
-		foreach (var @char in readLine[..^1])
-			if (!@char.IsWhiteSpace())
+			if (String.IsNullOrEmpty(readLine))
 				return false;
 
-		await charStream.ReadLine().ConfigureAwait(false);
+			if (readLine[0] == Characters.Tab)
+				throw new InvalidYamlException("An empty line can't begin with a tab.");
 
-		return true;
+			if (readLine[^1] != BasicStructures.Break)
+				return false;
+
+			foreach (var @char in readLine[..^1])
+				if (!@char.IsWhiteSpace())
+					return false;
+
+			await charStream.ReadLine().ConfigureAwait(false);
+
+			return true;
+		}
 	}
 }
