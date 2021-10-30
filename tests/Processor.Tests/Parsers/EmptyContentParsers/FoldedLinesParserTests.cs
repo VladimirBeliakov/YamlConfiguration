@@ -8,18 +8,13 @@ namespace YamlConfiguration.Processor.Tests
 	public class FoldedLinesParserTests
 	{
 		[Test]
-		public async Task Process_StreamDoesNotStartWithBreak_ReturnsZeroEmptyLinesAndNotBreakAsSpace()
+		public async Task Process_StreamDoesNotStartWithBreak_ReturnsNull()
 		{
 			var stream = createStreamFrom('a');
 
 			var result = await createParser().Process(stream);
 
-			Assert.Multiple(() =>
-				{
-					Assert.That(result.EmptyLineCount, Is.Zero);
-					Assert.False(result.IsBreakAsSpace);
-				}
-			);
+			Assert.Null(result);
 			stream.AssertNotAdvanced();
 		}
 
@@ -34,8 +29,8 @@ namespace YamlConfiguration.Processor.Tests
 
 			Assert.Multiple(() =>
 				{
-					Assert.That(result.EmptyLineCount, Is.Zero);
-					Assert.True(result.IsBreakAsSpace);
+					Assert.That(result?.EmptyLineCount, Is.Zero);
+					Assert.True(result?.IsBreakAsSpace);
 				}
 			);
 			A.CallTo(() => stream.Read(1)).MustHaveHappenedOnceExactly();
@@ -55,8 +50,8 @@ namespace YamlConfiguration.Processor.Tests
 
 			Assert.Multiple(() =>
 				{
-					Assert.That(result.EmptyLineCount, Is.EqualTo(zeroCount));
-					Assert.False(result.IsBreakAsSpace);
+					Assert.That(result?.EmptyLineCount, Is.EqualTo(zeroCount));
+					Assert.False(result?.IsBreakAsSpace);
 				}
 			);
 			A.CallTo(() => stream.Read(1)).MustHaveHappenedOnceExactly();

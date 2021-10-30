@@ -2,9 +2,9 @@ using System;
 
 namespace YamlConfiguration.Processor
 {
-	internal class FoldedLineResult
+	internal class FoldedLinesResult
 	{
-		public FoldedLineResult(uint emptyLineCount, bool isBreakAsSpace = false)
+		public FoldedLinesResult(uint emptyLineCount, bool isBreakAsSpace = false)
 		{
 			if (isBreakAsSpace && emptyLineCount > 0)
 				throw new ArgumentException(

@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace YamlConfiguration.Processor
 {
-	internal class FoldedLinesParser
+	internal class FoldedLinesParser : IFoldedLinesParser
 	{
 		private readonly IEmptyLineParser _emptyLineParser;
 
@@ -11,12 +11,12 @@ namespace YamlConfiguration.Processor
 			_emptyLineParser = emptyLineParser;
 		}
 
-		public async ValueTask<FoldedLineResult> Process(ICharacterStream charStream)
+		public async ValueTask<FoldedLinesResult?> Process(ICharacterStream charStream)
 		{
 			var possibleBreak = await charStream.Peek().ConfigureAwait(false);
 
 			if (possibleBreak != BasicStructures.Break)
-				return new(0);
+				return null;
 
 			await charStream.AdvanceBy(1).ConfigureAwait(false);
 

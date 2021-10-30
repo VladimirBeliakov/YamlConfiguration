@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor.FlowStyles
@@ -13,20 +12,12 @@ namespace YamlConfiguration.Processor.FlowStyles
 			inclusiveChars: Characters.NsChar
 		);
 
-		private static RegexPattern getNsPlainSafe(Context context)
+		private static RegexPattern getNsPlainSafe(Context context) => context switch
 		{
-			switch (context)
-			{
-				case Context.FlowOut:
-				case Context.BlockKey:
-					return _nsPlainSafeOut;
-				case Context.FlowIn:
-				case Context.FlowKey:
-					return _nsPlainSafeIn;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(context), context, null);
-			}
-		}
+			Context.FlowOut or Context.BlockKey => _nsPlainSafeOut,
+			Context.FlowIn or Context.FlowKey => _nsPlainSafeIn,
+			_ => throw new ArgumentOutOfRangeException(nameof(context), context, null),
+		};
 
 		private static RegexPattern getNsPlainFirst(Context context) =>
 			RegexPatternBuilder.BuildAlternation(
@@ -67,20 +58,14 @@ namespace YamlConfiguration.Processor.FlowStyles
 		private static RegexPattern getNsPlainOneLine(Context context) =>
 			(getNsPlainFirst(context) + getNbNsPlainInLine(context)).WithAnchorAtBeginning();
 
-		public static RegexPattern GetPatternFor(Context context)
+		public static RegexPattern GetPatternFor(Context context) => context switch
 		{
-			switch (context)
-			{
-				case Context.BlockKey:
-				case Context.FlowKey:
-					return getNsPlainOneLine(context);
-				default:
-					throw new ArgumentOutOfRangeException(
-						nameof(context),
-						context,
-						$"Only {Context.BlockKey} and {Context.FlowKey} are supported."
-					);
-			}
-		}
+			Context.BlockKey or Context.FlowKey => getNsPlainOneLine(context),
+			_ => throw new ArgumentOutOfRangeException(
+					nameof(context),
+					context,
+					$"Only {Context.BlockKey} and {Context.FlowKey} are supported."
+				),
+		};
 	}
 }
