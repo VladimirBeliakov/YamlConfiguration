@@ -6,15 +6,21 @@ using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor
 {
-	internal class PlainOneLineParser : IPlainOneLineParser
+	internal class PlainInOneLineParser : IPlainInOneLineParser
 	{
+		private static readonly ushort _breakCharLength = 1;
+
 		private static readonly Regex _blockKeyOneLineRegex =
 			new(Plain.GetPatternFor(Context.BlockKey), RegexOptions.Compiled);
 
 		private static readonly Regex _flowKeyOneLineRegex =
 			new(Plain.GetPatternFor(Context.FlowKey), RegexOptions.Compiled);
 
-		public async ValueTask<PlainOneLineNode?> Process(ICharacterStream charStream, Context context)
+		public async ValueTask<PlainLineNode?> Process(
+			ICharacterStream charStream,
+			Context context,
+			bool asOneLine = false
+		)
 		{
 			var regex = context switch
 			{
@@ -35,9 +41,17 @@ namespace YamlConfiguration.Processor
 			{
 				var value = match.Value;
 
+				if (asOneLine)
+				{
+					var valueWithBreakLength = value.Length + _breakCharLength;
+
+					if (valueWithBreakLength != peekedLine.Length)
+						return null;
+				}
+
 				await charStream.AdvanceBy((uint) value.Length).ConfigureAwait(false);
 
-				return new PlainOneLineNode(value);
+				return new PlainLineNode(value);
 			}
 
 			return null;

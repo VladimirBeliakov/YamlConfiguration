@@ -5,7 +5,7 @@ namespace YamlConfiguration.Processor
 {
 	public readonly struct RegexPattern : IEquatable<RegexPattern>
 	{
-		public static RegexPattern Empty = (RegexPattern) String.Empty;
+		public static RegexPattern Empty { get; } = (RegexPattern) String.Empty;
 
 		private readonly string _regexValue;
 
@@ -18,13 +18,10 @@ namespace YamlConfiguration.Processor
 
 		public static implicit operator string(RegexPattern pattern) => pattern._regexValue;
 
-		public static implicit operator char(RegexPattern pattern)
-		{
-			if (pattern._regexValue.Length == 1)
-				return pattern._regexValue.Single();
-
-			throw new InvalidCastException($"Can't cast the multi char pattern '{pattern}' to one char.");
-		}
+		public static implicit operator char(RegexPattern pattern) =>
+			pattern._regexValue.Length == 1
+				? pattern._regexValue.Single()
+				: throw new InvalidCastException($"Can't cast the multi char pattern '{pattern}' to one char.");
 
 		public static explicit operator RegexPattern(string rawValue) => new(rawValue);
 

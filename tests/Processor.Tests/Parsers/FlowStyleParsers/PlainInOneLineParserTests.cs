@@ -9,7 +9,7 @@ using YamlConfiguration.Processor.TypeDefinitions;
 namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
-	public class PlainOneLineParserTests
+	public class PlainInOneLineParserTests
 	{
 		[TestCaseSource(nameof(getKeyContext))]
 		public async Task Process_KeyContextWithPlainOneLineValue_ReturnsValueAndAdvancesStream(Context context)
@@ -45,6 +45,16 @@ namespace YamlConfiguration.Processor.Tests
 			stream.AssertNotAdvanced();
 		}
 
+		[Test]
+		public async Task Process_AsOneLine_OnlyPartOfLineParsed_ReturnsNull()
+		{
+			var stream = createStream("key: value");
+
+			var result = await createParser().Process(stream, Context.BlockKey, asOneLine: true);
+
+			Assert.Null(result);
+		}
+
 		private static ICharacterStream createStream(string line = "")
 		{
 			var stream = A.Fake<ICharacterStream>();
@@ -54,9 +64,10 @@ namespace YamlConfiguration.Processor.Tests
 			return stream;
 		}
 
-		private static PlainOneLineParser createParser() => new();
+		private static PlainInOneLineParser createParser() => new();
 
-		private static IEnumerable<Context> getInAndOutContext() => Enum.GetValues<Context>().Except(getKeyContext());
+		private static IEnumerable<Context> getInAndOutContext() =>
+			Enum.GetValues<Context>().Except(getKeyContext());
 
 		private static IEnumerable<Context> getKeyContext()
 		{
