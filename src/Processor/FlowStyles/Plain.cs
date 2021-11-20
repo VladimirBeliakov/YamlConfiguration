@@ -69,5 +69,23 @@ namespace YamlConfiguration.Processor.FlowStyles
 					$"Only {Context.BlockKey} and {Context.FlowKey} are supported."
 				),
 		};
+
+		public class NextLine
+		{
+			private static RegexPattern getPlainNextLine(Context context) =>
+				(getNsPlainChar(context) + getNbNsPlainInLine(context) + BasicStructures.Break)
+					.WithAnchorAtBeginning()
+					.WithAnchorAtEnd();
+
+			public static RegexPattern GetPatternFor(Context context) => context switch
+			{
+				Context.FlowIn or Context.FlowOut => getPlainNextLine(context),
+				_ => throw new ArgumentOutOfRangeException(
+						nameof(context),
+						context,
+						$"Only {Context.FlowIn} and {Context.FlowOut} are supported."
+					),
+			};
+		}
 	}
 }

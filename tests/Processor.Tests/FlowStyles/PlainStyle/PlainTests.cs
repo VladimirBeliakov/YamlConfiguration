@@ -10,9 +10,9 @@ using YamlConfiguration.Processor.TypeDefinitions;
 namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
-	public class PlainTests
+	public class PlainTests : PlainBaseTest
 	{
-		[TestCaseSource(nameof(getPositiveTestCases), new object[] { Context.BlockKey })]
+		[TestCaseSource(nameof(getPositiveTestCases), new Object[] { Context.BlockKey })]
 		public void ValidOnePlainLineInBlockKey_Matches(RegexTestCase testCase)
 		{
 			var match = _blockKeyOneLineRegex.Match(testCase.TestValue);
@@ -20,7 +20,7 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
-		[TestCaseSource(nameof(getPositiveTestCases), new object[] { Context.FlowKey })]
+		[TestCaseSource(nameof(getPositiveTestCases), new Object[] { Context.FlowKey })]
 		public void ValidOnePlainLineInFlowKey_Matches(RegexTestCase testCase)
 		{
 			var match = _flowKeyOneLineRegex.Match(testCase.TestValue);
@@ -28,13 +28,13 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
-		[TestCaseSource(nameof(getNegativeTextCases), new object[] { Context.BlockKey })]
+		[TestCaseSource(nameof(getNegativeTextCases), new Object[] { Context.BlockKey })]
 		public void InvalidOnePlainLineInBlockKey_DoesNotMatch(string testCase)
 		{
 			Assert.False(_blockKeyOneLineRegexWithAnchorAtEnd.IsMatch(testCase));
 		}
 
-		[TestCaseSource(nameof(getNegativeTextCases), new object[] { Context.FlowKey })]
+		[TestCaseSource(nameof(getNegativeTextCases), new Object[] { Context.FlowKey })]
 		public void InvalidOnePlainLineInFlowKey_DoesNotMatch(string testCase)
 		{
 			Assert.False(_flowKeyOneLineRegexWithAnchorAtEnd.IsMatch(testCase));
@@ -42,32 +42,19 @@ namespace YamlConfiguration.Processor.Tests
 
 		private static IEnumerable<RegexTestCase> getPositiveTestCases(Context context)
 		{
-			var excludedChars = context switch
-			{
-				Context.BlockKey => Enumerable.Empty<string>(),
-				Context.FlowKey => CharStore.FlowIndicators,
-				_ => throw new ArgumentOutOfRangeException(
-					nameof(context),
-					context,
-					$"Only {Context.BlockKey} and {Context.FlowKey} can be processed."
-				)
-			};
-
-			var nsPlainSafeCharsWithoutSurrogates =
-				CharStore.GetNsCharsWithoutSurrogates().Except(excludedChars).ToList();
-
-			var nsPlainSafeSurrogates = CharStore.SurrogatePairs.Value;
 			var whiteChars = CharStore.SpacesAndTabs;
 
-			foreach (var nsPlainSafeChars in new[] { nsPlainSafeCharsWithoutSurrogates, nsPlainSafeSurrogates })
-			foreach (var nbNsPlainInLine in createNbNsPlainInLineFrom(nsPlainSafeChars))
-				yield return new RegexTestCase(
-					testValue: nbNsPlainInLine + whiteChars + ":",
-					wholeMatch: nbNsPlainInLine
-				);
+			foreach (var nsPlainSafeChars in GetNsPlainSafeCharGroups(context))
+				foreach (var nsPlainOneLine in createNsPlainOneLinesFrom(nsPlainSafeChars))
+					yield return new RegexTestCase(
+						testValue: nsPlainOneLine + whiteChars + ":",
+						wholeMatch: nsPlainOneLine
+					);
 		}
 
-		private static IEnumerable<string> createNbNsPlainInLineFrom(IReadOnlyCollection<string> nsPlainSafeChars)
+		private static IEnumerable<string> createNsPlainOneLinesFrom(
+			IReadOnlyCollection<string> nsPlainSafeChars
+		)
 		{
 			static bool canBeNsPlainFirst(string nsChar) => !CharStore.CIndicators.Contains(nsChar);
 
@@ -92,7 +79,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			var sb = new StringBuilder(oneGroupLength);
 
-			var nsPlainFirstCount = nsPlainChars.Count / (groupItemCount / 4) + 1;
+			var nsPlainFirstCount = (nsPlainChars.Count / (groupItemCount / 4)) + 1;
 			var nsPlainFirsts = new List<string>(nsPlainFirstCount);
 
 			sb.Append(anyNsPlainFirst);
@@ -138,7 +125,7 @@ namespace YamlConfiguration.Processor.Tests
 				groupItemCount
 			);
 
-			var anyNsPlainCharGroup = string.Join(string.Empty, nsPlainChars.Take(groupItemCount));
+			var anyNsPlainCharGroup = String.Join(String.Empty, nsPlainChars.Take(groupItemCount));
 
 			yield return anyNsPlainFirst + anyNsPlainCharGroup;
 
