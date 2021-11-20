@@ -18,7 +18,7 @@ namespace YamlConfiguration.Processor.Tests
 			var line = $"{plainOneLine} # comment";
 			var stream = createStream(line);
 
-			var result = await createParser().Process(stream, context);
+			var result = await createParser().TryProcess(stream, context);
 
 			Assert.That(result?.Value, Is.EqualTo(plainOneLine));
 			A.CallTo(() => stream.Read((uint) plainOneLine.Length)).MustHaveHappenedOnceExactly();
@@ -30,7 +30,7 @@ namespace YamlConfiguration.Processor.Tests
 			const string? line = "# comment";
 			var stream = createStream(line);
 
-			var result = await createParser().Process(stream, context);
+			var result = await createParser().TryProcess(stream, context);
 
 			Assert.Null(result);
 			stream.AssertNotAdvanced();
@@ -41,7 +41,7 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var stream = createStream();
 
-			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => createParser().Process(stream, context).AsTask());
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => createParser().TryProcess(stream, context).AsTask());
 			stream.AssertNotAdvanced();
 		}
 
@@ -50,9 +50,21 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var stream = createStream("key: value");
 
-			var result = await createParser().Process(stream, Context.BlockKey, asOneLine: true);
+			var result = await createParser().TryProcess(stream, Context.BlockKey, asOneLine: true);
 
 			Assert.Null(result);
+		}
+
+		[Test]
+		public async Task Process_AsOneLine_WholeLineParsed_ReturnsParsedValueAndAdvancesStream()
+		{
+			var plainOneLineValue = "plain value\n";
+			var stream = createStream(plainOneLineValue);
+
+			var result = await createParser().TryProcess(stream, Context.BlockKey, asOneLine: true);
+
+			Assert.That(result?.Value, Is.EqualTo(plainOneLineValue[..^1]));
+			A.CallTo(() => stream.Read((uint) plainOneLineValue.Length)).MustHaveHappenedOnceExactly();
 		}
 
 		private static ICharacterStream createStream(string line = "")

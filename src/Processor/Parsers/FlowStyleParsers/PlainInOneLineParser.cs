@@ -16,7 +16,7 @@ namespace YamlConfiguration.Processor
 		private static readonly Regex _flowKeyOneLineRegex =
 			new(Plain.GetPatternFor(Context.FlowKey), RegexOptions.Compiled);
 
-		public async ValueTask<PlainLineNode?> Process(
+		public async ValueTask<PlainLineNode?> TryProcess(
 			ICharacterStream charStream,
 			Context context,
 			bool asOneLine = false
@@ -40,6 +40,7 @@ namespace YamlConfiguration.Processor
 			if (match.Success)
 			{
 				var value = match.Value;
+				var valueLength = value.Length;
 
 				if (asOneLine)
 				{
@@ -47,9 +48,11 @@ namespace YamlConfiguration.Processor
 
 					if (valueWithBreakLength != peekedLine.Length)
 						return null;
+
+					valueLength = valueWithBreakLength;
 				}
 
-				await charStream.AdvanceBy((uint) value.Length).ConfigureAwait(false);
+				await charStream.AdvanceBy((uint) valueLength).ConfigureAwait(false);
 
 				return new PlainLineNode(value);
 			}

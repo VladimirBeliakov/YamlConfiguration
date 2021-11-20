@@ -12,13 +12,19 @@ csharp_style_expression_bodied_operators = true
 
 # IDE0011: Add braces
 csharp_prefer_braces = false
+csharp_space_after_cast = true
 
 dotnet_diagnostic.IDE0058.severity = none
 dotnet_diagnostic.CA1707.severity = none
 dotnet_diagnostic.IDE0130.severity = none
+dotnet_diagnostic.IDE0072.severity = suggestion
+dotnet_diagnostic.IDE0049.severity = suggestion
+dotnet_diagnostic.IDE0022.severity = suggestion
+dotnet_diagnostic.IDE0059.severity = suggestion
 
 # String.Empty not string.Empty
 dotnet_style_predefined_type_for_member_access = false
+dotnet_style_predefined_type_for_locals_parameters_members = true
 
 dotnet_naming_symbols.private_methods_symbols.applicable_kinds = method
 dotnet_naming_symbols.private_methods_symbols.applicable_accessibilities = private
