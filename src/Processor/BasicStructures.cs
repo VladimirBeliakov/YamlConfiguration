@@ -5,7 +5,7 @@ namespace YamlConfiguration.Processor
 {
 	public static class BasicStructures
 	{
-		// TODO: Define the break code by the file parsed.
+		// TODO: Define the break code by the file parsed
 		internal static readonly RegexPattern Break = (RegexPattern) '\n';
 
 		internal static readonly RegexPattern Spaces = Characters.Space.WithLimitingRepetition(min: 1);
@@ -28,67 +28,18 @@ namespace YamlConfiguration.Processor
 		{
 			var indent = useAnchoredIndent ? _anchoredIndent : _indent;
 
-			switch (c)
+			return c switch
 			{
-				case Context.BlockIn:
-				case Context.BlockOut:
-					return indent;
-				case Context.FlowIn:
-				case Context.FlowOut:
-					return indent + SeparateInLine.AsOptional();
-				default:
-					throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(Context)} item {c}.");
-			}
+				Context.BlockIn or Context.BlockOut => indent,
+				Context.FlowIn or Context.FlowOut => indent + SeparateInLine.AsOptional(),
+				_ => throw new ArgumentOutOfRangeException(nameof(c), c, $"Unknown {nameof(Context)} item {c}."),
+			};
 		}
 
 		internal static RegexPattern EmptyLine(Context c, bool useAnchoredIndent = true)
 		{
 			return LinePrefix(c, useAnchoredIndent) + Break;
 		}
-
-		#region Folded Line Regexes
-
-		public static string TrimmedLine(Context c)
-		{
-			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their logic will be moved to upper levels.
-			throw new NotSupportedException();
-			return $"{Break}" +
-				   $"(?:{EmptyLine(c, useAnchoredIndent: false)})+";
-		}
-
-		// TODO: When writing the processor, one matter should be observed:
-		// if line breaks within a block surround a more intended line, then folding doesn't apply to such breaks.
-		public static string BreakAsSpace(string linePrefix = "")
-		{
-			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their logic will be moved to upper levels.
-			throw new NotSupportedException();
-			return Break +
-				linePrefix +
-				$"(?=.{{0,{Characters.CharGroupMaxLength}}}[^ \t{Break}]{{1,{Characters.CharGroupMaxLength}}}.{{0,{Characters.CharGroupMaxLength}}})";
-		}
-
-		public static string FlowFoldedTrimmedLine()
-		{
-			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their logic will be moved to upper levels.
-			throw new NotSupportedException();
-			return $"{SeparateInLine}?" +
-			TrimmedLine(Context.FlowIn) +
-			LinePrefix(Context.FlowIn, useAnchoredIndent: false);
-		}
-
-		public static string FlowFoldedLineWithBreakAsSpace()
-		{
-			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their logic will be moved to upper levels.
-			throw new NotSupportedException();
-			return $"{SeparateInLine}?" +
-			BreakAsSpace(linePrefix: LinePrefix(Context.FlowIn, useAnchoredIndent: false));
-		}
-
-		#endregion
 
 		// TODO: Replace with CommentParser
 		internal static readonly RegexPattern Comment =
@@ -100,31 +51,6 @@ namespace YamlConfiguration.Processor
 						.WithLimitingRepetition(max: Characters.CommentTextMaxLength)
 				).AsOptional()
 			).AsOptional() + Break;
-
-		// TODO: Move the logic to a higher level.
-		public static string SeparateLines(Context c)
-		{
-			// TODO: Since I'm going to process streams "line-by-line", multiline regex will be deleted and
-			// their logic will be moved to upper levels.
-			throw new NotSupportedException();
-			switch (c)
-			{
-				case Context.BlockIn:
-				case Context.BlockOut:
-				case Context.FlowIn:
-				case Context.FlowOut:
-					return $"(?:{Comment}" +
-						   $"(?:{Comment})*" +
-						   $"{LinePrefix(Context.FlowIn, useAnchoredIndent: false)}" +
-						   "|" +
-						   $"{SeparateInLine})";
-//				case BlockFlow.BlockKey:
-//				case BlockFlow.FlowKey:
-//					return _separateInLine;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(c), c, null);
-			}
-		}
 
 		internal static class Directives
 		{
@@ -184,7 +110,7 @@ namespace YamlConfiguration.Processor
 			// subject to tag resolution.
 			public static readonly RegexPattern VerbatimTag =
 				appendLookAhead(new RegexPattern(
-						$"!<{Characters.UriChar.WithLimitingRepetition(min: 1, asNonCapturingGroup: false).ToString()}>"
+						$"!<{Characters.UriChar.WithLimitingRepetition(min: 1, asNonCapturingGroup: false)}>"
 					)
 					.AsCapturingGroup()
 					.WithAnchorAtBeginning()

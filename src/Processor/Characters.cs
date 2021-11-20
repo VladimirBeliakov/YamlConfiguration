@@ -35,29 +35,29 @@ namespace YamlConfiguration.Processor
 		private static readonly string _basicLatinToLast16BitChar =
 			$"{Space}-\uD7FF{_privateUseAreaToSpecialsBeginning}{_notChars}";
 
-		#endregion
+		#endregion
 
-		#region Indicator Characters
+		#region Indicator Characters
 
-		public static readonly RegexPattern SequenceEntry = (RegexPattern) '\u002D';	// -
-		public static readonly RegexPattern MappingKey = (RegexPattern) '\u003F';		// ?
-		public static readonly RegexPattern MappingValue = (RegexPattern) '\u003A';		// :
-		public static readonly RegexPattern CollectEntry = (RegexPattern) '\u002C';		// ,
-		public static readonly RegexPattern SequenceStart = (RegexPattern) '\u005B';	// [
-		public static readonly RegexPattern SequenceEnd = (RegexPattern) '\u005D';		// ]
-		public static readonly RegexPattern MappingStart = (RegexPattern) '\u007B';		// {
-		public static readonly RegexPattern MappingEnd = (RegexPattern) '\u007D';		// }
-		public static readonly RegexPattern Comment = (RegexPattern) '\u0023';			// #
-		public static readonly RegexPattern Anchor = (RegexPattern) '\u0026';			// &
-		public static readonly RegexPattern Alias = (RegexPattern) '\u002A';			// *
-		public static readonly RegexPattern Tag = (RegexPattern) '\u0021';				// !
-		public static readonly RegexPattern Literal = (RegexPattern) '\u007C';			// |
-		public static readonly RegexPattern Folded = (RegexPattern) '\u003E';			// >
-		public static readonly RegexPattern SingleQuote = (RegexPattern) '\u0027';		// '
-		public static readonly RegexPattern DoubleQuote = (RegexPattern) '\u0022';		// "
-		public static readonly RegexPattern Directive = (RegexPattern) '\u0025';		// %
-		public static readonly RegexPattern ReservedChar1 = (RegexPattern) '\u0040';	// @
-		public static readonly RegexPattern ReservedChar2 = (RegexPattern) '\u0060';	// `
+		public static readonly RegexPattern SequenceEntry = (RegexPattern) '\u002D';    // -
+		public static readonly RegexPattern MappingKey = (RegexPattern) '\u003F';       // ?
+		public static readonly RegexPattern MappingValue = (RegexPattern) '\u003A';     // :
+		public static readonly RegexPattern CollectEntry = (RegexPattern) '\u002C';     // ,
+		public static readonly RegexPattern SequenceStart = (RegexPattern) '\u005B';    // [
+		public static readonly RegexPattern SequenceEnd = (RegexPattern) '\u005D';      // ]
+		public static readonly RegexPattern MappingStart = (RegexPattern) '\u007B';     // {
+		public static readonly RegexPattern MappingEnd = (RegexPattern) '\u007D';       // }
+		public static readonly RegexPattern Comment = (RegexPattern) '\u0023';          // #
+		public static readonly RegexPattern Anchor = (RegexPattern) '\u0026';           // &
+		public static readonly RegexPattern Alias = (RegexPattern) '\u002A';            // *
+		public static readonly RegexPattern Tag = (RegexPattern) '\u0021';              // !
+		public static readonly RegexPattern Literal = (RegexPattern) '\u007C';          // |
+		public static readonly RegexPattern Folded = (RegexPattern) '\u003E';           // >
+		public static readonly RegexPattern SingleQuote = (RegexPattern) '\u0027';      // '
+		public static readonly RegexPattern DoubleQuote = (RegexPattern) '\u0022';      // "
+		public static readonly RegexPattern Directive = (RegexPattern) '\u0025';        // %
+		public static readonly RegexPattern ReservedChar1 = (RegexPattern) '\u0040';    // @
+		public static readonly RegexPattern ReservedChar2 = (RegexPattern) '\u0060';    // `
 
 		public static readonly string FlowIndicators =
 			$@"{CollectEntry}\{SequenceStart}\{SequenceEnd}{MappingStart}{MappingEnd}";
@@ -135,7 +135,7 @@ namespace YamlConfiguration.Processor
 			RegexPatternBuilder.BuildAlternation(
 				RegexPatternBuilder.BuildCharSet(
 					Tab,
-					new String(new [] { _lf, _cr, _nel }),
+					new String(new[] { _lf, _cr, _nel }),
 					_basicLatinSubset,
 					_latinSupplementToHangulJamo,
 					_privateUseAreaToSpecialsBeginning
@@ -182,7 +182,7 @@ namespace YamlConfiguration.Processor
 		);
 
 		public static readonly RegexPattern NbChar = RegexPatternBuilder.BuildExclusive(
-			exclusiveChars: new String(new [] { _lf, _cr, ByteOrderMark }),
+			exclusiveChars: new String(new[] { _lf, _cr, ByteOrderMark }),
 			inclusiveChars: PrintableChar
 		);
 

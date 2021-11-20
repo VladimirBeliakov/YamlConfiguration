@@ -81,12 +81,12 @@ namespace YamlConfiguration.Processor.Tests
 			var newLine = Environment.NewLine;
 
 			yield return new BlockFlowTestCase(
-				type, 
+				type,
 				testValue: String.Empty + newLine + "\tABC\t  ",
 				wholeCapture: String.Empty + newLine
 			);
 			yield return new BlockFlowTestCase(
-				type, 
+				type,
 				testValue: spaces + newLine + "\tABC\t  ",
 				wholeCapture: spaces + newLine
 			);
