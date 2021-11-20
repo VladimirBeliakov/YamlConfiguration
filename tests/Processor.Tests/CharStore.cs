@@ -295,7 +295,7 @@ namespace YamlConfiguration.Processor.Tests
 #if RELEASE
 				getCharSequence(start: 0x0020, end: 0xD7FF)
 #else
-				new char[] {}
+				Array.Empty<char>()
 				.Append((char) 0x0020)
 				.Append((char) 0xD7FF)
 #endif

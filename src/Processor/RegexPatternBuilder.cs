@@ -15,16 +15,16 @@ namespace YamlConfiguration.Processor
 		public static RegexPattern BuildAlternation(params string[] items) => new($"(?:{join(items, separator: "|")})");
 
 		public static RegexPattern BuildLookAhead(RegexPattern beforeChars, RegexPattern lookAheadExpression) =>
-			new($"{beforeChars.ToString()}(?={lookAheadExpression.ToString()})");
+			new($"{beforeChars}(?={lookAheadExpression})");
 
 		public static string BuildLookBehind(RegexPattern lookBehindExpression, string afterChars) =>
-			$"(?<={lookBehindExpression.ToString()}){afterChars}";
+			$"(?<={lookBehindExpression}){afterChars}";
 
 		public static RegexPattern AsNonCapturingGroup(this RegexPattern pattern) =>
-			new($"(?:{pattern.ToString()})");
+			new($"(?:{pattern})");
 
 		public static RegexPattern AsCapturingGroup(this RegexPattern pattern) =>
-			new($"({pattern.ToString()})");
+			new($"({pattern})");
 
 		public static RegexPattern AsOptional(this RegexPattern pattern, bool asNonCapturingGroup = true) =>
 			new($"{(asNonCapturingGroup ? pattern.AsNonCapturingGroup().ToString() : pattern)}?");
@@ -36,14 +36,12 @@ namespace YamlConfiguration.Processor
 			bool asNonCapturingGroup = true
 		) => new(
 				$"{(asNonCapturingGroup ? pattern.AsNonCapturingGroup().ToString() : pattern)}" +
-				$"{{{min.ToString()},{max.ToString()}}}"
+				$"{{{min},{max}}}"
 			 );
 
-		public static RegexPattern WithAnchorAtBeginning(this RegexPattern pattern) =>
-			new($"^{pattern.ToString()}");
+		public static RegexPattern WithAnchorAtBeginning(this RegexPattern pattern) => new($"^{pattern}");
 
-		public static RegexPattern WithAnchorAtEnd(this RegexPattern pattern) =>
-			new($"{pattern.ToString()}$");
+		public static RegexPattern WithAnchorAtEnd(this RegexPattern pattern) => new($"{pattern}$");
 
 		private static string join(IEnumerable<string> items, string? separator = null) =>
 			String.Join(separator ?? String.Empty, items);

@@ -52,8 +52,10 @@ namespace YamlConfiguration.Processor.FlowStyles
 			);
 
 		private static RegexPattern getNbNsPlainInLine(Context context) =>
-			(RegexPatternBuilder.BuildCharSet(Characters.SWhites).WithLimitingRepetition() + getNsPlainChar(context))
-				.WithLimitingRepetition();
+			(
+				RegexPatternBuilder.BuildCharSet(Characters.SWhites).WithLimitingRepetition() +
+				getNsPlainChar(context)
+			).WithLimitingRepetition();
 
 		private static RegexPattern getNsPlainOneLine(Context context) =>
 			(getNsPlainFirst(context) + getNbNsPlainInLine(context)).WithAnchorAtBeginning();
