@@ -6,10 +6,10 @@ namespace YamlConfiguration.Processor
 	{
 		public FoldedLinesResult(uint emptyLineCount, bool isBreakAsSpace = false)
 		{
-			if (isBreakAsSpace && emptyLineCount > 0)
+			if ((isBreakAsSpace && emptyLineCount > 0) || (!isBreakAsSpace && emptyLineCount is 0))
 				throw new ArgumentException(
-						$"{nameof(isBreakAsSpace)} can't be true " +
-						$"when {nameof(emptyLineCount)} is greater than 0."
+						$"{nameof(isBreakAsSpace)} can't be true when {nameof(emptyLineCount)} is greater than 0, " +
+						$"and {nameof(emptyLineCount)} can't be 0 when {nameof(isBreakAsSpace)} is false."
 					);
 
 			EmptyLineCount = emptyLineCount;

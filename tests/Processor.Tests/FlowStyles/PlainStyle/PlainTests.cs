@@ -79,8 +79,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			var sb = new StringBuilder(oneGroupLength);
 
-			var nsPlainFirstCount = (nsPlainChars.Count / (groupItemCount / 4)) + 1;
-			var nsPlainFirsts = new List<string>(nsPlainFirstCount);
+			var nsPlainFirsts = new List<string>();
 
 			sb.Append(anyNsPlainFirst);
 

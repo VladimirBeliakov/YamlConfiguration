@@ -11,7 +11,7 @@ namespace YamlConfiguration.Processor.Tests
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class PlainInOneLineParserTests
 	{
-		[TestCaseSource(nameof(getKeyContext))]
+		[TestCaseSource(nameof(getKeyContexts))]
 		public async Task Process_KeyContextWithPlainOneLineValue_ReturnsValueAndAdvancesStream(Context context)
 		{
 			const string plainOneLine = "abc def";
@@ -24,7 +24,7 @@ namespace YamlConfiguration.Processor.Tests
 			A.CallTo(() => stream.Read((uint) plainOneLine.Length)).MustHaveHappenedOnceExactly();
 		}
 
-		[TestCaseSource(nameof(getKeyContext))]
+		[TestCaseSource(nameof(getKeyContexts))]
 		public async Task Process_KeyContextWithoutPlainOneLineValue_ReturnsNullAndDoesNotAdvanceStream(Context context)
 		{
 			const string? line = "# comment";
@@ -36,7 +36,7 @@ namespace YamlConfiguration.Processor.Tests
 			stream.AssertNotAdvanced();
 		}
 
-		[TestCaseSource(nameof(getInAndOutContext))]
+		[TestCaseSource(nameof(getInAndOutContexts))]
 		public void Process_NotKeyContext_Throws(Context context)
 		{
 			var stream = createStream();
@@ -78,10 +78,10 @@ namespace YamlConfiguration.Processor.Tests
 
 		private static PlainInOneLineParser createParser() => new();
 
-		private static IEnumerable<Context> getInAndOutContext() =>
-			Enum.GetValues<Context>().Except(getKeyContext());
+		private static IEnumerable<Context> getInAndOutContexts() =>
+			Enum.GetValues<Context>().Except(getKeyContexts());
 
-		private static IEnumerable<Context> getKeyContext()
+		private static IEnumerable<Context> getKeyContexts()
 		{
 			yield return Context.BlockKey;
 			yield return Context.FlowKey;
