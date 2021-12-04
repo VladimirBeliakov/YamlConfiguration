@@ -73,7 +73,7 @@ namespace YamlConfiguration.Processor.FlowStyles
 		public class NextLine
 		{
 			private static RegexPattern getPlainNextLine(Context context) =>
-				(getNsPlainChar(context) + getNbNsPlainInLine(context) + BasicStructures.Break)
+				((getNsPlainChar(context) + getNbNsPlainInLine(context)).AsCapturingGroup() + BasicStructures.Break)
 					.WithAnchorAtBeginning()
 					.WithAnchorAtEnd();
 

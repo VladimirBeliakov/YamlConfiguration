@@ -23,7 +23,9 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var match = _flowInNextLineRegex.Match(testCase.TestValue);
 
-			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
+			Assert.That(match.Groups.Count, Is.EqualTo(2));
+			Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
+			Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
 		[TestCaseSource(nameof(getPositiveTestCases), new Object[] { Context.FlowOut })]
@@ -31,7 +33,9 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			var match = _flowOutNextLineRegex.Match(testCase.TestValue);
 
-			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
+			Assert.That(match.Groups.Count, Is.EqualTo(2));
+			Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
+			Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
 		[TestCaseSource(nameof(getNegativeTextCases), new Object[] { Context.FlowIn })]
@@ -52,7 +56,7 @@ namespace YamlConfiguration.Processor.Tests
 				foreach (var plainNextLine in getPlainNextLine(nsPlainSafeChars))
 					yield return new(
 						testValue: plainNextLine + BasicStructures.Break,
-						wholeMatch: plainNextLine + BasicStructures.Break
+						wholeMatch: plainNextLine
 					);
 		}
 

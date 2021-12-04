@@ -8,6 +8,7 @@ using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor.Tests
 {
+	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class PlainMultilineParserTests
 	{
 		[TestCaseSource(nameof(getNotFlowContexts))]
