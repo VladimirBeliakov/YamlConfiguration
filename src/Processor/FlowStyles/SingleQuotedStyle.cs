@@ -20,7 +20,7 @@ namespace YamlConfiguration.Processor.FlowStyles
 		private static readonly string _nbSingleOneLine =
 			Characters.SingleQuote + _nbSingleChar.WithLimitingRepetition().AsCapturingGroup() + Characters.SingleQuote;
 
-		private static readonly Regex _oneLineRegex = new Regex(_nbSingleOneLine, RegexOptions.Compiled);
+		private static readonly Regex _oneLineRegex = new(_nbSingleOneLine, RegexOptions.Compiled);
 
 		// case BlockFlow.BlockKey
 		// case BlockFlow.FlowKey
@@ -64,24 +64,24 @@ namespace YamlConfiguration.Processor.FlowStyles
 			private static readonly RegexPattern _nonEmptyLine =
 				BasicStructures.LinePrefix(Context.FlowIn) + (_nsSingleChar + _nbNsSingleInLine).AsCapturingGroup();
 
-			private static readonly Regex _firstLineBreakRegex = new Regex(
+			private static readonly Regex _firstLineBreakRegex = new(
 				_nbNsSingleFirstLine + _foldedLineSequenceBeginning,
 				RegexOptions.Compiled
 			);
 
-			private static readonly Regex _emptyLineRegex = new Regex(
+			private static readonly Regex _emptyLineRegex = new(
 				_emptyLineWithoutBreak + BasicStructures.Break,
 				RegexOptions.Compiled
 			);
 
 			private static readonly Regex _nonEmptyLineRegex =
-				new Regex(_nonEmptyLine + _foldedLineSequenceBeginning, RegexOptions.Compiled);
+				new(_nonEmptyLine + _foldedLineSequenceBeginning, RegexOptions.Compiled);
 
-			private static readonly Regex _lastEmptyLineRegex = new Regex(
+			private static readonly Regex _lastEmptyLineRegex = new(
 				_emptyLineWithoutBreak + Characters.SingleQuote.WithAnchorAtEnd(),
 				RegexOptions.Compiled
 			);
-			private static readonly Regex _lastNonEmptyLineRegex = new Regex(
+			private static readonly Regex _lastNonEmptyLineRegex = new(
 				_nonEmptyLine +
 				BasicStructures.SeparateInLine.AsOptional().AsCapturingGroup() +
 				Characters.SingleQuote.WithAnchorAtEnd(),

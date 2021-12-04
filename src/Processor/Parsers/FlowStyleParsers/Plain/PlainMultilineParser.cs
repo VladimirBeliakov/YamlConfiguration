@@ -5,7 +5,7 @@ using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor
 {
-	internal class PlainMultilineParser
+	internal class PlainMultilineParser : IPlainMultilineParser
 	{
 		private readonly IPlainInOneLineParser _plainInOneLineParser;
 		private readonly IPlainNextLineParser _plainNextLineParser;

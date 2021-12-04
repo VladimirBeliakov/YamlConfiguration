@@ -5,6 +5,10 @@ namespace YamlConfiguration.Processor
 {
 	internal interface IPlainInOneLineParser
 	{
-		ValueTask<PlainLineNode?> TryProcess(ICharacterStream charStream, Context context, bool asOneLine = false);
+		ValueTask<PlainLineNode?> TryProcess(
+			ICharacterStream charStream,
+			Context context,
+			bool asOneLine = false
+		);
 	}
 }
