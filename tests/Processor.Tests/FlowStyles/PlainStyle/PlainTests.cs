@@ -13,31 +13,59 @@ namespace YamlConfiguration.Processor.Tests
 	public class PlainTests : PlainBaseTest
 	{
 		[TestCaseSource(nameof(getPositiveTestCases), new Object[] { Context.BlockKey })]
-		public void ValidOnePlainLineInBlockKey_Matches(RegexTestCase testCase)
+		public void ValidPlainOneLineInBlockKey_Matches(RegexTestCase testCase)
 		{
 			var match = _blockKeyOneLineRegex.Match(testCase.TestValue);
 
 			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
+		[TestCaseSource(nameof(getPositiveTestCases), new Object[] { Context.FlowOut })]
+		public void ValidPlainOneLineInFlowOut_Matches(RegexTestCase testCase)
+		{
+			var match = _flowOutOneLineRegex.Match(testCase.TestValue);
+
+			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
+		}
+
 		[TestCaseSource(nameof(getPositiveTestCases), new Object[] { Context.FlowKey })]
-		public void ValidOnePlainLineInFlowKey_Matches(RegexTestCase testCase)
+		public void ValidPlainOneLineInFlowKey_Matches(RegexTestCase testCase)
 		{
 			var match = _flowKeyOneLineRegex.Match(testCase.TestValue);
 
 			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
+		[TestCaseSource(nameof(getPositiveTestCases), new Object[] { Context.FlowIn })]
+		public void ValidPlainOneLineInFlowIn_Matches(RegexTestCase testCase)
+		{
+			var match = _flowInOneLineRegex.Match(testCase.TestValue);
+
+			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
+		}
+
 		[TestCaseSource(nameof(getNegativeTextCases), new Object[] { Context.BlockKey })]
-		public void InvalidOnePlainLineInBlockKey_DoesNotMatch(string testCase)
+		public void InvalidPlainOneLineInBlockKey_DoesNotMatch(string testCase)
 		{
 			Assert.False(_blockKeyOneLineRegexWithAnchorAtEnd.IsMatch(testCase));
 		}
 
+		[TestCaseSource(nameof(getNegativeTextCases), new Object[] { Context.FlowOut })]
+		public void InvalidPlainOneLineInFlowOut_DoesNotMatch(string testCase)
+		{
+			Assert.False(_flowOutOneLineRegexWithAnchorAtEnd.IsMatch(testCase));
+		}
+
 		[TestCaseSource(nameof(getNegativeTextCases), new Object[] { Context.FlowKey })]
-		public void InvalidOnePlainLineInFlowKey_DoesNotMatch(string testCase)
+		public void InvalidPlainOneLineInFlowKey_DoesNotMatch(string testCase)
 		{
 			Assert.False(_flowKeyOneLineRegexWithAnchorAtEnd.IsMatch(testCase));
+		}
+
+		[TestCaseSource(nameof(getNegativeTextCases), new Object[] { Context.FlowIn })]
+		public void InvalidPlainOneLineInFlowIn_DoesNotMatch(string testCase)
+		{
+			Assert.False(_flowInOneLineRegexWithAnchorAtEnd.IsMatch(testCase));
 		}
 
 		private static IEnumerable<RegexTestCase> getPositiveTestCases(Context context)
@@ -155,8 +183,8 @@ namespace YamlConfiguration.Processor.Tests
 
 			IReadOnlyCollection<string> invalidNsPlainSafes = context switch
 			{
-				Context.BlockKey => new[] { " " },
-				Context.FlowKey => CharStore.FlowIndicators.ToList(),
+				Context.BlockKey or Context.FlowOut => new[] { whiteChar },
+				Context.FlowKey or Context.FlowIn => CharStore.FlowIndicators.ToList(),
 				_ => throw new ArgumentOutOfRangeException(
 					nameof(context),
 					context,
@@ -201,7 +229,7 @@ namespace YamlConfiguration.Processor.Tests
 			}
 		}
 
-		private static Regex getRegexPatternFor(Context context, bool withAnchorAtEnd = false)
+		private static Regex getRegexFor(Context context, bool withAnchorAtEnd = false)
 		{
 			var regexPattern = Plain.GetPatternFor(context);
 
@@ -211,16 +239,24 @@ namespace YamlConfiguration.Processor.Tests
 			return new(regexPattern, RegexOptions.Compiled);
 		}
 
-		private static readonly Regex _blockKeyOneLineRegex =
-			getRegexPatternFor(Context.BlockKey);
+		private static readonly Regex _blockKeyOneLineRegex = getRegexFor(Context.BlockKey);
 
-		private static readonly Regex _flowKeyOneLineRegex =
-			getRegexPatternFor(Context.FlowKey);
+		private static readonly Regex _flowOutOneLineRegex = getRegexFor(Context.FlowOut);
+
+		private static readonly Regex _flowKeyOneLineRegex = getRegexFor(Context.FlowKey);
+
+		private static readonly Regex _flowInOneLineRegex = getRegexFor(Context.FlowIn);
 
 		private static readonly Regex _blockKeyOneLineRegexWithAnchorAtEnd =
-			getRegexPatternFor(Context.BlockKey, withAnchorAtEnd: true);
+			getRegexFor(Context.BlockKey, withAnchorAtEnd: true);
+
+		private static readonly Regex _flowOutOneLineRegexWithAnchorAtEnd =
+			getRegexFor(Context.FlowOut, withAnchorAtEnd: true);
 
 		private static readonly Regex _flowKeyOneLineRegexWithAnchorAtEnd =
-			getRegexPatternFor(Context.FlowKey, withAnchorAtEnd: true);
+			getRegexFor(Context.FlowKey, withAnchorAtEnd: true);
+
+		private static readonly Regex _flowInOneLineRegexWithAnchorAtEnd =
+			getRegexFor(Context.FlowIn, withAnchorAtEnd: true);
 	}
 }

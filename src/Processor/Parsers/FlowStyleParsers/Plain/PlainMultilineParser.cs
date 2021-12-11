@@ -36,18 +36,10 @@ namespace YamlConfiguration.Processor
 					$"Only {Context.FlowIn} and {Context.FlowOut} are allowed.", nameof(context)
 				);
 
-			var firstLine = await _plainInOneLineParser
-				.TryProcess(charStream, context, asOneLine: true)
-				.ConfigureAwait(false);
+			var firstLine = await _plainInOneLineParser.TryProcess(charStream, context).ConfigureAwait(false);
 
 			if (firstLine is null)
-			{
-				var plainInOneLine = await _plainInOneLineParser
-					.TryProcess(charStream, context, asOneLine: false)
-					.ConfigureAwait(false);
-
-				return plainInOneLine;
-			}
+				return null;
 
 			var result = new StringBuilder();
 

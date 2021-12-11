@@ -3,7 +3,7 @@ using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor.FlowStyles
 {
-	public class Plain
+	public static class Plain
 	{
 		private static readonly RegexPattern _nsPlainSafeOut = Characters.NsChar;
 
@@ -60,17 +60,9 @@ namespace YamlConfiguration.Processor.FlowStyles
 		private static RegexPattern getNsPlainOneLine(Context context) =>
 			(getNsPlainFirst(context) + getNbNsPlainInLine(context)).WithAnchorAtBeginning();
 
-		public static RegexPattern GetPatternFor(Context context) => context switch
-		{
-			Context.BlockKey or Context.FlowKey => getNsPlainOneLine(context),
-			_ => throw new ArgumentOutOfRangeException(
-					nameof(context),
-					context,
-					$"Only {Context.BlockKey} and {Context.FlowKey} are supported."
-				),
-		};
+		public static RegexPattern GetPatternFor(Context context) => getNsPlainOneLine(context);
 
-		public class NextLine
+		public static class NextLine
 		{
 			private static RegexPattern getPlainNextLine(Context context) =>
 				((getNsPlainChar(context) + getNbNsPlainInLine(context)).AsCapturingGroup() + BasicStructures.Break)

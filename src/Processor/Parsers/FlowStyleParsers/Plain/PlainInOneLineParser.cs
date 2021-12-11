@@ -16,20 +16,28 @@ namespace YamlConfiguration.Processor
 		private static readonly Regex _flowKeyOneLineRegex =
 			new(Plain.GetPatternFor(Context.FlowKey), RegexOptions.Compiled);
 
+		private static readonly Regex _flowInOneLineRegex =
+			new(Plain.GetPatternFor(Context.FlowIn), RegexOptions.Compiled);
+
+		private static readonly Regex _flowOutOneLineRegex =
+			new(Plain.GetPatternFor(Context.FlowOut), RegexOptions.Compiled);
+
 		public async ValueTask<PlainLineNode?> TryProcess(
 			ICharacterStream charStream,
-			Context context,
-			bool asOneLine = false
+			Context context
 		)
 		{
-			var regex = context switch
+			var (regex, asOneLine) = context switch
 			{
-				Context.BlockKey => _blockKeyOneLineRegex,
-				Context.FlowKey => _flowKeyOneLineRegex,
+				Context.BlockKey => (_blockKeyOneLineRegex, false),
+				Context.FlowKey => (_flowKeyOneLineRegex, false),
+				Context.FlowIn => (_flowInOneLineRegex, true),
+				Context.FlowOut => (_flowOutOneLineRegex, true),
 				_ => throw new ArgumentOutOfRangeException(
 						nameof(context),
 						context,
-						$"Only {Context.BlockKey} and {Context.FlowKey} are supported."
+						$"Only {Context.BlockKey}, {Context.FlowKey}, " +
+						$"{Context.FlowIn} and {Context.FlowOut} are supported."
 					)
 			};
 

@@ -11,8 +11,10 @@ namespace YamlConfiguration.Processor.Tests
 	[TestFixture, Parallelizable(ParallelScope.All)]
 	public class PlainInOneLineParserTests
 	{
-		[TestCaseSource(nameof(getKeyContexts))]
-		public async Task Process_KeyContextWithPlainOneLineValue_ReturnsValueAndAdvancesStream(Context context)
+		[TestCaseSource(nameof(getInLineContexts))]
+		public async Task TryProcess_InLineContextAndStreamWithPlainOneLineValue_ReturnsParsedValue(
+			Context context
+		)
 		{
 			const string plainOneLine = "abc def";
 			var line = $"{plainOneLine} # comment";
@@ -24,8 +26,10 @@ namespace YamlConfiguration.Processor.Tests
 			A.CallTo(() => stream.Read((uint) plainOneLine.Length)).MustHaveHappenedOnceExactly();
 		}
 
-		[TestCaseSource(nameof(getKeyContexts))]
-		public async Task Process_KeyContextWithoutPlainOneLineValue_ReturnsNullAndDoesNotAdvanceStream(Context context)
+		[TestCaseSource(nameof(getInLineContexts))]
+		public async Task TryProcess_InLineContextAndStreamWithoutPlainOneLineValue_ReturnsNull(
+			Context context
+		)
 		{
 			const string? line = "# comment";
 			var stream = createStream(line);
@@ -36,32 +40,34 @@ namespace YamlConfiguration.Processor.Tests
 			stream.AssertNotAdvanced();
 		}
 
-		[TestCaseSource(nameof(getInAndOutContexts))]
-		public void Process_NotKeyContext_Throws(Context context)
+		[TestCaseSource(nameof(getInvalidContexts))]
+		public void TryProcess_InvalidContext_Throws(Context context)
 		{
 			var stream = createStream();
 
-			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => createParser().TryProcess(stream, context).AsTask());
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+				createParser().TryProcess(stream, context).AsTask()
+			);
 			stream.AssertNotAdvanced();
 		}
 
-		[Test]
-		public async Task Process_AsOneLine_OnlyPartOfLineParsed_ReturnsNull()
+		[TestCaseSource(nameof(getWholeLineContexts))]
+		public async Task TryProcess_WholeLineContext_OnlyPartOfLineParsed_ReturnsNull(Context context)
 		{
 			var stream = createStream("key: value");
 
-			var result = await createParser().TryProcess(stream, Context.BlockKey, asOneLine: true);
+			var result = await createParser().TryProcess(stream, context);
 
 			Assert.Null(result);
 		}
 
-		[Test]
-		public async Task Process_AsOneLine_WholeLineParsed_ReturnsParsedValueAndAdvancesStream()
+		[TestCaseSource(nameof(getWholeLineContexts))]
+		public async Task TryProcess_WholeLineContext_WholeLineParsed_ReturnsParsedValue(Context context)
 		{
 			var plainOneLineValue = "plain value\n";
 			var stream = createStream(plainOneLineValue);
 
-			var result = await createParser().TryProcess(stream, Context.BlockKey, asOneLine: true);
+			var result = await createParser().TryProcess(stream, context);
 
 			Assert.That(result?.Value, Is.EqualTo(plainOneLineValue[..^1]));
 			A.CallTo(() => stream.Read((uint) plainOneLineValue.Length)).MustHaveHappenedOnceExactly();
@@ -78,13 +84,19 @@ namespace YamlConfiguration.Processor.Tests
 
 		private static PlainInOneLineParser createParser() => new();
 
-		private static IEnumerable<Context> getInAndOutContexts() =>
-			Enum.GetValues<Context>().Except(getKeyContexts());
+		private static IEnumerable<Context> getInvalidContexts() =>
+			Enum.GetValues<Context>().Except(getInLineContexts()).Except(getWholeLineContexts());
 
-		private static IEnumerable<Context> getKeyContexts()
+		private static IEnumerable<Context> getInLineContexts()
 		{
 			yield return Context.BlockKey;
 			yield return Context.FlowKey;
+		}
+
+		private static IEnumerable<Context> getWholeLineContexts()
+		{
+			yield return Context.FlowOut;
+			yield return Context.FlowIn;
 		}
 	}
 }
