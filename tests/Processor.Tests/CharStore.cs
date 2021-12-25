@@ -280,7 +280,7 @@ namespace YamlConfiguration.Processor.Tests
 					 select new String(new[] { highSurrogate, lowSurrogate }))
 					.ToList()
 #else
-				   new [] {
+				   new[] {
 					   new String(new[] { (char) 0xD800, (char) 0xDC00 }),
 					   new String(new[] { (char) 0xDBFF, (char) 0xDFFF }),
 				   }

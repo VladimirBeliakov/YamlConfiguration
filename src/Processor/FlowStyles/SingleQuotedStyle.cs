@@ -4,7 +4,7 @@ using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor.FlowStyles
 {
-	public class SingleQuotedStyle
+	public static class SingleQuotedStyle
 	{
 		private static readonly RegexPattern _quotedQuote = Characters.SingleQuote + Characters.SingleQuote;
 
@@ -17,27 +17,23 @@ namespace YamlConfiguration.Processor.FlowStyles
 		private static readonly RegexPattern _nbSingleChar =
 			RegexPatternBuilder.BuildAlternation(_quotedQuote, _jsonWithoutSingleQuote);
 
-		private static readonly string _nbSingleOneLine =
-			Characters.SingleQuote + _nbSingleChar.WithLimitingRepetition().AsCapturingGroup() + Characters.SingleQuote;
+		private static readonly RegexPattern _nbSingleFirstLine =
+			(Characters.SingleQuote + _nbSingleChar.WithLimitingRepetition().AsCapturingGroup())
+				.WithAnchorAtBeginning();
 
-		private static readonly Regex _oneLineRegex = new(_nbSingleOneLine, RegexOptions.Compiled);
+		private static readonly RegexPattern _nbSingleInLine = _nbSingleFirstLine + Characters.SingleQuote;
 
-		// case BlockFlow.BlockKey
-		// case BlockFlow.FlowKey
-		public static bool TryProcessOneLine(string value, out string? extractedValue)
+		public static RegexPattern GetPatternFor(Context context) => context switch
 		{
-			extractedValue = null;
-
-			var match = _oneLineRegex.Match(value);
-
-			if (match.Success)
-			{
-				extractedValue = match.Groups[1].Captures[0].Value;
-				return true;
-			}
-
-			return false;
-		}
+			Context.BlockKey or Context.FlowKey => _nbSingleInLine,
+			Context.FlowOut or Context.FlowIn => _nbSingleFirstLine + BasicStructures.Break,
+			_ => throw new ArgumentOutOfRangeException(
+				nameof(context),
+				context,
+				$"Only {Context.BlockKey}, {Context.FlowKey}, " +
+				$"{Context.FlowIn}, and {Context.FlowOut} are allowed."
+			),
+		};
 
 		// case BlockFlow.FlowIn
 		// case BlockFlow.FlowOut

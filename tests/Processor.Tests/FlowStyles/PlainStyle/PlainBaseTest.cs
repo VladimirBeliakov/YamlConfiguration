@@ -14,10 +14,11 @@ namespace YamlConfiguration.Processor.Tests
 				Context.FlowOut or Context.BlockKey => Enumerable.Empty<string>(),
 				Context.FlowIn or Context.FlowKey => CharStore.FlowIndicators,
 				_ => throw new ArgumentOutOfRangeException(
-					nameof(context),
-					context,
-					$"Only {Context.FlowOut} and {Context.FlowIn} can be processed."
-				)
+						nameof(context),
+						context,
+						$"Only {Context.BlockKey}, {Context.FlowKey}, " +
+						$"{Context.FlowIn} and {Context.FlowOut} are supported."
+					)
 			};
 
 			var nsPlainSafeCharsWithoutSurrogates =

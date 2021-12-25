@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using YamlConfiguration.Processor.FlowStyles;
+using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor.Tests
 {
@@ -10,55 +12,91 @@ namespace YamlConfiguration.Processor.Tests
 	public class SingleQuotedOneLineTests
 	{
 		[TestCaseSource(nameof(getPositiveOneLineTestCases))]
-		public void ValidOneSingleQuotedLine_ReturnsTrueAndExtractedValue(Tuple<string, string> testCase)
+		public void ValidOneSingleQuotedLineInBlockKey_Matches((RegexTestCase, Context) testCaseWithContext)
 		{
-			var (testValue, expectedExtractedValue) = testCase;
+			var (testCase, context) = testCaseWithContext;
 
-			var isSuccess = SingleQuotedStyle.TryProcessOneLine(testValue, out var extractedValue);
+			var match = getRegexFor(context).Match(testCase.TestValue);
 
-			Assert.True(isSuccess);
-			Assert.That(extractedValue, Is.EqualTo(expectedExtractedValue));
+			Assert.That(match.Groups.Count, Is.EqualTo(2));
+			Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
+			Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(testCase.WholeMatch));
 		}
 
 		[TestCaseSource(nameof(getNegativeOneLineCases))]
-		public void InvalidOneSingleQuotedLine_ReturnsFalseAndNullAsExtractedValue(string testCase)
+		public void InvalidOneSingleQuotedLine_DoesNotMatch((string value, Context context) testCase)
 		{
-			var isSuccess = SingleQuotedStyle.TryProcessOneLine(testCase, out var extractedValue);
-
-			Assert.False(isSuccess);
-			Assert.Null(extractedValue);
+			Assert.False(getRegexFor(testCase.context, withAnchorAtEnd: true).IsMatch(testCase.value));
 		}
 
-		private static IEnumerable<Tuple<string, string>> getPositiveOneLineTestCases()
+		private static IEnumerable<(RegexTestCase, Context)> getPositiveOneLineTestCases()
 		{
-			var chars = CharStore.Chars;
+			static string getCharsAtEnd(Context context) => context switch
+			{
+				Context.BlockKey or Context.FlowKey => $"'{CharStore.Chars}",
+				Context.FlowIn or Context.FlowOut => $"\n{CharStore.Chars}",
+				_ => throw new ArgumentOutOfRangeException(
+						nameof(context),
+						context,
+						$"Only {Context.BlockKey}, {Context.FlowKey}, " +
+						$"{Context.FlowIn} and {Context.FlowOut} are supported."
+					),
+			};
 
 			var nbSingleOneLines =
 				CharStore.NbNsSingleCharsWithoutSurrogates.Value
 					.GroupBy(Characters.CharGroupMaxLength)
 					.Concat(CharStore.SurrogatePairs.Value.GroupBy(Characters.CharGroupMaxLength))
 					.Append(CharStore.GetCharRange("''"))
-					.Append(string.Empty);
+					.Append(String.Empty);
+
+			var contexts = new[] { Context.BlockKey, Context.FlowKey, Context.FlowIn, Context.FlowOut };
 
 			foreach (var nbSingleOneLine in nbSingleOneLines)
-			{
-				yield return Tuple.Create(
-					chars + "'" + nbSingleOneLine + "'" + chars,
-					nbSingleOneLine
-				);
-			}
+				foreach (var context in contexts)
+					yield return (
+							new($"'{nbSingleOneLine}{getCharsAtEnd(context)}", nbSingleOneLine),
+							context
+						);
 		}
 
-		private static IEnumerable<string> getNegativeOneLineCases()
+		private static IEnumerable<(string, Context)> getNegativeOneLineCases()
 		{
+			static string getLastChars(Context context) => context switch
+			{
+				Context.FlowKey or Context.BlockKey => "'",
+				Context.FlowIn or Context.FlowOut => "\n",
+				_ => throw new ArgumentOutOfRangeException(
+						$"Only {Context.BlockKey}, {Context.FlowKey}, " +
+						$"{Context.FlowIn} and {Context.FlowOut} are supported."
+				),
+			};
+
 			var chars = CharStore.Chars;
 			var tooManyNbSingleChars = CharStore.GetCharRange("a") + "a";
 
-			yield return chars + "'" + "\u0019" + "'" + chars;
-			yield return chars + "'" + "a" + chars;
-			yield return chars + "a" + "'" + chars;
-			yield return chars + "a" + chars;
-			yield return chars + "'" + tooManyNbSingleChars + "'" + chars;
+			var contexts = new[] { Context.FlowKey, Context.BlockKey, Context.FlowIn, Context.FlowOut };
+
+			foreach (var context in contexts)
+			{
+				var lastChars = getLastChars(context);
+
+				yield return ($"'\u0019{lastChars}", context);
+				yield return ($"'a{chars}", context);
+				yield return ($"a'{chars}", context);
+				yield return ($"a{chars}", context);
+				yield return ($"'{tooManyNbSingleChars}{lastChars}", context);
+			}
+		}
+
+		private static Regex getRegexFor(Context context, bool withAnchorAtEnd = false)
+		{
+			var regexPattern = SingleQuotedStyle.GetPatternFor(context);
+
+			if (withAnchorAtEnd)
+				regexPattern = regexPattern.WithAnchorAtEnd();
+
+			return new(regexPattern);
 		}
 	}
 }

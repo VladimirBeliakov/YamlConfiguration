@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp5.0</TargetFramework>
+        <TargetFramework>netcoreapp6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <AssemblyName>YamlConfiguration.Processor</AssemblyName>
         <RootNamespace>YamlConfiguration.Processor</RootNamespace>
-        <LangVersion>9</LangVersion>
+        <LangVersion>10</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
