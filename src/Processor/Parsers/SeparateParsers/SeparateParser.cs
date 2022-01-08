@@ -9,7 +9,10 @@ namespace YamlConfiguration.Processor
 		private readonly ISeparateLinesParser _separateLinesParser;
 		private readonly ISeparateInLineParser _separateInLineParser;
 
-		public SeparateParser(ISeparateLinesParser separateLinesParser, ISeparateInLineParser separateInLineParser)
+		public SeparateParser(
+			ISeparateLinesParser separateLinesParser,
+			ISeparateInLineParser separateInLineParser
+		)
 		{
 			_separateLinesParser = separateLinesParser;
 			_separateInLineParser = separateInLineParser;

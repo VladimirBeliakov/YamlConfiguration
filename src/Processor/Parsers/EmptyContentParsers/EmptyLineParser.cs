@@ -7,18 +7,18 @@ namespace YamlConfiguration.Processor
 	{
 		public async ValueTask<bool> TryProcess(ICharacterStream charStream)
 		{
-			var readLine = await charStream.PeekLine().ConfigureAwait(false);
+			var peekedLine = await charStream.PeekLine().ConfigureAwait(false);
 
-			if (String.IsNullOrEmpty(readLine))
+			if (String.IsNullOrEmpty(peekedLine))
 				return false;
 
-			if (readLine[0] == Characters.Tab)
+			if (peekedLine[0] == Characters.Tab)
 				throw new InvalidYamlException("An empty line can't begin with a tab.");
 
-			if (readLine[^1] != BasicStructures.Break)
+			if (peekedLine[^1] != BasicStructures.Break)
 				return false;
 
-			foreach (var @char in readLine[..^1])
+			foreach (var @char in peekedLine[..^1])
 				if (!@char.IsWhiteSpace())
 					return false;
 

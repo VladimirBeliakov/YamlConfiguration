@@ -1,9 +1,10 @@
 using System.Threading.Tasks;
+using YamlConfiguration.Processor.FlowStyles;
 
 namespace YamlConfiguration.Processor
 {
 	internal interface IFlowFoldedLinesParser
 	{
-		ValueTask<FoldedLinesResult?> TryProcess(ICharacterStream charStream, uint indentLength);
+		ValueTask<FlowFoldedLinesResult> TryProcess(ICharacterStream charStream, uint indentLength);
 	}
 }

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using YamlConfiguration.Processor.FlowStyles;
 
 namespace YamlConfiguration.Processor
 {
@@ -19,21 +20,27 @@ namespace YamlConfiguration.Processor
 			_flowLinePrefixParser = flowLinePrefixParser;
 		}
 
-		public async ValueTask<FoldedLinesResult?> TryProcess(ICharacterStream charStream, uint indentLength)
+		public async ValueTask<FlowFoldedLinesResult> TryProcess(ICharacterStream charStream, uint indentLength)
 		{
-			// Not checking the result because a separate in line is optional here.
-			await _separateInLineParser.TryProcess(charStream).ConfigureAwait(false);
+			var (isSeparateInLine, whiteSpaceCount) =
+				await _separateInLineParser.Peek(charStream).ConfigureAwait(false);
 
-			var foldedLinesResult = await _foldedLinesParser.Process(charStream).ConfigureAwait(false);
+			if (isSeparateInLine)
+				await charStream.AdvanceBy(whiteSpaceCount).ConfigureAwait(false);
+
+			var foldedLinesResult =
+				await _foldedLinesParser.Process(charStream).ConfigureAwait(false);
+
+			var result = new FlowFoldedLinesResult(whiteSpaceCount, foldedLinesResult);
 
 			if (foldedLinesResult is null)
-				return null;
+				return result;
 
 			var isFlowLinePrefix =
 				await _flowLinePrefixParser.TryProcess(charStream, indentLength).ConfigureAwait(false);
 
 			return isFlowLinePrefix
-				? foldedLinesResult
+				? result
 				: throw new InvalidYamlException("Folded lines must be followed by a flow line prefix.");
 		}
 	}

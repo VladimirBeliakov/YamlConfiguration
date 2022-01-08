@@ -23,10 +23,12 @@ namespace YamlConfiguration.Processor
 		{
 			if (indentLength.HasValue)
 			{
-				var isComment = await _multilineCommentParser.TryProcess(charStream).ConfigureAwait(false);
+				var isComment =
+					await _multilineCommentParser.TryProcess(charStream).ConfigureAwait(false);
 
 				if (isComment)
-					return await _flowLinePrefixParser.TryProcess(charStream, indentLength.Value).ConfigureAwait(false);
+					return await _flowLinePrefixParser.TryProcess(charStream, indentLength.Value)
+						.ConfigureAwait(false);
 
 				return false;
 			}

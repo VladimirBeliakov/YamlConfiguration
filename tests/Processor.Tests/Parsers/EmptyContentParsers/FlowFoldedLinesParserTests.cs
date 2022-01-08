@@ -8,15 +8,21 @@ namespace YamlConfiguration.Processor.Tests
 	public class FlowFoldedLinesParserTests
 	{
 		[Test]
-		public async Task TryProcess_StreamWithoutFoldedLines_ReturnsNull()
+		public async Task TryProcess_StreamWithoutFoldedLinesAndSeparateInLine_ReturnsEmptyResult()
 		{
 			var foldedLineParser = A.Fake<IFoldedLinesParser>();
 			A.CallTo(() => foldedLineParser.Process(A<ICharacterStream>._)).Returns(null);
+			var separateInLineParser = A.Fake<ISeparateInLineParser>();
+			var separateInLineResult = new ParsedSeparateInLineResult(isSeparateInLine: false, whiteSpaceCount: 0);
+			A.CallTo(() => separateInLineParser.Peek(A<ICharacterStream>._)).Returns(separateInLineResult);
 
+			var charStream = A.Fake<ICharacterStream>();
 			var result =
-				await createParser(foldedLineParser).TryProcess(A.Dummy<ICharacterStream>(), indentLength: 0);
+				await createParser(foldedLineParser).TryProcess(charStream, indentLength: 0);
 
-			Assert.Null(result);
+			Assert.Null(result.FoldedLineResult);
+			Assert.Zero(result.SeparateInLineWhiteSpaceCount);
+			A.CallTo(() => charStream.Read(A<uint>._)).MustNotHaveHappened();
 		}
 
 		[Test]
@@ -31,31 +37,38 @@ namespace YamlConfiguration.Processor.Tests
 			var parser = createParser(foldedLineParser, flowLinePrefixParser);
 
 			Assert.ThrowsAsync<InvalidYamlException>(
-				() => parser.TryProcess(A.Dummy<ICharacterStream>(), indentLength: 0).AsTask()
+				() => ((IFlowFoldedLinesParser) parser).TryProcess(A.Dummy<ICharacterStream>(), indentLength: 0).AsTask()
 			);
 		}
 
 		[Test]
-		public async Task TryProcess_StreamWithFoldedLinesAndFlowLinePrefix_ReturnsFoldedLinesResult()
+		public async Task TryProcess_StreamWithFoldedLinesAndFlowLinePrefix_ReturnsFlowFoldedLinesResult()
 		{
 			var foldedLinesResult = new FoldedLinesResult(emptyLineCount: 1);
 			var foldedLineParser = A.Fake<IFoldedLinesParser>();
 			A.CallTo(() => foldedLineParser.Process(A<ICharacterStream>._)).Returns(foldedLinesResult);
 			var flowLinePrefixParser = A.Fake<IFlowLinePrefixParser>();
 			A.CallTo(() => flowLinePrefixParser.TryProcess(A<ICharacterStream>._, A<uint>._)).Returns(true);
+			var separateInLineParser = A.Fake<ISeparateInLineParser>();
+			var separateInLineResult = new ParsedSeparateInLineResult(isSeparateInLine: true, whiteSpaceCount: 2);
+			A.CallTo(() => separateInLineParser.Peek(A<ICharacterStream>._)).Returns(separateInLineResult);
 
-			var parser = createParser(foldedLineParser, flowLinePrefixParser);
-			var result = await parser.TryProcess(A.Dummy<ICharacterStream>(), indentLength: 0);
+			var parser = createParser(foldedLineParser, flowLinePrefixParser, separateInLineParser);
+			var charStream = A.Fake<ICharacterStream>();
+			var result = await ((IFlowFoldedLinesParser) parser).TryProcess(charStream, indentLength: 0);
 
-			Assert.That(result, Is.SameAs(foldedLinesResult));
+			Assert.That(result.FoldedLineResult, Is.SameAs(foldedLinesResult));
+			Assert.That(result.SeparateInLineWhiteSpaceCount, Is.EqualTo(separateInLineResult.WhiteSpaceCount));
+			A.CallTo(() => charStream.Read(separateInLineResult.WhiteSpaceCount)).MustHaveHappenedOnceExactly();
 		}
 
 		private static FlowFoldedLinesParser createParser(
 			IFoldedLinesParser? foldedLinesParser = null,
-			IFlowLinePrefixParser? flowLinePrefixParser = null
+			IFlowLinePrefixParser? flowLinePrefixParser = null,
+			ISeparateInLineParser? separateInLineParser = null
 		)
 		{
-			var separateInLineParser = A.Dummy<ISeparateInLineParser>();
+			var defaultSeparateInLineParser = A.Dummy<ISeparateInLineParser>();
 			var defaultFoldedLineParser = A.Fake<IFoldedLinesParser>();
 
 			A.CallTo(() => defaultFoldedLineParser.Process(A<ICharacterStream>._))
@@ -66,7 +79,7 @@ namespace YamlConfiguration.Processor.Tests
 			A.CallTo(() => defaultFlowLinePrefixParser.TryProcess(A<ICharacterStream>._, A<uint>._)).Returns(true);
 
 			return new(
-				separateInLineParser,
+				separateInLineParser ?? defaultSeparateInLineParser,
 				foldedLinesParser ?? defaultFoldedLineParser,
 				flowLinePrefixParser ?? defaultFlowLinePrefixParser
 			);

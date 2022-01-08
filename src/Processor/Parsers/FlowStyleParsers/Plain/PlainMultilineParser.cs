@@ -49,19 +49,21 @@ namespace YamlConfiguration.Processor
 			{
 				// If the next line is empty, we just discard any folded lines 
 				// since they are not important for the next node.
-				var foldedLines =
-					await _flowFoldedLinesParser.TryProcess(charStream, indentLength).ConfigureAwait(false);
+				var flowFoldedLinesResult =
+					await _flowFoldedLinesParser
+						.TryProcess(charStream, indentLength).ConfigureAwait(false);
 
-				var nextLine = await _plainNextLineParser.TryProcess(charStream, context).ConfigureAwait(false);
+				var nextLine =
+					await _plainNextLineParser.TryProcess(charStream, context).ConfigureAwait(false);
 
 				if (String.IsNullOrEmpty(nextLine))
 					break;
 
-				if (foldedLines is not null)
-					if (foldedLines.IsBreakAsSpace)
+				if (flowFoldedLinesResult.FoldedLineResult is not null)
+					if (flowFoldedLinesResult.FoldedLineResult.IsBreakAsSpace)
 						result.Append(_spaceChar);
 					else
-						for (var i = 0; i < foldedLines.EmptyLineCount; i++)
+						for (var i = 0; i < flowFoldedLinesResult.FoldedLineResult.EmptyLineCount; i++)
 							result.Append(_breakChar);
 				else
 					throw new InvalidYamlException("Plain lines must be separated by folded lines.");

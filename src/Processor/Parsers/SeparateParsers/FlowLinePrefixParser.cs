@@ -26,7 +26,8 @@ namespace YamlConfiguration.Processor
 
 			await charStream.AdvanceBy(indentLength).ConfigureAwait(false);
 
-			var (_, whiteSpaceCount) = await _separateInLineParser.Peek(charStream).ConfigureAwait(false);
+			var (_, whiteSpaceCount) =
+				await _separateInLineParser.Peek(charStream).ConfigureAwait(false);
 
 			if (whiteSpaceCount > 0)
 				await charStream.AdvanceBy(whiteSpaceCount).ConfigureAwait(false);

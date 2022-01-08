@@ -9,7 +9,8 @@ namespace YamlConfiguration.Processor
 			ICharacterStream charStream
 		)
 		{
-			var (isSeparateInLine, whiteSpaceCount) = await separateInLineParser.Peek(charStream).ConfigureAwait(false);
+			var (isSeparateInLine, whiteSpaceCount) =
+				await separateInLineParser.Peek(charStream).ConfigureAwait(false);
 
 			if (isSeparateInLine)
 			{
