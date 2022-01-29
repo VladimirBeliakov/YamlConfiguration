@@ -14,25 +14,16 @@ namespace YamlConfiguration.Processor
 		private static readonly Regex _flowKeyOneLineRegex =
 			new(SingleQuotedStyle.GetInLinePatternFor(Context.FlowKey), RegexOptions.Compiled);
 
-		private static readonly Regex _flowInOneLineRegex =
-			new(SingleQuotedStyle.GetInLinePatternFor(Context.FlowIn), RegexOptions.Compiled);
-
-		private static readonly Regex _flowOutOneLineRegex =
-			new(SingleQuotedStyle.GetInLinePatternFor(Context.FlowOut), RegexOptions.Compiled);
-
 		public async ValueTask<SingleQuotedLineNode?> Process(ICharacterStream charStream, Context context)
 		{
 			var regex = context switch
 			{
 				Context.BlockKey => _blockKeyOneLineRegex,
 				Context.FlowKey => _flowKeyOneLineRegex,
-				Context.FlowIn => _flowInOneLineRegex,
-				Context.FlowOut => _flowOutOneLineRegex,
 				_ => throw new ArgumentOutOfRangeException(
 						nameof(context),
 						context,
-						$"Only {Context.BlockKey}, {Context.FlowKey}, " +
-						$"{Context.FlowIn}, and {Context.FlowOut} are supported."
+						$"Only {Context.BlockKey} and {Context.FlowKey}, are supported."
 					),
 			};
 

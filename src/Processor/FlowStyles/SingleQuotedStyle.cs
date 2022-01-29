@@ -56,25 +56,27 @@ namespace YamlConfiguration.Processor.FlowStyles
 			private static readonly RegexPattern _singleNextLine =
 				((_nsSingleChar + _singleInLine).AsCapturingGroup() + _closingSingleQuote).WithAnchorAtBeginning();
 
-			public static RegexPattern GetFirstLinePatternFor(Context context) => context switch
-			{
-				Context.FlowIn or Context.FlowOut => _singleInFirstLine,
-				_ => throw new ArgumentOutOfRangeException(
-						nameof(context),
-						context,
-						$"Only {Context.FlowIn} and {Context.FlowOut} are allowed."
-					),
-			};
+			public static RegexPattern GetFirstLinePatternFor(Context context) =>
+				context switch
+				{
+					Context.FlowIn or Context.FlowOut => _singleInFirstLine,
+					_ => throw new ArgumentOutOfRangeException(
+							nameof(context),
+							context,
+							$"Only {Context.FlowIn} and {Context.FlowOut} are allowed."
+						),
+				};
 
-			public static RegexPattern GetNextLinePatternFor(Context context) => context switch
-			{
-				Context.FlowIn or Context.FlowOut => _singleNextLine,
-				_ => throw new ArgumentOutOfRangeException(
-						nameof(context),
-						context,
-						$"Only {Context.FlowIn} and {Context.FlowOut} are allowed."
-					),
-			};
+			public static RegexPattern GetNextLinePatternFor(Context context) =>
+				context switch
+				{
+					Context.FlowIn or Context.FlowOut => _singleNextLine,
+					_ => throw new ArgumentOutOfRangeException(
+							nameof(context),
+							context,
+							$"Only {Context.FlowIn} and {Context.FlowOut} are allowed."
+						),
+				};
 		}
 	}
 }
