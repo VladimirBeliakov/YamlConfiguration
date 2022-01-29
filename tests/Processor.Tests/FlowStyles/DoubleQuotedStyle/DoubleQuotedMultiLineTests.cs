@@ -90,16 +90,12 @@ namespace YamlConfiguration.Processor.Tests
 			Assert.Throws<InvalidOperationException>(() => multiLine.ProcessNextLine(string.Empty));
 		}
 
-		private static IEnumerable<MultiLineOneLineTestCase> getFirstLinePositiveTestCases() =>
-			GetFirstLines(isDoubleQuoted: true, withEscapedBreak: false)
-				.Concat(GetFirstLines(isDoubleQuoted: true, withEscapedBreak: true));
+		private static IEnumerable<RegexTestCase> getFirstLinePositiveTestCases() =>
+			GetFirstLines(isDoubleQuoted: true);
 
-		private static IEnumerable<MultiLineOneLineTestCase> getNextLinePositiveTestCases() =>
-			GetEmptyNextLines(isDoubleQuoted: true, isLastLine: false)
-				.Concat(GetEmptyNextLines(isDoubleQuoted: true, isLastLine: true))
-				.Concat(GetNonEmptyLines(isDoubleQuoted: true, withEscapedBreak: false, isLastLine: false))
-				.Concat(GetNonEmptyLines(isDoubleQuoted: true, withEscapedBreak: true, isLastLine: false))
-				.Concat(GetNonEmptyLines(isDoubleQuoted: true, withEscapedBreak: false, isLastLine: true));
+		private static IEnumerable<RegexTestCase> getNextLinePositiveTestCases() =>
+				GetNextLines(isDoubleQuoted: true, withClosingQuote: false)
+				.Concat(GetNextLines(isDoubleQuoted: true, withClosingQuote: true));
 
 	}
 }

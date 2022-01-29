@@ -2,150 +2,82 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using YamlConfiguration.Processor.FlowStyles;
 
 namespace YamlConfiguration.Processor.Tests
 {
 	public abstract class QuotedMultiLineBaseTest
 	{
-		protected static IEnumerable<MultiLineOneLineTestCase> GetFirstLines(
+		protected static IEnumerable<RegexTestCase> GetFirstLines(
 			bool isDoubleQuoted,
-			bool withEscapedBreak = false
+			bool withClosingQuote = false
 		)
 		{
 			var quote = isDoubleQuoted ? "\"" : "\'";
-			var @break = withEscapedBreak && isDoubleQuoted ? "\\" + Environment.NewLine : Environment.NewLine;
-			var chars = CharStore.Chars;
+			var @break = BasicStructures.Break;
 
-			var separateInLineCases = CharStore.SeparateInLineCases;
+			var closingWhites = withClosingQuote ? CharStore.SpacesAndTabs : null;
+			var closingChars = withClosingQuote ? closingWhites + quote : null;
 
 			var nbNsInLineCases = getNbNsInLineCases(isFirstLine: true, isDoubleQuoted);
-			var anySeparateInLine = separateInLineCases.First();
-			var anyNonSpaceCharGroup = nbNsInLineCases.First();
 
-			string trailingWhiteSpaces;
 			foreach (var nbNsInLine in nbNsInLineCases)
-			{
-				trailingWhiteSpaces = withEscapedBreak && isDoubleQuoted ? anySeparateInLine : string.Empty;
-
-				yield return new MultiLineOneLineTestCase(
-					testValue: quote + nbNsInLine + anySeparateInLine + @break + chars,
-					result: ProcessedLineResult.First(nbNsInLine + trailingWhiteSpaces)
+				yield return new RegexTestCase(
+					testValue: quote + nbNsInLine + closingChars + @break,
+					wholeMatch: quote + nbNsInLine + closingChars,
+					nbNsInLine,
+					closingChars,
+					closingWhites
 				);
-			}
 
-			foreach (var separateInLine in separateInLineCases.Append(string.Empty))
-			{
-				trailingWhiteSpaces = withEscapedBreak && isDoubleQuoted ? separateInLine : string.Empty;
-
-				yield return new MultiLineOneLineTestCase(
-					testValue: quote + anyNonSpaceCharGroup + separateInLine + @break + chars,
-					result: ProcessedLineResult.First(anyNonSpaceCharGroup + trailingWhiteSpaces)
-				);
-			}
-
-			trailingWhiteSpaces = withEscapedBreak && isDoubleQuoted ? anySeparateInLine : string.Empty;
-
-			yield return new MultiLineOneLineTestCase(
-				testValue: quote + string.Empty + anySeparateInLine + @break + chars,
-				result: ProcessedLineResult.First(string.Empty + trailingWhiteSpaces)
+			yield return new RegexTestCase(
+				testValue: quote + String.Empty + closingChars + @break,
+				wholeMatch: quote + String.Empty + closingChars,
+				String.Empty,
+				closingChars,
+				closingWhites
 			);
 		}
 
-		protected static IEnumerable<MultiLineOneLineTestCase> GetEmptyNextLines(
+		protected static IEnumerable<RegexTestCase> GetNextLines(
 			bool isDoubleQuoted,
-			bool isLastLine = false
+			bool withClosingQuote = false
 		)
 		{
+			var quote = isDoubleQuoted ? "\"" : "\'";
 			var @break = Environment.NewLine;
-			var quote = isDoubleQuoted ? "\"" : "\'";
-			var lineEnding = isLastLine ? quote : @break;
-			var indent = CharStore.Spaces;
-			var separateInLineCases = CharStore.SeparateInLineCases;
 
-			foreach (var separateInLine in separateInLineCases.Append(string.Empty))
-			{
-				yield return new MultiLineOneLineTestCase(
-					testValue: indent + separateInLine + lineEnding,
-					result: isLastLine ? ProcessedLineResult.LastEmpty() : ProcessedLineResult.Empty()
-				);
-
-				yield return new MultiLineOneLineTestCase(
-					testValue: separateInLine + lineEnding,
-					result: isLastLine ? ProcessedLineResult.LastEmpty() : ProcessedLineResult.Empty()
-				);
-			}
-		}
-
-		protected static IEnumerable<MultiLineOneLineTestCase> GetNonEmptyLines(
-			bool isDoubleQuoted,
-			bool withEscapedBreak = false,
-			bool isLastLine = false
-		)
-		{
-			if (!isDoubleQuoted && withEscapedBreak)
-				throw new InvalidOperationException("Only double quoted lines have escaped breaks.");
-
-			if (withEscapedBreak && isLastLine)
-				throw new InvalidOperationException("Last line can't be with an escaped break.");
-
-			var quote = isDoubleQuoted ? "\"" : "\'";
-			var @break = withEscapedBreak && isDoubleQuoted ? "\\" + Environment.NewLine : Environment.NewLine;
-			var lineEnding = isLastLine ? quote : @break;
-			var indent = CharStore.Spaces;
-			var separateInLineCases = CharStore.SeparateInLineCases;
+			var closingWhites = withClosingQuote ? CharStore.SpacesAndTabs : null;
+			var closingChars = withClosingQuote ? closingWhites + quote : null;
 
 			var nbNsInLineCases = getNbNsInLineCases(isFirstLine: false, isDoubleQuoted);
 			var anyNonSpaceCharGroup = nbNsInLineCases.First();
-			var anySeparateInLine = separateInLineCases.First();
-			var anyLinePrefix = anySeparateInLine;
 
-			foreach (var separateInLine in separateInLineCases.Append(string.Empty))
-			{
-				var trailingWhiteSpaces =
-					withEscapedBreak && isDoubleQuoted || isLastLine ? separateInLine : string.Empty;
-
-				var testValue = anyNonSpaceCharGroup + trailingWhiteSpaces;
-				var linePrefix = indent + separateInLine;
-
-				yield return new MultiLineOneLineTestCase(
-					testValue: linePrefix + anyNonSpaceCharGroup + separateInLine + lineEnding,
-					result: isLastLine
-						? ProcessedLineResult.LastNotEmpty(testValue)
-						: ProcessedLineResult.NotEmpty(testValue)
-				);
-			}
+			yield return new RegexTestCase(
+				testValue: anyNonSpaceCharGroup + closingChars + @break,
+				wholeMatch: anyNonSpaceCharGroup + closingChars,
+				anyNonSpaceCharGroup,
+				closingChars,
+				closingWhites
+			);
 
 			foreach (var nbNsInLine in nbNsInLineCases)
-			{
-				var trailingWhiteSpaces =
-					withEscapedBreak && isDoubleQuoted || isLastLine ? anySeparateInLine : string.Empty;
-
-				var testValue = nbNsInLine + trailingWhiteSpaces;
-
-				yield return new MultiLineOneLineTestCase(
-					testValue: anyLinePrefix + nbNsInLine + anySeparateInLine +
-							   lineEnding,
-					result: isLastLine
-						? ProcessedLineResult.LastNotEmpty(testValue)
-						: ProcessedLineResult.NotEmpty(testValue)
+				yield return new RegexTestCase(
+					testValue: nbNsInLine + closingChars + @break,
+					wholeMatch: nbNsInLine + closingChars,
+					nbNsInLine,
+					closingChars,
+					closingWhites
 				);
-			}
 		}
 
 		private static IReadOnlyCollection<string> getNbNsInLineCases(bool isFirstLine, bool isDoubleQuoted)
 		{
-			if (isDoubleQuoted)
-			{
-				return
-					getNbNsFirstQuotedInLineFor(CharStore.NbNsDoubleCharsWithoutEscapedAndSurrogates.Value, isFirstLine)
+			return isDoubleQuoted
+				? getNbNsFirstQuotedInLineFor(CharStore.NbNsDoubleCharsWithoutEscapedAndSurrogates.Value, isFirstLine)
 						.Concat(getNbNsFirstQuotedInLineFor(CharStore.EscapedChars, isFirstLine))
 						.Concat(getNbNsFirstQuotedInLineFor(CharStore.SurrogatePairs.Value, isFirstLine))
-						.ToList();
-			}
-
-			return
-				getNbNsFirstQuotedInLineFor(CharStore.NbNsSingleCharsWithoutSurrogates.Value, isFirstLine)
+						.ToList()
+				: getNbNsFirstQuotedInLineFor(CharStore.NbNsSingleCharsWithoutSurrogates.Value, isFirstLine)
 					.Concat(getNbNsFirstQuotedInLineFor(CharStore.SurrogatePairs.Value, isFirstLine))
 					.ToList();
 		}
@@ -194,13 +126,13 @@ namespace YamlConfiguration.Processor.Tests
 			if (sb.Length > 0)
 				yield return sb.ToString();
 
-			var prependedChar = isFirstLine ? string.Empty : anyNonSpaceChar;
-			yield return prependedChar + string.Join(
-				string.Empty,
+			var prependedChar = isFirstLine ? String.Empty : anyNonSpaceChar;
+			yield return prependedChar + String.Join(
+				String.Empty,
 				Enumerable.Repeat(CharStore.SpacesAndTabs + anyNonSpaceChar, groupItemCount)
 			);
 
-			yield return prependedChar + string.Join(string.Empty, nonSpaceChars.Take(groupItemCount));
+			yield return prependedChar + String.Join(String.Empty, nonSpaceChars.Take(groupItemCount));
 		}
 
 		protected static IEnumerable<string> GetFirstLineNegativeTestCases(bool isDoubleQuote)
@@ -224,6 +156,10 @@ namespace YamlConfiguration.Processor.Tests
 			{
 				// With ' inside nb ns single in line
 				yield return $"{quote} \' \\0A \t{@break}";
+				yield return $"{quote} \' \\0A \t'{@break}";
+
+				// Too many chars before the closing quote
+				yield return $"{quote} \\0A \t{tooManyWhiteSpaces}\'{@break}";
 			}
 
 			// Too many chars
@@ -231,53 +167,40 @@ namespace YamlConfiguration.Processor.Tests
 			yield return $"{quote}{tooManyNonSpaceChars} \t{@break}";
 			yield return $"{quote} \\0A{tooLongSeparateInLine}{@break}";
 
-			// Without a break
+			// Without a break (or no closing quote after the closing whites)
 			yield return $"{quote}\t\\0A \t";
 		}
 
 		protected static IEnumerable<string> GetNextLineNegativeTestCases(bool isDoubleQuote)
 		{
-			var @break = Environment.NewLine;
-			var indent = CharStore.Spaces;
-			var separateInLine = CharStore.GetCharRange(" \t");
+			var whites = CharStore.SpacesAndTabs;
 			const string space = " ";
 
-			var tooLongIndent = indent + space;
-			var tooLongSeparateInLine = separateInLine + space;
+			var tooLongClosingWhites = whites + space;
 			var tooManyNonSpaceChars = "a" + CharStore.GetCharRange("a ") + CharStore.GetCharRange("a ") + "a";
-			var tooManyNonSpaceCharGroups = "a" + string.Join(
-				string.Empty,
+			var tooManyNonSpaceCharGroups = "a" + String.Join(
+				String.Empty,
 				Enumerable.Repeat(CharStore.SpacesAndTabs + "a", Characters.CharGroupMaxLength)
 			) + "a";
 
-			foreach (var lineEnding in new[] { @break, isDoubleQuote ? "\"" : "\'" })
+			var lineEnding = isDoubleQuote ? "\"" : "\'";
+
+			if (isDoubleQuote)
 			{
-				// Invalid empty lines
-				yield return $"{indent}{tooLongSeparateInLine}{lineEnding}";
-				yield return $"{tooLongIndent}{separateInLine}{lineEnding}";
-
-				if (isDoubleQuote)
-				{
-					// Invalid non empty lines
-					// With \ and " inside nb ns double in line
-					yield return $" \\1\\0A \t{lineEnding}";
-					yield return $" \" \\0A \t{lineEnding}";
-				}
-				else
-				{
-					// Invalid non empty lines
-					// With ' inside nb ns single in line
-					yield return $" \' \\0A \t{lineEnding}";
-				}
-
-				// Too many chars
-				yield return $" {tooManyNonSpaceChars} \t{lineEnding}";
-				yield return $" {tooManyNonSpaceCharGroups} \t{lineEnding}";
-				yield return $" \\0A{tooLongSeparateInLine}{lineEnding}";
+				// With \ and " inside nb ns double in line
+				yield return $" \\1\\0A \t{lineEnding}";
+				yield return $" \" \\0A \t{lineEnding}";
+			}
+			else
+			{
+				// With ' inside nb ns single in line
+				yield return $" \' \\0A \t{lineEnding}";
 			}
 
-			// Invalid empty last line
-			yield return $"{string.Empty}";
+			// Too many chars
+			yield return $" {tooManyNonSpaceChars} \t{lineEnding}";
+			yield return $" {tooManyNonSpaceCharGroups} \t{lineEnding}";
+			yield return $" \\0A{tooLongClosingWhites}{lineEnding}";
 
 			// Invalid non empty last line
 			yield return " \\0A \t";

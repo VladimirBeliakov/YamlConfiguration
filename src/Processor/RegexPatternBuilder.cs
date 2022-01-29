@@ -26,8 +26,8 @@ namespace YamlConfiguration.Processor
 		public static RegexPattern AsCapturingGroup(this RegexPattern pattern) =>
 			new($"({pattern})");
 
-		public static RegexPattern AsOptional(this RegexPattern pattern, bool asNonCapturingGroup = true) =>
-			new($"{(asNonCapturingGroup ? pattern.AsNonCapturingGroup().ToString() : pattern)}?");
+		public static RegexPattern AsOptional(this RegexPattern pattern) =>
+			new($"{pattern}?");
 
 		public static RegexPattern WithLimitingRepetition(
 			this RegexPattern pattern,

@@ -5,6 +5,6 @@ namespace YamlConfiguration.Processor
 {
 	internal interface IFlowFoldedLinesParser
 	{
-		ValueTask<FlowFoldedLinesResult> TryProcess(ICharacterStream charStream, uint indentLength);
+		ValueTask<FlowFoldedLinesResult> Process(ICharacterStream charStream, uint indentLength);
 	}
 }

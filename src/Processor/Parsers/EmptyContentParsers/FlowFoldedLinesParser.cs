@@ -20,7 +20,7 @@ namespace YamlConfiguration.Processor
 			_flowLinePrefixParser = flowLinePrefixParser;
 		}
 
-		public async ValueTask<FlowFoldedLinesResult> TryProcess(ICharacterStream charStream, uint indentLength)
+		public async ValueTask<FlowFoldedLinesResult> Process(ICharacterStream charStream, uint indentLength)
 		{
 			var (isSeparateInLine, whiteSpaceCount) =
 				await _separateInLineParser.Peek(charStream).ConfigureAwait(false);

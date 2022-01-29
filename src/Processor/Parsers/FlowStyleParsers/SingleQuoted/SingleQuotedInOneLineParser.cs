@@ -9,16 +9,16 @@ namespace YamlConfiguration.Processor
 	internal class SingleQuotedInOneLineParser
 	{
 		private static readonly Regex _blockKeyOneLineRegex =
-			new(SingleQuotedStyle.GetPatternFor(Context.BlockKey), RegexOptions.Compiled);
+			new(SingleQuotedStyle.GetInLinePatternFor(Context.BlockKey), RegexOptions.Compiled);
 
 		private static readonly Regex _flowKeyOneLineRegex =
-			new(SingleQuotedStyle.GetPatternFor(Context.FlowKey), RegexOptions.Compiled);
+			new(SingleQuotedStyle.GetInLinePatternFor(Context.FlowKey), RegexOptions.Compiled);
 
 		private static readonly Regex _flowInOneLineRegex =
-			new(SingleQuotedStyle.GetPatternFor(Context.FlowIn), RegexOptions.Compiled);
+			new(SingleQuotedStyle.GetInLinePatternFor(Context.FlowIn), RegexOptions.Compiled);
 
 		private static readonly Regex _flowOutOneLineRegex =
-			new(SingleQuotedStyle.GetPatternFor(Context.FlowOut), RegexOptions.Compiled);
+			new(SingleQuotedStyle.GetInLinePatternFor(Context.FlowOut), RegexOptions.Compiled);
 
 		public async ValueTask<SingleQuotedLineNode?> Process(ICharacterStream charStream, Context context)
 		{

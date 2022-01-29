@@ -1,8 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using YamlConfiguration.Processor.FlowStyles;
+using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor.Tests
 {
@@ -10,85 +11,144 @@ namespace YamlConfiguration.Processor.Tests
 	public class SingleQuotedMultiLineTests : QuotedMultiLineBaseTest
 	{
 		[TestCaseSource(nameof(getFirstLinePositiveTestCases))]
-		public void ValidSingleQuotedFirstLine_ReturnsCorrectLineTypeAndExtractedValue(
-			MultiLineOneLineTestCase testCase
-		)
+		public void ValidSingleQuotedFirstLine_Matches((RegexTestCase, Context) testCaseWithContext)
 		{
-			var multiLine = new SingleQuotedStyle.MultiLine();
+			var (testCase, context) = testCaseWithContext;
 
-			var firstLineResult = multiLine.ProcessFirstLine(testCase.TestValue);
+			var match = getFirstLineRegexFor(context).Match(testCase.TestValue);
 
-			Assert.That(firstLineResult.LineType, Is.EqualTo(testCase.Result.LineType));
-			Assert.That(firstLineResult.ExtractedValue, Is.EqualTo(testCase.Result.ExtractedValue));
+			assert(testCase, match);
 		}
 
 		[TestCaseSource(nameof(getNextLinePositiveTestCases))]
-		public void ValidSingleQuotedNextLine_ReturnsCorrectLineTypeAndExtractedValue(MultiLineOneLineTestCase testCase)
+		public void ValidSingleQuotedNextLine_Matches((RegexTestCase, Context) testCaseWithContext)
 		{
-			var multiLine = new SingleQuotedStyle.MultiLine();
-			multiLine.ProcessFirstLine("\'");
+			var (testCase, context) = testCaseWithContext;
 
-			var nextLineResult = multiLine.ProcessNextLine(testCase.TestValue);
+			var match = getNextLineRegexFor(context).Match(testCase.TestValue);
 
-			Assert.That(nextLineResult.LineType, Is.EqualTo(testCase.Result.LineType));
-			Assert.That(nextLineResult.ExtractedValue, Is.EqualTo(testCase.Result.ExtractedValue));
+			assert(testCase, match);
 		}
 
-		[TestCaseSource(nameof(GetFirstLineNegativeTestCases), new Object[] { false })]
-		public void InvalidSingleQuotedFirstLine_ReturnsInvalid(string testCase)
+		[TestCaseSource(nameof(getFirstLineNegativeTestCases))]
+		public void InvalidSingleQuotedFirstLine_DoesNotMatch((string, Context) testCaseWithContext)
 		{
-			var multiLine = new SingleQuotedStyle.MultiLine();
+			var (testCase, context) = testCaseWithContext;
 
-			var firstLineResult = multiLine.ProcessFirstLine(testCase);
+			var result = getFirstLineRegexFor(context, withAnchorAtEnd: true).IsMatch(testCase);
 
-			Assert.That(firstLineResult.LineType, Is.EqualTo(LineType.Invalid));
+			Assert.False(result);
 		}
 
-		[TestCaseSource(nameof(GetNextLineNegativeTestCases), new Object[] { false })]
-		public void InvalidSingleQuotedNextLine_ReturnsInvalid(string testCase)
+		[TestCaseSource(nameof(getNextLineNegativeTestCases))]
+		public void InvalidSingleQuotedNextLine_DoesNotMatch((string, Context) testCaseWithContext)
 		{
-			var multiLine = new SingleQuotedStyle.MultiLine();
-			multiLine.ProcessFirstLine("\'");
+			var (testCase, context) = testCaseWithContext;
 
-			var nextLineResult = multiLine.ProcessNextLine(testCase);
+			var result = getNextLineRegexFor(context, withAnchorAtEnd: true).IsMatch(testCase);
 
-			Assert.That(nextLineResult.LineType, Is.EqualTo(LineType.Invalid));
+			Assert.False(result);
 		}
 
-		[Test]
-		public void ProcessSingleQuotedFirstLine_CalledTwice_Throws()
+		private static void assert(RegexTestCase testCase, Match match)
 		{
-			var multiLine = new SingleQuotedStyle.MultiLine();
-			multiLine.ProcessFirstLine("\'");
+			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 
-			Assert.Throws<InvalidOperationException>(() => multiLine.ProcessFirstLine("\'"));
+			Assert.That(match.Groups.Count, Is.EqualTo(4));
+
+			var content = testCase.Captures?.FirstOrDefault();
+			if (content is null)
+			{
+				Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(0));
+				Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(0));
+				Assert.That(match.Groups[3].Captures.Count, Is.EqualTo(0));
+				return;
+			}
+
+			Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
+			Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(content));
+
+			var trailingWhitesAndQuote = testCase.Captures?.ElementAtOrDefault(1);
+			if (trailingWhitesAndQuote is null)
+			{
+				Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(0));
+				Assert.That(match.Groups[3].Captures.Count, Is.EqualTo(0));
+				return;
+			}
+
+			Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(1));
+			Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(trailingWhitesAndQuote));
+
+			var trailingWhites = testCase.Captures?.ElementAtOrDefault(2);
+			if (trailingWhites is null)
+			{
+				Assert.That(match.Groups[3].Captures.Count, Is.EqualTo(0));
+				return;
+			}
+
+			Assert.That(match.Groups[3].Captures.Count, Is.EqualTo(1));
+			Assert.That(match.Groups[3].Captures[0].Value, Is.EqualTo(trailingWhites));
 		}
 
-		[Test]
-		public void ProcessSingleQuotedNextLine_FirstLineWasNotProcessed_Throws()
+		private static IEnumerable<(RegexTestCase, Context)> getFirstLinePositiveTestCases()
 		{
-			var multiLine = new SingleQuotedStyle.MultiLine();
+			var firstLines = GetFirstLines(isDoubleQuoted: false, withClosingQuote: false)
+				.Concat(GetFirstLines(isDoubleQuoted: false, withClosingQuote: true));
 
-			Assert.Throws<InvalidOperationException>(() => multiLine.ProcessNextLine(string.Empty));
+			foreach (var context in _availableContext)
+				foreach (var testCase in firstLines)
+					yield return (testCase, context);
 		}
 
-		[Test]
-		public void ProcessSingleQuotedNextLine_LastLineAlreadyProcessed_Throws()
+		private static IEnumerable<(RegexTestCase, Context)> getNextLinePositiveTestCases()
 		{
-			var multiLine = new SingleQuotedStyle.MultiLine();
-			multiLine.ProcessFirstLine("\'");
-			multiLine.ProcessNextLine("\'");
+			var nextLines = GetNextLines(isDoubleQuoted: false, withClosingQuote: false)
+				.Concat(GetNextLines(isDoubleQuoted: false, withClosingQuote: true));
 
-			Assert.Throws<InvalidOperationException>(() => multiLine.ProcessNextLine(string.Empty));
+			foreach (var context in _availableContext)
+				foreach (var nextLine in nextLines)
+					yield return (nextLine, context);
 		}
 
-		private static IEnumerable<MultiLineOneLineTestCase> getFirstLinePositiveTestCases() =>
-			GetFirstLines(isDoubleQuoted: false);
+		private static IEnumerable<(string, Context)> getFirstLineNegativeTestCases()
+		{
+			var firstLines = GetFirstLineNegativeTestCases(isDoubleQuote: false);
 
-		private static IEnumerable<MultiLineOneLineTestCase> getNextLinePositiveTestCases() =>
-			GetEmptyNextLines(isDoubleQuoted: false, isLastLine: false)
-				.Concat(GetEmptyNextLines(isDoubleQuoted: false, isLastLine: true))
-				.Concat(GetNonEmptyLines(isDoubleQuoted: false, isLastLine: false))
-				.Concat(GetNonEmptyLines(isDoubleQuoted: false, isLastLine: true));
+			foreach (var context in _availableContext)
+				foreach (var firstLine in firstLines)
+					yield return (firstLine, context);
+		}
+
+		private static IEnumerable<(string, Context)> getNextLineNegativeTestCases()
+		{
+			var nextLines = GetNextLineNegativeTestCases(isDoubleQuote: false);
+
+			foreach (var context in _availableContext)
+				foreach (var nextLine in nextLines)
+					yield return (nextLine, context);
+		}
+
+		private static Regex getFirstLineRegexFor(Context context, bool withAnchorAtEnd = false)
+		{
+			var regexPattern = SingleQuotedStyle.MultiLine.GetFirstLinePatternFor(context);
+
+			if (withAnchorAtEnd)
+				regexPattern = regexPattern.WithAnchorAtEnd();
+
+			return new(regexPattern);
+		}
+
+		private static Regex getNextLineRegexFor(Context context, bool withAnchorAtEnd = false)
+		{
+			var regexPattern = SingleQuotedStyle.MultiLine.GetNextLinePatternFor(context);
+
+			if (withAnchorAtEnd)
+				regexPattern = regexPattern.WithAnchorAtEnd();
+
+			return new(regexPattern);
+		}
+
+		private static readonly IReadOnlyCollection<Context> _availableContext =
+			new[] { Context.FlowIn, Context.FlowOut };
 	}
 }

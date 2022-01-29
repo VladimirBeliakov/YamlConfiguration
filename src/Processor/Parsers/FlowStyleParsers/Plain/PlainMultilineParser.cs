@@ -50,8 +50,7 @@ namespace YamlConfiguration.Processor
 				// If the next line is empty, we just discard any folded lines 
 				// since they are not important for the next node.
 				var flowFoldedLinesResult =
-					await _flowFoldedLinesParser
-						.TryProcess(charStream, indentLength).ConfigureAwait(false);
+					await _flowFoldedLinesParser.Process(charStream, indentLength).ConfigureAwait(false);
 
 				var nextLine =
 					await _plainNextLineParser.TryProcess(charStream, context).ConfigureAwait(false);

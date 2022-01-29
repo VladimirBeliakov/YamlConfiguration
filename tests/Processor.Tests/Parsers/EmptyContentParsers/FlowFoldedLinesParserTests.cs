@@ -18,7 +18,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			var charStream = A.Fake<ICharacterStream>();
 			var result =
-				await createParser(foldedLineParser).TryProcess(charStream, indentLength: 0);
+				await createParser(foldedLineParser).Process(charStream, indentLength: 0);
 
 			Assert.Null(result.FoldedLineResult);
 			Assert.Zero(result.SeparateInLineWhiteSpaceCount);
@@ -37,7 +37,7 @@ namespace YamlConfiguration.Processor.Tests
 			var parser = createParser(foldedLineParser, flowLinePrefixParser);
 
 			Assert.ThrowsAsync<InvalidYamlException>(
-				() => ((IFlowFoldedLinesParser) parser).TryProcess(A.Dummy<ICharacterStream>(), indentLength: 0).AsTask()
+				() => ((IFlowFoldedLinesParser) parser).Process(A.Dummy<ICharacterStream>(), indentLength: 0).AsTask()
 			);
 		}
 
@@ -55,7 +55,7 @@ namespace YamlConfiguration.Processor.Tests
 
 			var parser = createParser(foldedLineParser, flowLinePrefixParser, separateInLineParser);
 			var charStream = A.Fake<ICharacterStream>();
-			var result = await ((IFlowFoldedLinesParser) parser).TryProcess(charStream, indentLength: 0);
+			var result = await ((IFlowFoldedLinesParser) parser).Process(charStream, indentLength: 0);
 
 			Assert.That(result.FoldedLineResult, Is.SameAs(foldedLinesResult));
 			Assert.That(result.SeparateInLineWhiteSpaceCount, Is.EqualTo(separateInLineResult.WhiteSpaceCount));

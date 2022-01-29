@@ -64,7 +64,7 @@ namespace YamlConfiguration.Processor.Tests
 			var plainNextLineParser = A.Fake<IPlainNextLineParser>();
 			A.CallTo(() => plainNextLineParser.TryProcess(stream, context)).Returns(Guid.NewGuid().ToString());
 			var flowFoldedLinesParser = A.Fake<IFlowFoldedLinesParser>();
-			A.CallTo(() => flowFoldedLinesParser.TryProcess(stream, A<uint>._)).Returns(
+			A.CallTo(() => flowFoldedLinesParser.Process(stream, A<uint>._)).Returns(
 				new FlowFoldedLinesResult(separateInLineWhiteSpaceCount: 0, foldedLineResult: null)
 			);
 
@@ -83,7 +83,7 @@ namespace YamlConfiguration.Processor.Tests
 			var firstLine = Guid.NewGuid().ToString();
 			var nextLine = Guid.NewGuid().ToString();
 			var plainLineNode = new PlainLineNode(firstLine);
-			var flowFoldedLinesResult = 
+			var flowFoldedLinesResult =
 				new FlowFoldedLinesResult(
 					separateInLineWhiteSpaceCount: 0,
 					foldedLineResult: new FoldedLinesResult(emptyLineCount: 0, isBreakAsSpace: true)
@@ -93,7 +93,7 @@ namespace YamlConfiguration.Processor.Tests
 			var plainNextLineParser = A.Fake<IPlainNextLineParser>();
 			A.CallTo(() => plainNextLineParser.TryProcess(stream, context)).Returns(nextLine).Once();
 			var flowFoldedLinesParser = A.Fake<IFlowFoldedLinesParser>();
-			A.CallTo(() => flowFoldedLinesParser.TryProcess(stream, indentLength)).Returns(flowFoldedLinesResult);
+			A.CallTo(() => flowFoldedLinesParser.Process(stream, indentLength)).Returns(flowFoldedLinesResult);
 
 			var parser = createParser(plainInOneLineParser, plainNextLineParser, flowFoldedLinesParser);
 			var result = await parser.TryProcess(stream, indentLength, context);
@@ -123,7 +123,7 @@ namespace YamlConfiguration.Processor.Tests
 			var plainNextLineParser = A.Fake<IPlainNextLineParser>();
 			A.CallTo(() => plainNextLineParser.TryProcess(stream, context)).Returns(nextLine).Once();
 			var flowFoldedLinesParser = A.Fake<IFlowFoldedLinesParser>();
-			A.CallTo(() => flowFoldedLinesParser.TryProcess(stream, indentLength)).Returns(flowFoldedLinesResult);
+			A.CallTo(() => flowFoldedLinesParser.Process(stream, indentLength)).Returns(flowFoldedLinesResult);
 
 			var parser = createParser(plainInOneLineParser, plainNextLineParser, flowFoldedLinesParser);
 			var result = await parser.TryProcess(stream, indentLength, context);
@@ -148,12 +148,12 @@ namespace YamlConfiguration.Processor.Tests
 			var thirdLine = Guid.NewGuid().ToString();
 			var forthLine = Guid.NewGuid().ToString();
 			var plainLineNode = new PlainLineNode(firstLine);
-			var firstFlowFoldedLinesResult = 
+			var firstFlowFoldedLinesResult =
 				new FlowFoldedLinesResult(
 					separateInLineWhiteSpaceCount: 0,
 					foldedLineResult: new FoldedLinesResult(firstEmptyLineCount)
 				);
-			var secondFlowFoldedLinesResult = 
+			var secondFlowFoldedLinesResult =
 				new FlowFoldedLinesResult(
 					separateInLineWhiteSpaceCount: 0,
 					foldedLineResult: new FoldedLinesResult(emptyLineCount: 0, isBreakAsSpace: true)
@@ -171,7 +171,7 @@ namespace YamlConfiguration.Processor.Tests
 				.Returns(thirdLine).Once().Then
 				.Returns(forthLine).Once();
 			var flowFoldedLinesParser = A.Fake<IFlowFoldedLinesParser>();
-			A.CallTo(() => flowFoldedLinesParser.TryProcess(stream, indentLength))
+			A.CallTo(() => flowFoldedLinesParser.Process(stream, indentLength))
 				.Returns(firstFlowFoldedLinesResult).Once().Then
 				.Returns(secondFlowFoldedLinesResult).Once().Then
 				.Returns(thirdFlowFoldedLinesResult).Once();

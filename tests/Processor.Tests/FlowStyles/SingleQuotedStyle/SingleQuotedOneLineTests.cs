@@ -12,7 +12,7 @@ namespace YamlConfiguration.Processor.Tests
 	public class SingleQuotedOneLineTests
 	{
 		[TestCaseSource(nameof(getPositiveOneLineTestCases))]
-		public void ValidOneSingleQuotedLineInBlockKey_Matches((RegexTestCase, Context) testCaseWithContext)
+		public void ValidOneSingleQuotedLine_Matches((RegexTestCase, Context) testCaseWithContext)
 		{
 			var (testCase, context) = testCaseWithContext;
 
@@ -34,7 +34,6 @@ namespace YamlConfiguration.Processor.Tests
 			static string getCharsAtEnd(Context context) => context switch
 			{
 				Context.BlockKey or Context.FlowKey => $"'{CharStore.Chars}",
-				Context.FlowIn or Context.FlowOut => $"\n{CharStore.Chars}",
 				_ => throw new ArgumentOutOfRangeException(
 						nameof(context),
 						context,
@@ -50,12 +49,12 @@ namespace YamlConfiguration.Processor.Tests
 					.Append(CharStore.GetCharRange("''"))
 					.Append(String.Empty);
 
-			var contexts = new[] { Context.BlockKey, Context.FlowKey, Context.FlowIn, Context.FlowOut };
+			var contexts = new[] { Context.BlockKey, Context.FlowKey };
 
 			foreach (var nbSingleOneLine in nbSingleOneLines)
 				foreach (var context in contexts)
 					yield return (
-							new($"'{nbSingleOneLine}{getCharsAtEnd(context)}", nbSingleOneLine),
+							new(testValue: $"'{nbSingleOneLine}{getCharsAtEnd(context)}", wholeMatch: nbSingleOneLine),
 							context
 						);
 		}
@@ -65,7 +64,6 @@ namespace YamlConfiguration.Processor.Tests
 			static string getLastChars(Context context) => context switch
 			{
 				Context.FlowKey or Context.BlockKey => "'",
-				Context.FlowIn or Context.FlowOut => "\n",
 				_ => throw new ArgumentOutOfRangeException(
 						$"Only {Context.BlockKey}, {Context.FlowKey}, " +
 						$"{Context.FlowIn} and {Context.FlowOut} are supported."
@@ -75,7 +73,7 @@ namespace YamlConfiguration.Processor.Tests
 			var chars = CharStore.Chars;
 			var tooManyNbSingleChars = CharStore.GetCharRange("a") + "a";
 
-			var contexts = new[] { Context.FlowKey, Context.BlockKey, Context.FlowIn, Context.FlowOut };
+			var contexts = new[] { Context.FlowKey, Context.BlockKey };
 
 			foreach (var context in contexts)
 			{
@@ -91,7 +89,7 @@ namespace YamlConfiguration.Processor.Tests
 
 		private static Regex getRegexFor(Context context, bool withAnchorAtEnd = false)
 		{
-			var regexPattern = SingleQuotedStyle.GetPatternFor(context);
+			var regexPattern = SingleQuotedStyle.GetInLinePatternFor(context);
 
 			if (withAnchorAtEnd)
 				regexPattern = regexPattern.WithAnchorAtEnd();
