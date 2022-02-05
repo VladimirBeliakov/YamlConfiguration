@@ -39,7 +39,7 @@ namespace YamlConfiguration.Processor.FlowStyles
 				RegexPatternBuilder.BuildCharSet(Characters.SWhites).WithLimitingRepetition();
 
 			private static readonly RegexPattern _closingSingleQuote =
-				(_whites.AsCapturingGroup() + Characters.SingleQuote).AsCapturingGroup().AsOptional();
+				(_whites.AsCapturingGroup() + Characters.SingleQuote).AsNonCapturingGroup().AsOptional();
 
 			private static readonly RegexPattern _nsSingleChar =
 				RegexPatternBuilder.BuildExclusive(

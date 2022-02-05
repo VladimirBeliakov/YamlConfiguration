@@ -54,40 +54,28 @@ namespace YamlConfiguration.Processor.Tests
 		{
 			Assert.That(match.Value, Is.EqualTo(testCase.WholeMatch));
 
-			Assert.That(match.Groups.Count, Is.EqualTo(4));
+			Assert.That(match.Groups.Count, Is.EqualTo(3));
 
 			var content = testCase.Captures?.FirstOrDefault();
 			if (content is null)
 			{
 				Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(0));
 				Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(0));
-				Assert.That(match.Groups[3].Captures.Count, Is.EqualTo(0));
 				return;
 			}
 
 			Assert.That(match.Groups[1].Captures.Count, Is.EqualTo(1));
 			Assert.That(match.Groups[1].Captures[0].Value, Is.EqualTo(content));
 
-			var trailingWhitesAndQuote = testCase.Captures?.ElementAtOrDefault(1);
-			if (trailingWhitesAndQuote is null)
+			var trailingWhites = testCase.Captures?.ElementAtOrDefault(1);
+			if (trailingWhites is null)
 			{
 				Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(0));
-				Assert.That(match.Groups[3].Captures.Count, Is.EqualTo(0));
 				return;
 			}
 
 			Assert.That(match.Groups[2].Captures.Count, Is.EqualTo(1));
-			Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(trailingWhitesAndQuote));
-
-			var trailingWhites = testCase.Captures?.ElementAtOrDefault(2);
-			if (trailingWhites is null)
-			{
-				Assert.That(match.Groups[3].Captures.Count, Is.EqualTo(0));
-				return;
-			}
-
-			Assert.That(match.Groups[3].Captures.Count, Is.EqualTo(1));
-			Assert.That(match.Groups[3].Captures[0].Value, Is.EqualTo(trailingWhites));
+			Assert.That(match.Groups[2].Captures[0].Value, Is.EqualTo(trailingWhites));
 		}
 
 		private static IEnumerable<(RegexTestCase, Context)> getFirstLinePositiveTestCases()

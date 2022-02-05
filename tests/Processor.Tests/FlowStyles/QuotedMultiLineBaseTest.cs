@@ -25,7 +25,6 @@ namespace YamlConfiguration.Processor.Tests
 					testValue: quote + nbNsInLine + closingChars + @break,
 					wholeMatch: quote + nbNsInLine + closingChars,
 					nbNsInLine,
-					closingChars,
 					closingWhites
 				);
 
@@ -33,7 +32,6 @@ namespace YamlConfiguration.Processor.Tests
 				testValue: quote + String.Empty + closingChars + @break,
 				wholeMatch: quote + String.Empty + closingChars,
 				String.Empty,
-				closingChars,
 				closingWhites
 			);
 		}
@@ -56,7 +54,6 @@ namespace YamlConfiguration.Processor.Tests
 				testValue: anyNonSpaceCharGroup + closingChars + @break,
 				wholeMatch: anyNonSpaceCharGroup + closingChars,
 				anyNonSpaceCharGroup,
-				closingChars,
 				closingWhites
 			);
 
@@ -65,7 +62,6 @@ namespace YamlConfiguration.Processor.Tests
 					testValue: nbNsInLine + closingChars + @break,
 					wholeMatch: nbNsInLine + closingChars,
 					nbNsInLine,
-					closingChars,
 					closingWhites
 				);
 		}
