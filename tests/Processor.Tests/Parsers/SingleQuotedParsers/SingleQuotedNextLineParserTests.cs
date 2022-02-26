@@ -9,7 +9,7 @@ using YamlConfiguration.Processor.TypeDefinitions;
 namespace YamlConfiguration.Processor.Tests
 {
 	[TestFixture, Parallelizable(ParallelScope.All)]
-	public class SingleQuotedFirstLineParserTests
+	public class SingleQuotedNextLineParserTests
 	{
 		[TestCaseSource(nameof(_invalidContexts))]
 		public void Process_InvalidContexts_Throws(Context context)
@@ -20,44 +20,39 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 		[TestCaseSource(nameof(_validContexts))]
-		public async Task Process_InvalidFirstLine_ReturnsNull(Context context)
+		public async Task Process_InvalidNextLine_ReturnsNull(Context context)
 		{
-			var charStream = createStreamFrom("abc");
+			var charStream = createStreamFrom("'abc");
 
 			var result = await createParser().Process(charStream, context);
 
 			Assert.Null(result);
 		}
 
-		[Test]
-		public async Task Process_FirstLineWithoutClosingQuote_ReturnsNotClosedFirstLine(
-			[ValueSource(nameof(_validContexts))] Context context,
-			[Values("", "abc")] string contentInQuotes
-		)
+		[TestCaseSource(nameof(_validContexts))]
+		public async Task Process_NextLineWithoutClosingQuote_ReturnsNotClosedNextLine(Context context)
 		{
-			var firstLineContent = $"'{contentInQuotes}";
-			var allChars = $"{firstLineContent}  \ndef";
+			var nextLineContent = "abc";
+			var allChars = $"{nextLineContent}  ";
 			var charStream = createStreamFrom(allChars);
 
 			var result = await createParser().Process(charStream, context);
 
 			Assert.Multiple(() =>
 				{
-					Assert.That(result?.Value, Is.EqualTo(contentInQuotes));
+					Assert.That(result?.Value, Is.EqualTo(nextLineContent));
 					Assert.False(result?.IsClosed);
-					A.CallTo(() => charStream.Read((uint) firstLineContent.Length)).MustHaveHappenedOnceExactly();
+					A.CallTo(() => charStream.Read((uint) nextLineContent.Length)).MustHaveHappenedOnceExactly();
 				}
 			);
 		}
 
-		[Test]
-		public async Task Process_FirstLineWithClosingQuote_ReturnsClosedFirstLine(
-			[ValueSource(nameof(_validContexts))] Context context,
-			[Values("  ", "abc  ")] string contentInQuotes
-		)
+		[TestCaseSource(nameof(_validContexts))]
+		public async Task Process_NextLineWithClosingQuote_ReturnsClosedNextLine(Context context)
 		{
-			var firstLineContent = $"'{contentInQuotes}'";
-			var allChars = $"{firstLineContent}: def";
+			var contentInQuotes = "abc  ";
+			var nextLineContent = $"{contentInQuotes}'";
+			var allChars = $"{nextLineContent}: def";
 			var charStream = createStreamFrom(allChars);
 
 			var result = await createParser().Process(charStream, context);
@@ -66,7 +61,7 @@ namespace YamlConfiguration.Processor.Tests
 				{
 					Assert.That(result?.Value, Is.EqualTo(contentInQuotes));
 					Assert.True(result?.IsClosed);
-					A.CallTo(() => charStream.Read((uint) firstLineContent.Length)).MustHaveHappenedOnceExactly();
+					A.CallTo(() => charStream.Read((uint) nextLineContent.Length)).MustHaveHappenedOnceExactly();
 				}
 			);
 		}
@@ -81,7 +76,7 @@ namespace YamlConfiguration.Processor.Tests
 		}
 
 
-		private static SingleQuotedFirstLineParser createParser() => new();
+		private static SingleQuotedNextLineParser createParser() => new();
 
 		private static readonly IEnumerable<Context> _validContexts = new[] { Context.FlowIn, Context.FlowOut };
 

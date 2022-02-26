@@ -7,22 +7,22 @@ using YamlConfiguration.Processor.TypeDefinitions;
 
 namespace YamlConfiguration.Processor
 {
-	internal class SingleQuotedFirstLineParser
+	internal class SingleQuotedNextLineParser
 	{
 		private const uint _singleQuoteLength = 1;
 
-		private static readonly Regex _flowInFirstLineRegex =
-			new(SingleQuotedStyle.MultiLine.GetFirstLinePatternFor(Context.FlowIn), RegexOptions.Compiled);
+		private static readonly Regex _flowInNextLineRegex =
+			new(SingleQuotedStyle.MultiLine.GetNextLinePatternFor(Context.FlowIn));
 
-		private static readonly Regex _flowOutFirstLineRegex =
-			new(SingleQuotedStyle.MultiLine.GetFirstLinePatternFor(Context.FlowOut), RegexOptions.Compiled);
+		private static readonly Regex _flowOutNextLineRegex =
+			new(SingleQuotedStyle.MultiLine.GetNextLinePatternFor(Context.FlowOut));
 
 		public async Task<SingleQuotedMultilineNode?> Process(ICharacterStream charStream, Context context)
 		{
 			var regex = context switch
 			{
-				Context.FlowIn => _flowInFirstLineRegex,
-				Context.FlowOut => _flowOutFirstLineRegex,
+				Context.FlowIn => _flowInNextLineRegex,
+				Context.FlowOut => _flowOutNextLineRegex,
 				_ => throw new ArgumentOutOfRangeException(
 						nameof(context),
 						context,
@@ -41,21 +41,20 @@ namespace YamlConfiguration.Processor
 
 			var closingWhites = match.Groups[2].Captures.FirstOrDefault()?.Value;
 
-			var isFirstLineClosed = closingWhites is not null;
+			var isNextLineClosed = closingWhites is not null;
 
-			if (isFirstLineClosed)
+			if (isNextLineClosed)
 			{
-				var firstLineLength =
-					_singleQuoteLength + content.Length + closingWhites!.Length + _singleQuoteLength;
+				var nextLineLength = content.Length + closingWhites!.Length + _singleQuoteLength;
 
-				await charStream.AdvanceBy((uint) firstLineLength!).ConfigureAwait(false);
+				await charStream.AdvanceBy((uint) nextLineLength!).ConfigureAwait(false);
 			}
 			else
 			{
-				await charStream.AdvanceBy(_singleQuoteLength + (uint) content.Length).ConfigureAwait(false);
+				await charStream.AdvanceBy((uint) content.Length).ConfigureAwait(false);
 			}
 
-			return new SingleQuotedMultilineNode($"{content}{closingWhites}", isFirstLineClosed);
+			return new SingleQuotedMultilineNode($"{content}{closingWhites}", isNextLineClosed);
 		}
 	}
 }
